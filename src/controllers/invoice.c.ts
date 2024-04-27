@@ -165,11 +165,13 @@ const invoiceController = {
       try {
         const BCTopDb = await getTopSeller({salonId, type: "buy car", fromDate});
         const MTTopDb = await getTopSeller({salonId, type: "maintenance", fromDate});
+        const ATopDb = await getTopSeller({salonId, type: "accessory", fromDate});
 
         return res.json({
           status: "success", 
           buyCarTop: BCTopDb,
-          MTTopDb
+          MTTopDb,
+          accessoriesTop: ATopDb
         })
       } catch (error) {
         return res.json({

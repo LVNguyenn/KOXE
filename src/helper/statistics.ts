@@ -1,5 +1,5 @@
-import { LessThan, MoreThan, getRepository } from "typeorm";
-import { Invoice, Maintenance, Purchase } from '../entities';
+import { IsNull, LessThan, MoreThan, Not, getRepository } from "typeorm";
+import { Accessory, Invoice, MInvoiceDetail, Maintenance, Purchase } from '../entities';
 import { isDateInMonth } from "../utils";
 
 const statistics = async ({ salonId, type, fromDate, year }: { salonId: string, type: string, fromDate: Date, year: any }) => {
@@ -71,7 +71,6 @@ export const getTopSeller = async ({ salonId, type, fromDate }: { salonId: strin
 
     try {
 
-
         if (type === "buy car") {
             let invoiceDb: any = await invoiceRepository
                 .createQueryBuilder('invoice')
@@ -83,32 +82,27 @@ export const getTopSeller = async ({ salonId, type, fromDate }: { salonId: strin
                 .addGroupBy('salon.salon_id')
                 .getRawMany();
 
-            for (let iv of invoiceDb) {
-                rs.set(iv?.carName, rs.has(iv?.carName) ? rs.get(iv?.carName) + Number(iv?.count) : Number(iv?.count));
-            }
+            await handleParseStructor(invoiceDb, "carName", rs, rs2, doNotThing, false)
 
-            for (const [item, count] of rs) {
-                const data = { name: item, quantitySold: count };
-                rs2.push(data);
-            }
+        } else if (type === "maintenance" || type === "accessory") {
+            let invoiceDb: any;
+            if (type === "maintenance") {
+                invoiceDb = await invoiceRepository
+                    .createQueryBuilder('invoice')
+                    .innerJoinAndSelect('invoice.seller', 'salon', 'salon.salon_id = :salonId', { salonId })
+                    .where({ type, create_at: MoreThan(fromDate) && LessThan(toDate) })
+                    .getMany();
 
-        } else if (type === "maintenance") {
-            let invoiceDb: any = await invoiceRepository
-                .createQueryBuilder('invoice')
-                .innerJoinAndSelect('invoice.seller', 'salon', 'salon.salon_id = :salonId', { salonId })
-                .where({ type, create_at: MoreThan(fromDate) && LessThan(toDate) })
-                .getMany();
+                await handleParseStructor(invoiceDb, "maintenanceServices", rs, rs2, getInforMaintenance);
 
-            for (let iv of invoiceDb) {
-                for (let e of iv?.maintenanceServices) {
-                    rs.set(e, rs.has(e) ? rs.get(e) + 1 : 1);
-                }
-            }
+            } else {
+                invoiceDb = await invoiceRepository
+                    .createQueryBuilder('invoice')
+                    .innerJoinAndSelect('invoice.seller', 'salon', 'salon.salon_id = :salonId', { salonId })
+                    .where({ create_at: MoreThan(fromDate) && LessThan(toDate), accessories: Not(IsNull()) })
+                    .getMany();
 
-            for (const [item, count] of rs) {
-                const inforMTDB = await getInforMaintenance(item);
-                const data = { name: inforMTDB, quantitySold: count };
-                rs2.push(data);
+                await handleParseStructor(invoiceDb, "accessories", rs, rs2, getInforAccessory);
             }
         }
 
@@ -143,6 +137,23 @@ function quickSort(arr: any): any {
     return [...quickSort(left), ...equal, ...quickSort(right)];
 }
 
+const handleParseStructor = async (invoiceDb: any, property: any, array1: any, array2: any, functionX: any, increaseOne = true) => {
+    for (let iv of invoiceDb) {
+        // uhm... need  to fix two code lines
+        if (property === "carName")
+            array1.set(iv?.carName, array1.has(iv?.carName) ? array1.get(iv?.carName) + Number(iv?.count) : Number(iv?.count));
+        else
+            for (let e of iv?.[property]) {
+                array1.set(e, array1.has(e) ? array1.get(e) + 1 : (increaseOne ? 1 : 2));
+            }
+    }
+
+    for (const [item, count] of array1) {
+        const inforMTDB = await functionX(item);
+        const data = { name: inforMTDB, quantitySold: count };
+        array2.push(data);
+    }
+}
 
 const getInforMaintenance = async (key: string) => {
     const MTRepository = getRepository(Maintenance);
@@ -156,5 +167,19 @@ const getInforMaintenance = async (key: string) => {
     }
 }
 
+const getInforAccessory = async (key: string) => {
+    const MTRepository = getRepository(Accessory);
 
+    try {
+        return await MTRepository.findOneOrFail({
+            where: { accessory_id: key }
+        })
+    } catch (error) {
+        return null;
+    }
+}
+
+const doNotThing = (data: any) => {
+    return data;
+}
 export default statistics;
