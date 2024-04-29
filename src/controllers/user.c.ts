@@ -3,6 +3,7 @@ import { User } from "../entities/User";
 import { getRepository } from "typeorm";
 const cloudinary = require("cloudinary").v2;
 import { getFileName } from "../utils/index"
+import UserRepository from "../repository/user";
 // import Cache from '../config/node-cache';
 
 interface MulterFileRequest extends Request {
@@ -11,32 +12,18 @@ interface MulterFileRequest extends Request {
 
 const userController = {
     getAllUsers: async (req: Request, res: Response) => {
+        const rs = await UserRepository.getAllUsers();
 
-        const userRepository = getRepository(User);
-        const rs = await userRepository.find({});
-        return res.status(200).json(rs);
+        return res.status(rs?.code).json(rs?.data);
     },
     getUserById: async (req: Request, res: Response) => {
-        const userRepository = getRepository(User);
         const user_id = req.params.id; // Lấy id từ URL params
-        // console.log("user_id", user_id);
-        try {
-            const userDb = await userRepository.find({ where: { user_id: user_id } });
-            if (!userDb) {
-                return res.status(404).json({ message: "User not found" });
-            }
-            // fix by Cao Qui - delete password before sending client - 08/03/24
-            const { password, ...user } = userDb[0];
+        const userDb = await UserRepository.getUserById(user_id);
 
-            return res.status(200).json(user);
-        } catch (error) {
-            console.error("Error retrieving user:", error);
-            return res.status(500).json({ msg: "Internal server error" });
-        }
+        return res.status(userDb?.code).json({ msg: userDb?.msg });
     },
 
     getProfile: async (req: Request, res: Response) => {
-        const userRepository = getRepository(User);
         const userId: any = req.headers['userId'] || "";
         // const valueCache = await Cache.get(userId + "user");
 
@@ -47,28 +34,17 @@ const userController = {
         //         profile: valueCache
         //     });
         // }
-        
-        try {
-            const userDb = await userRepository.findOneOrFail({ where: { user_id: userId } });
-            const { password, ...others } = userDb;
 
-            // set value for cache.
-            // Cache.set(userId+"user", others);
+        const userDb = await UserRepository.getProfile(userId);
 
-            return res.json({
-                status: "success",
-                profile: others
-            });
-        } catch (error) {
-            return res.json({
-                status: "failed",
-                msg: "Invalid information."
-            });
-        }
+        return res.json({
+            status: userDb?.status,
+            profile: userDb?.data,
+            msg: userDb?.msg
+        });
     },
 
     updateProfile: async (req: Request | MulterFileRequest, res: Response) => {
-        const userRepository = getRepository(User);
         const userId: any = req.headers['userId'] || "";
 
         let avatar = "", filename = ""
@@ -76,39 +52,23 @@ const userController = {
             avatar = req.file.path;
             filename = req.file.filename;
         }
-        
-        const {fullname, gender, phone, address, date_of_birth, email } = req.body;
-        let newProfile: any = {fullname, gender, phone, address, date_of_birth, email}
-        if(avatar !== "") newProfile.avatar = avatar;
-        const {user_id, username, password, google, facebook, role, aso, ...other} = newProfile;
 
-        try {
-            const userDb = await userRepository.findOneOrFail({where: {user_id: userId}});
+        const { fullname, gender, phone, address, date_of_birth, email } = req.body;
+        let data: any = { fullname, gender, phone, address, date_of_birth, email };
+        const userDb = await UserRepository.updateProfile(userId, data, avatar);
+        // set new value for cache
+        // Cache.del(userId+"user");
 
-            if(avatar !== "" && userDb.avatar){
-                if(!getFileName(userDb.avatar).includes('default')){
-                    cloudinary.uploader.destroy(getFileName(userDb.avatar));
-                }
-            }
-            const saveProfile = {...userDb, ...other};
-            await userRepository.save(saveProfile);
-
-            // set new value for cache
-            // Cache.del(userId+"user");
-
-            return res.json({
-                status: "success",
-                msg: "Update successfully!"
-            })
-        } catch (error) {
-            if(filename !== ""){
+        if (userDb?.status === "failed") {
+            if (filename !== "") {
                 cloudinary.uploader.destroy(filename)
             }
-            return res.json({
-                status: "failed",
-                msg: "Invalid information."
-            });
         }
+
+        return res.json({
+            status: userDb?.status,
+            msg: userDb?.msg
+        })
     }
 };
 
