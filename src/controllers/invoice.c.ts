@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Car } from "../entities/Car";
 import { MoreThan, getRepository } from "typeorm";
-import { Invoice, Salon } from '../entities';
+import { Invoice, Salon, User } from '../entities';
 import statistics, {averageEachMonth, getTopSeller} from '../helper/statistics';
 import Year from "../utils/year";
 
@@ -183,6 +183,51 @@ const invoiceController = {
         return res.json({
           status: "failed",
           msg: "Error get top."
+        })
+      }
+    },
+
+    getInvoiceByPhone: async (req: Request, res: Response) => {
+      // const {phone} = req.body;
+      const userId: any = req.user;
+      let phone;
+
+      try {
+        const userRepository = getRepository(User);
+        const userDb = await userRepository.findOneOrFail({
+          where: {user_id: userId}
+        })
+        phone = userDb?.phone;
+
+        if (!phone) {
+          return res.json({
+            status: "failed",
+            msg: "You need to update phone in your profile."
+          });
+        }
+      } catch (error) {
+        return res.json({
+          status: "failed",
+          msg: "error information."
+        })
+      }
+
+      try {
+        const invoiceRepository = getRepository(Invoice);
+
+        const invoiceDb = await invoiceRepository.find({
+          where: {phone: phone, type: "buy car"},
+          relations: ['seller']
+        })
+
+        return res.json({
+          status: "success",
+          invoices: invoiceDb
+        })
+      } catch (error) {
+        return res.json({
+          status: "failed",
+          msg: "Error information."
         })
       }
     }

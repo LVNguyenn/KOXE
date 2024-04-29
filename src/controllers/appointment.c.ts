@@ -3,6 +3,7 @@ import { getRepository } from 'typeorm';
 import { Appointment, Car, Salon, User } from '../entities';
 import createNotification from '../helper/createNotification';
 import { newLogs } from '../helper/createLogs';
+import { isValidUUID } from '../utils';
 // import Cache from '../config/node-cache';
 
 const appointmentController = {
@@ -89,7 +90,7 @@ const appointmentController = {
         select: ['id', 'date', 'description', 'status', 'user', 'salon', 'car_id'],
         order: { create_at: 'DESC' }
       })
-
+      
       for (let app in appointDb) {
         appointDb[app].user = { fullname: appointDb[app].user.fullname, phone: appointDb[app].user.phone };
         appointDb[app].salon = appointDb[app].salon.name;
@@ -98,10 +99,12 @@ const appointmentController = {
           appointDb[app].car = await carRepository.findOneOrFail({
             where: { car_id: appointDb[app].car_id }
           })
+
         } catch (error) {
           return res.json({
             status: "failed",
-            msg: "error information car."
+            msg: "error information car.",
+            error
           })
         }
 

@@ -616,6 +616,8 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
         Và cũng có top các phụ kiện được sử dụng nhiều nhất. Danh sách trả về trong ouput ngang cấp với buyCarTop là:
         "accessoriesTop": [{"name": {thông tin gói}, "quantitySold": số lượng.}]
     </div>
+    <div>[POST] /invoice/get-invoice-buy-car</div>
+    Tìm lịch sử giao dịch mua xe cho khách hàng. Yêu cầu khách hàng cần đăng nhập. Không truyền vô gì.
     <li>[POST] /invoice/statistics-admin</li>
     Thống kê doanh thu mua bán gói chức năng của hệ thống mình. yêu cầu là admin của hệ thống. Yêu cầu truyền vô: {"fromDate": "2024-04-21"}.
     Dữ liệu trả về: {status,  "purchaseDb": {purchases: [{}, {}, danh sách các giao dịch mua gói chức năng.], total: tổng tiền của tất cả giao dịch.}.}
