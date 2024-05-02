@@ -9,9 +9,22 @@ const LegalsRepository = {
             const legalsRepository = getRepository(LegalDocuments);
             await legalsRepository.save(data);
 
+            return FormatData("success", "create legal documents successfully!", data);
+        } catch (error) {
+            return FormatData("failed", "Error create new legal documents.");
+        }
+
+    },
+
+    async createLegalDetails(data: any) {
+        try {
+            const legalsRepository = getRepository(LegalDetails);
+            await legalsRepository.save(data);
+
             return FormatData("success", "create legal details successfully!", data);
         } catch (error) {
-            return FormatData("success", "Error create new legals.");
+            console.log(error)
+            return FormatData("failed", "Error create new legal details.");
         }
 
     },
@@ -22,8 +35,8 @@ const LegalsRepository = {
             const queryBuilder : any = await legalRepository
             .createQueryBuilder('legalDocuments')
             .innerJoinAndSelect('legalDocuments.salon', 'salon', 'salon.salon_id = :salonId', { ...data })
-            // .leftJoinAndSelect('legalDocuments.car', 'car')
             .leftJoinAndSelect('legalDocuments.documents', 'legalDetails')
+            .orderBy('legalDocuments.order', 'ASC')
 
             if (data?.period) {
                 queryBuilder.where({ period: data.period });
@@ -38,6 +51,29 @@ const LegalsRepository = {
 
     },
     
+    async removeLegalDetailsForDocuments (data: any) {
+        
+    },
+
+    async updateLegalDetailsOfDocuments (data: any) {
+        
+    },
+
+    async updateLegalDocuments (data: any) {
+        
+    },
+
+    async getLegalForUser (data: any) {
+        
+    },
+
+    async addLegalForUser (data: any) {
+        
+    },
+
+    async removeLegalForUser (data: any) {
+        
+    }
 }
 
 export default LegalsRepository;

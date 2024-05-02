@@ -8,7 +8,7 @@ export class LegalDetails {
 
     @JoinColumn()
     @ManyToOne(() => LegalDocuments, (legal) => legal.documents, { cascade: true })
-    period!: LegalDocuments
+    period!: LegalDocuments;
 
     @Column()
     name!: string;
@@ -20,5 +20,4 @@ export class LegalDetails {
         this.name = name;
         this.update_date = update_date;
     }
-
 }

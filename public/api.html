@@ -629,14 +629,43 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     "avg": 840918.1666666666  Đây là giá trị trung bình cho mỗi tháng (tổng / 12).
 
 
+    <h2>Giấy tờ pháp lý</h2>
+    <div>
+        Note: Chia thành 2 loại là legal documents và legal details. legal documents là một giai đoạn chứa các loại giấy tờ là legal details. Cần làm là cho phép
+        Salon thêm giai đoạn, tạo và thêm các details vô giai đoạn đó. Thêm người dùng vào các giai đoạn mà người dùng đã hoàn tất giấy tờ pháp lý ở ngoài thực tế,
+        việc thêm này là salon thêm sau khi người dùng mua xe tại salon đó. Người dùng chỉ việc xem, còn salon thấy người dùng hoàn thành giai đoạn nào, quá trình tới 
+        đâu thì salon tự cập nhật cho người dùng. 
+    </div>
+    <li>[POST] /legals/create</li>
+    Tạo ra  legal documents (tức là giai đoạn). Salon thực hiện. Cần truyền vô: 
+    {carId, name, salonId, reuse, order}.
+    <div>
+        carId: Id của cái xe mà mình cần gán luôn, có thể không truyền thì là không gán, sau này gán sau cũng được, tức là có thể truyền hoặc không.
+    </div>
+    <div>
+        name: tên của giai đoạn.
+        salonId: id salon.
+        reuse: cho phép dùng lại giai đoạn này cho các xe khác hay không, mặc định là cho phép dùng lại nếu không truyền vô. Còn muốn giai đoạn này chỉ 
+        dùng cho xe gì đó thì truyền vô reuse: false.
+        order: số thứ tự của giai đoạn, tức là giai đoạn 1, 2, 3, 4. Cần truyền vô là number.
+    </div>
+    <li>[POST] /legals</li>
+    Dùng để lấy ra các legal documents  (các giai đoạn) của một salon. Cần truyền vô:
+    {salonId, period: là id của giai đoạn, không truyền thì lấy toàn bộ, truyền thêm period thì lấy theo id.}
 
-
-
-
-
-
-
-
+    <li>[POST] /legals/create-details</li>
+    Dùng để tạo ra một giấy tờ trong mỗi giai đoạn (legal details). Khi kích vào mỗi giai đoạn chúng ta nên có nút cộng để tạo thêm giấy tờ cho giai đoạn đó. Cần truyền vô:
+    <div>
+        {period: id của legal documents, name: tên của giấy tờ chi tiết (legal details), salonId}.
+    </div>
+    <li>[POST] /cars/legals</li>
+    Lưu ý là /cars chứ không phải /legals như những api trên. Dùng để lấy ra toàn bộ giấy tờ pháp lý của toàn bộ các quá trình của xe. Cần truyền vô:
+    {carId}.
+    <div>
+        Để xem dữ liệu có sẵn thì truyền vô "carId": "e13e9396-542c-4c55-8aea-66b4144aa10c".
+        salonId: "997af3b3-0ccc-41a2-8133-1c0f7ccf268c" (nếu cần truyền).
+    </div>
+    <li>Các phần khác sẽ sớm hoàn thiện. Có vấn đề gì thì trao đổi nhé.</li>
 </body>
 
 </html>

@@ -15,6 +15,9 @@ export class LegalDocuments {
     @Column({default: true})
     reuse!: boolean;
 
+    @Column()
+    order!: number;
+
     @JoinTable()
     @ManyToMany(() => Car, (car) => car.legals, { cascade: true })
     car!: Car[]
@@ -28,7 +31,8 @@ export class LegalDocuments {
     @ManyToOne(() => Salon, (salon) => salon.legals, { cascade: true })
     salon!: Salon;
 
-    init (name: string) {
+    init (name: string, order: number) {
         this.name = name;
+        this.order = order;
     }
 }

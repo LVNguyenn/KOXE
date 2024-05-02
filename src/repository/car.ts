@@ -30,8 +30,9 @@ const CarRepository = {
             .createQueryBuilder('car')
             .leftJoinAndSelect('car.legals', 'legalDocuments')
             .leftJoinAndSelect('legalDocuments.documents', 'legalDetails')
+            .orderBy('legalDocuments.order', 'ASC')
             .where({
-                car_id: data?.carId
+                car_id: data?.carId 
             })
             .getMany()
 

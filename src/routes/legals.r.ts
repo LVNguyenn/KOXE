@@ -6,12 +6,17 @@ const router = Router();
 
 router.post(
     "/create",
-    legalsController.createLegalDetails
+    legalsController.createLegalDocuments
 );
 
 router.post(
     "/",
     legalsController.getLegalDocuments
+);
+
+router.post(
+    "/create-details",
+    legalsController.createLegalDetails
 );
 
 
