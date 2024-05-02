@@ -1,25 +1,27 @@
 import { Request, Response } from "express";
-import { Maintenance } from "../entities/Maintenance";
-import { Invoice } from "../entities/Invoice";
-import { MInvoiceDetail } from "../entities/MInvoiceDetail";
-import { User } from "../entities/User";
-import { getRepository, In } from "typeorm";
-import { formatDate } from "../utils/index";
+import { Invoice, MInvoiceDetail, AInvoiceDetail } from "../entities";
+import { getRepository } from "typeorm";
 import moment from "moment";
 import {
   getUserInfo,
   getMaintenanceServiceList,
   getMaintenanceInvoice,
-  getMaintenanceInvoiceList,
+  getMaintenanceInvoiceListBySalonId,
+  getMaintenanceInvoiceListByPhone,
   getMaintenanceInvoiceDetails,
   getMaintenanceInvoiceDetailsList,
   formatMaintenanceInvoice,
   formatMaintenanceInvoiceList,
   getAccessoryList,
+  calculateMExpense,
+  calculateAExpense,
+  saveMInvoiceDetails,
+  saveAInvoiceDetails,
   getAccessoryInvoiceDetails,
   getAccessoryInvoiceDetailsList,
+  processServices,
+  processAccessory,
 } from "../helper/mInvoice";
-import { AInvoiceDetail, Accessory } from "../entities";
 
 const maintainController = {
   getAllMaintenanceInvoices: async (req: Request, res: Response) => {
@@ -39,17 +41,14 @@ const maintainController = {
 
       if (user?.salonId) {
         const salonId = user.salonId.salon_id;
-        mInvoices = await getMaintenanceInvoiceList(salonId);
+        mInvoices = await getMaintenanceInvoiceListBySalonId(salonId);
       } else {
         const phone = user.phone;
-        mInvoices = await getRepository(Invoice).find({
-          where: { type: "maintenance", phone: phone },
-          relations: ["seller"],
-        });
+        mInvoices = await getMaintenanceInvoiceListByPhone(phone);
       }
 
       // Tình danh sách các dịch vụ đã dùng
-      const serviceCodes = mInvoices
+      const mServiceCodes = mInvoices
         .map((invoice) => invoice.maintenanceServices)
         .flat();
 
@@ -59,7 +58,7 @@ const maintainController = {
         .flat();
 
       // Tìm dịch vụ đó bao gồm tên và giá
-      const mServices = await getMaintenanceServiceList(serviceCodes);
+      const mServices = await getMaintenanceServiceList(mServiceCodes);
 
       // Tìm vật dụng đó bao gồm tên và giá
       const aServices = await getAccessoryList(accessoryCodes);
@@ -140,20 +139,11 @@ const maintainController = {
     const userId: any = req.headers["userId"] || "";
     const { licensePlate } = req.params;
     const mInvoiceRepository = getRepository(Invoice);
-    const maintainRepository = getRepository(Maintenance);
-    const accessoryRepository = getRepository(Accessory);
-    const mInvoiceDetailRepository = getRepository(MInvoiceDetail);
-    const aInvoiceDetailRepository = getRepository(AInvoiceDetail);
-    let salonId = "";
 
     try {
-      const user = await getRepository(User).findOne({
-        where: { user_id: userId },
-        relations: ["salonId"],
-      });
+      const user = await getUserInfo(userId);
 
-      if (user?.salonId) salonId = user.salonId.salon_id;
-      else {
+      if (!user?.salonId && !user?.phone) {
         return res.status(403).json({
           status: "failed",
           msg: "You do not have sufficient permissions",
@@ -175,7 +165,7 @@ const maintainController = {
       } else {
         const phone = user.phone;
         mInvoices = await getRepository(Invoice).find({
-          where: { type: "maintenance", phone: phone },
+          where: { licensePlate, type: "maintenance", phone: phone },
           relations: ["seller"],
         });
       }
@@ -190,79 +180,21 @@ const maintainController = {
       const mServiceCodes = mInvoices
         .map((invoice) => invoice.maintenanceServices)
         .flat();
+      const mServices = await getMaintenanceServiceList(mServiceCodes);
 
-      const mServices = await maintainRepository.find({
-        where: { maintenance_id: In(mServiceCodes) },
-      });
-
-      const aServiceCodes = mInvoices
+      const accessoryCodes = mInvoices
         .map((invoice) => invoice.accessories)
         .flat();
+      const aServices = await getAccessoryList(accessoryCodes);
 
-      const aServices = await accessoryRepository.find({
-        where: { accessory_id: In(aServiceCodes) },
-      });
+      const mInvoiceIds = mInvoices.map((invoice) => invoice.invoice_id);
+      const mInvoiceDetails = await getMaintenanceInvoiceDetailsList(
+        mInvoiceIds
+      );
 
-      const mInvoiceDetails = await mInvoiceDetailRepository.find({
-        where: {
-          invoice_id: In(mInvoices.map((invoice) => invoice.invoice_id)),
-        },
-      });
+      const aInvoiceIds = mInvoices.map((invoice) => invoice.invoice_id);
+      const aInvoiceDetails = await getAccessoryInvoiceDetailsList(aInvoiceIds);
 
-      const aInvoiceDetails = await aInvoiceDetailRepository.find({
-        where: {
-          invoice_id: In(mInvoices.map((invoice) => invoice.invoice_id)),
-        },
-      });
-
-      // const mInvoicesWithServices = mInvoices.map((invoice) => {
-      //   const mDetailedServices = invoice.maintenanceServices.map((code) => {
-      //     const service = mServices.find((s) => s.maintenance_id === code);
-      //     const invoiceDetail = mInvoiceDetails.find(
-      //       (detail) =>
-      //         detail.invoice_id === invoice.invoice_id &&
-      //         detail.maintenance_id === code
-      //     );
-
-      //     if (service && invoiceDetail) {
-      //       return {
-      //         name: service.name,
-      //         cost: service.cost,
-      //         quantity: invoiceDetail.quantity,
-      //       };
-      //     }
-      //   });
-
-      //   const aDetailedServices = invoice.accessories.map((code) => {
-      //     const service = aServices.find((s) => s.accessory_id === code);
-      //     const invoiceDetail = aInvoiceDetails.find(
-      //       (detail) =>
-      //         detail.invoice_id === invoice.invoice_id &&
-      //         detail.accessory_id === code
-      //     );
-
-      //     if (service && invoiceDetail) {
-      //       return {
-      //         name: service.name,
-      //         price: service.price,
-      //         quantity: invoiceDetail.quantity,
-      //       };
-      //     }
-      //   });
-
-      //   return {
-      //     invoice_id: invoice.invoice_id,
-      //     fullname: invoice.fullname,
-      //     phone: invoice.phone,
-      //     email: invoice.email,
-      //     carName: invoice.carName,
-      //     invoiceDate: formatDate(invoice.create_at),
-      //     total: invoice.expense,
-      //     note: invoice.note,
-      //     maintenanceServices: mDetailedServices,
-      //     accessories: aDetailedServices,
-      //   };
-      // });
       const mInvoicesWithServices = formatMaintenanceInvoiceList(
         mInvoices,
         mServices,
@@ -297,12 +229,11 @@ const maintainController = {
       phone,
     } = req.body;
     let salonId = "";
-    let expense = 0;
 
     try {
-      let serviceIds = [];
+      let mServiceIds = [];
       if (services && services.length !== 0) {
-        serviceIds = services.map((service: any) => service.maintenance_id);
+        mServiceIds = services.map((service: any) => service.maintenance_id);
       }
 
       let accessoryIds = [];
@@ -312,60 +243,39 @@ const maintainController = {
         );
       }
 
-      const maintenanceServices = serviceIds;
-      const mServices = await getRepository(Maintenance).find({
-        where: { maintenance_id: In(serviceIds) },
-      });
+      const mServices = await getMaintenanceServiceList(mServiceIds);
 
-      const accessoryServices = accessoryIds;
-      const aServices = await getRepository(Accessory).find({
-        where: { accessory_id: In(accessoryIds) },
-      });
+      const aServices = await getAccessoryList(accessoryIds);
+      let expense = 0;
 
       if (services && services.length !== 0) {
-        for (const service of services) {
-          const quantity = service.quantity || 1;
-          const dbService = mServices.find(
-            (s) => s.maintenance_id === service.maintenance_id
-          );
-          if (dbService) {
-            expense += dbService.cost * quantity;
-          }
-        }
+        const mExpense = calculateMExpense(services, mServices);
+        expense += mExpense;
       }
 
       if (accessories && accessories.length !== 0) {
-        for (const accessory of accessories) {
-          const quantity = accessory.quantity || 1;
-          const aService = aServices.find(
-            (s) => s.accessory_id === accessory.accessory_id
-          );
-          if (aService) {
-            expense += aService.price * quantity;
-          }
-        }
+        const aExpense = calculateAExpense(accessories, aServices);
+        expense += aExpense;
       }
 
-      const user = await getRepository(User).findOne({
-        where: { user_id: userId },
-        relations: ["salonId"],
-      });
+      const user = await getUserInfo(userId);
 
-      if (user?.salonId) salonId = user.salonId.salon_id;
-      else {
+      if (!user?.salonId && !user?.phone) {
         return res.status(403).json({
           status: "failed",
           msg: "You do not have sufficient permissions",
         });
       }
 
+      salonId = user.salonId.salon_id;
+
       const newMaintain = {
         licensePlate,
         carName,
         create_at: moment().format("YYYY-MM-DDTHH:mm:ss"),
         seller: { salon_id: salonId },
-        maintenanceServices,
-        accessories: accessoryServices,
+        maintenanceServices: mServiceIds,
+        accessories: accessoryIds,
         expense,
         note,
         type: "maintenance",
@@ -378,40 +288,10 @@ const maintainController = {
         newMaintain
       );
 
-      if (services && services.length !== 0) {
-        const mInvoiceDetailRepository = getRepository(MInvoiceDetail);
-        for (const service of services) {
-          const quantity = service.quantity || 1;
-          const mInvoiceDetail = new MInvoiceDetail();
-
-          mInvoiceDetail.invoice_id = savedMaintenanceInvoice.invoice_id;
-          mInvoiceDetail.maintenance_id = service.maintenance_id;
-          const mService = await getRepository(Maintenance).findOne({
-            where: { maintenance_id: service.maintenance_id },
-          });
-          mInvoiceDetail.quantity = quantity;
-          mInvoiceDetail.price = mService?.cost || 1;
-
-          await mInvoiceDetailRepository.save(mInvoiceDetail);
-        }
-      }
-
+      if (services && services.length !== 0)
+        await saveMInvoiceDetails(services, savedMaintenanceInvoice);
       if (accessories && accessories.length !== 0) {
-        const aInvoiceDetailRepository = getRepository(AInvoiceDetail);
-        for (const accessory of accessories) {
-          const quantity = accessory.quantity || 1;
-          const aInvoiceDetail = new AInvoiceDetail();
-
-          aInvoiceDetail.invoice_id = savedMaintenanceInvoice.invoice_id;
-          aInvoiceDetail.accessory_id = accessory.accessory_id;
-          const aService = await getRepository(Accessory).findOne({
-            where: { accessory_id: accessory.accessory_id },
-          });
-          aInvoiceDetail.quantity = quantity;
-          aInvoiceDetail.price = aService?.price || 1;
-
-          await aInvoiceDetailRepository.save(aInvoiceDetail);
-        }
+        await saveAInvoiceDetails(accessories, savedMaintenanceInvoice);
       }
 
       return res.status(201).json({
@@ -442,6 +322,7 @@ const maintainController = {
     const InvoicesRepository = getRepository(Invoice);
     const mInvoiceDetailRepository = getRepository(MInvoiceDetail);
     const aInvoiceDetailRepository = getRepository(AInvoiceDetail);
+    let total = 0;
 
     try {
       let mserviceIds: any = [];
@@ -449,14 +330,10 @@ const maintainController = {
         mserviceIds = services.map((service: any) => service.maintenance_id);
       }
 
-      const maintenanceServices = mserviceIds;
-
       let aserviceIds: any = [];
       if (accessories && accessories.length !== 0) {
         aserviceIds = accessories.map((service: any) => service.accessory_id);
       }
-
-      const accessoryServices = aserviceIds;
 
       const Invoice = await InvoicesRepository.findOne({
         where: { invoice_id: id, type: "maintenance" },
@@ -476,60 +353,42 @@ const maintainController = {
       Invoice.email = email;
       Invoice.phone = phone;
 
-      if (maintenanceServices && maintenanceServices.length !== 0) {
-        Invoice.maintenanceServices = maintenanceServices;
+      if (mserviceIds && mserviceIds.length !== 0) {
+        Invoice.maintenanceServices = mserviceIds;
         await mInvoiceDetailRepository.delete({ invoice_id: id });
+      } else {
+        const mInvoiceDetail = await mInvoiceDetailRepository.find({
+          where: { invoice_id: id },
+        });
+        if (mInvoiceDetail) {
+          mInvoiceDetail.map((detail) => {
+            total += detail.quantity * detail.price;
+          });
+        }
       }
 
-      if (accessoryServices && accessoryServices.length !== 0) {
-        Invoice.accessories = accessoryServices;
+      if (aserviceIds && aserviceIds.length !== 0) {
+        Invoice.accessories = aserviceIds;
         await aInvoiceDetailRepository.delete({ invoice_id: id });
+      } else {
+        const aInvoiceDetail = await aInvoiceDetailRepository.find({
+          where: { invoice_id: id },
+        });
+        if (aInvoiceDetail) {
+          aInvoiceDetail.map((detail) => {
+            total += detail.quantity * detail.price;
+          });
+        }
       }
-
-      let total = 0;
 
       if (services && services.length !== 0) {
-        for (const service of services) {
-          const { maintenance_id, quantity } = service;
-          const mInvoiceDetail = new MInvoiceDetail();
-          mInvoiceDetail.invoice_id = id;
-          mInvoiceDetail.maintenance_id = maintenance_id;
-          const mService = await getRepository(Maintenance).findOne({
-            where: { maintenance_id: service.maintenance_id },
-          });
-          mInvoiceDetail.quantity = quantity || 1;
-          mInvoiceDetail.price = mService?.cost || 1;
-          await mInvoiceDetailRepository.save(mInvoiceDetail);
-
-          const dbService = await getRepository(Maintenance).findOne({
-            where: { maintenance_id: maintenance_id },
-          });
-          if (dbService) {
-            total += dbService.cost * (quantity || 1);
-          }
-        }
+        const mExpense = await processServices(id, services);
+        total += mExpense;
       }
 
       if (accessories && accessories.length !== 0) {
-        for (const accessory of accessories) {
-          const { accessory_id, quantity } = accessory;
-          const aInvoiceDetail = new AInvoiceDetail();
-          aInvoiceDetail.invoice_id = id;
-          aInvoiceDetail.accessory_id = accessory_id;
-          const aService = await getRepository(Accessory).findOne({
-            where: { accessory_id: accessory.accessory_id },
-          });
-          aInvoiceDetail.quantity = quantity || 1;
-          aInvoiceDetail.price = aService?.price || 1;
-          await aInvoiceDetailRepository.save(aInvoiceDetail);
-
-          const dbService = await getRepository(Accessory).findOne({
-            where: { accessory_id: accessory_id },
-          });
-          if (dbService) {
-            total += dbService.price * (quantity || 1);
-          }
-        }
+        const aExpense = await processAccessory(id, accessories);
+        total += aExpense;
       }
 
       if (
@@ -564,7 +423,6 @@ const maintainController = {
     const mInvoiceDetailRepository = getRepository(MInvoiceDetail);
     const aInvoiceDetailRepository = getRepository(AInvoiceDetail);
     try {
-      //const mInvoice = await mInvoicesRepository.delete(id);
       const mInvoice = await mInvoicesRepository.findOne({
         where: { invoice_id: id, type: "maintenance" },
       });
