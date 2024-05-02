@@ -13,8 +13,8 @@ export class LegalDetails {
     @Column()
     name!: string;
 
-    @Column()
-    update_date!: Date
+    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+    update_date!: Date;
 
     init (name: string, update_date: Date) {
         this.name = name;
