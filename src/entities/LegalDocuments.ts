@@ -12,6 +12,9 @@ export class LegalDocuments {
     @Column()
     name!: string;
 
+    @Column({default: true})
+    reuse!: boolean;
+
     @ManyToMany(() => Car, (car) => car.legals, { cascade: true })
     car!: Car[]
 

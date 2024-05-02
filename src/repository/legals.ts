@@ -16,12 +16,17 @@ const LegalsRepository = {
 
     },
 
-    async findLegalDocumentByLegalId(data: any) {
+    async findLegalDocumentByLegalIdSalonId(data: any) {
         try {
             const legalRepository = getRepository(LegalDocuments);
             const legalDb: LegalDocuments = await legalRepository.findOneOrFail({
-                where: {period: data?.period}
+                where: {period: data?.period},
+                relations: ['salon']
             })
+
+            if (legalDb?.salon?.salon_id !== data?.salonId) {
+                return FormatData("failed", "Error find the legal document");
+            }
 
             return FormatData("success", "find successfully!", legalDb);
         } catch (error) {
