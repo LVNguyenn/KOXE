@@ -12,6 +12,7 @@ import { Maintenance } from "./Maintenance";
 import { Invoice } from "./Invoice";
 import { Warranty } from "./Warranty";
 import { Accessory } from "./Accessory";
+import { LegalDocuments } from "./LegalDocuments";
 
 @Entity()
 export class Salon {
@@ -67,6 +68,9 @@ export class Salon {
 
   @OneToMany(() => Accessory, (accessory) => accessory.salon)
   accessories!: Accessory[];
+
+  @OneToMany(() => LegalDocuments, legals => legals.salon)
+  legals!: LegalDocuments[];
 
   init(
     name: string,

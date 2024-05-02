@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, ManyToOne, ManyT
 import { Car } from "./Car";
 import { User } from "./User";
 import { LegalDetails } from "./LegalDetails";
+import { Salon } from "./Salon";
 
 @Entity()
 export class LegalDocuments {
@@ -19,6 +20,9 @@ export class LegalDocuments {
 
     @OneToMany(() => LegalDetails, (legal) => legal.period)
     documents!: LegalDetails[];
+
+    @ManyToOne(() => Salon, (salon) => salon.legals, { cascade: true })
+    salon!: Salon;
 
     init (name: string) {
         this.name = name;

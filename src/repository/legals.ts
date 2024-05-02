@@ -1,7 +1,6 @@
 import { getRepository } from "typeorm";
 import { FormatData } from '../utils/index';
-import { LegalDetails } from "../entities";
-
+import { LegalDetails, LegalDocuments } from "../entities";
 
 const LegalsRepository = {
 
@@ -17,6 +16,19 @@ const LegalsRepository = {
 
     },
 
+    async findLegalDocumentByLegalId(data: any) {
+        try {
+            const legalRepository = getRepository(LegalDocuments);
+            const legalDb: LegalDocuments = await legalRepository.findOneOrFail({
+                where: {period: data?.period}
+            })
+
+            return FormatData("success", "find successfully!", legalDb);
+        } catch (error) {
+            return FormatData("failed", "Error find the legal documents.");
+        }
+
+    },
 }
 
 export default LegalsRepository;
