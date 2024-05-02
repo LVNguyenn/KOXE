@@ -4,9 +4,9 @@ import { LegalDetails, LegalDocuments } from "../entities";
 
 const LegalsRepository = {
 
-    async createLegalDetails(data: any) {
+    async createLegalDocuments(data: any) {
         try {
-            const legalsRepository = getRepository(LegalDetails);
+            const legalsRepository = getRepository(LegalDocuments);
             await legalsRepository.save(data);
 
             return FormatData("success", "create legal details successfully!", data);
@@ -16,17 +16,20 @@ const LegalsRepository = {
 
     },
 
-    async findLegalDocumentByLegalIdSalonId(data: any) {
+    async findLegalDocumentSalonId(data: any) {
         try {
             const legalRepository = getRepository(LegalDocuments);
-            const legalDb: LegalDocuments = await legalRepository.findOneOrFail({
-                where: {period: data?.period},
-                relations: ['salon']
-            })
+            const queryBuilder : any = await legalRepository
+            .createQueryBuilder('legalDocuments')
+            .innerJoinAndSelect('legalDocuments.salon', 'salon', 'salon.salon_id = :salonId', { ...data })
+            // .leftJoinAndSelect('legalDocuments.car', 'car')
+            .leftJoinAndSelect('legalDocuments.documents', 'legalDetails')
 
-            if (legalDb?.salon?.salon_id !== data?.salonId) {
-                return FormatData("failed", "Error find the legal document");
+            if (data?.period) {
+                queryBuilder.where({ period: data.period });
             }
+            
+            const legalDb: any = await queryBuilder.getMany();
 
             return FormatData("success", "find successfully!", legalDb);
         } catch (error) {
@@ -34,6 +37,7 @@ const LegalsRepository = {
         }
 
     },
+    
 }
 
 export default LegalsRepository;

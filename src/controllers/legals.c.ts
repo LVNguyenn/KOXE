@@ -8,10 +8,17 @@ const legalsController = {
         const {carId, name, salonId, reuse} = req.body;
         const salonRp = await SalonRepository.findSalonById({salonId});
         const carRp = await CarRepository.findCarByCarIdSalonId({salonId, carId});
-        const legalRp = await LegalsRepository.createLegalDetails({name, salon: salonRp?.data, reuse, car: carRp?.data});
+        const legalRp = await LegalsRepository.createLegalDocuments({name, salon: salonRp?.data, reuse, car: [carRp?.data]});
 
         return res.json({...legalRp});
-    }
+    },
+
+    getLegalDocuments: async (req: Request, res: Response) => {
+        const {carId, name, salonId, reuse, period} = req.body;
+        const legalRp = await LegalsRepository.findLegalDocumentSalonId({salonId, reuse, period})
+
+        return res.json({...legalRp});
+    },
 
 }
 

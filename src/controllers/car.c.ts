@@ -6,6 +6,7 @@ import { getFileName } from "../utils/index"
 import { newLogs } from '../helper/createLogs';
 // import Cache from '../config/node-cache';
 import { Invoice, Salon } from '../entities';
+import CarRepository from '../repository/car';
 
 interface MulterFile {
     path: string;
@@ -365,6 +366,13 @@ const carController = {
                 msg: "Can not create the invoice."
             })
         }
+    },
+
+    getAllLegalByCar: async (req: Request, res: Response) => {
+        const {carId, name, salonId, reuse, period} = req.body;
+        const legalRp = await CarRepository.findLegalByCar({carId})
+
+        return res.json({...legalRp});
     }
 }
 

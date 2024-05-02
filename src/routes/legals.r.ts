@@ -8,3 +8,11 @@ router.post(
     "/create",
     legalsController.createLegalDetails
 );
+
+router.post(
+    "/",
+    legalsController.getLegalDocuments
+);
+
+
+export default router;

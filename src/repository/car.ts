@@ -8,19 +8,37 @@ const CarRepository = {
         try {
             const carRepository = getRepository(Car);
             const carDb: Car = await carRepository.findOneOrFail({
-                where: {car_id: data.carId},
-                relations: ['salon']
+                where: {car_id: data.carId}
+                // relations: ['salon']
             })
 
-            if (carDb.salon?.salon_id !== data.salonId) {
-                return FormatData("failed", "Error information.");
-            }
+            // if (carDb.salon?.salon_id !== data.salonId) {
+            //     return FormatData("failed", "Error information.");
+            // }
 
             return FormatData("success", "find successfully!", carDb);
         } catch (error) {
             return FormatData("failed", "Error find the car.");
         }
 
+    },
+
+    async findLegalByCar(data: any) {
+        try {
+            const carRepository = getRepository(Car);
+            const carDb : any = await carRepository
+            .createQueryBuilder('car')
+            .leftJoinAndSelect('car.legals', 'legalDocuments')
+            .leftJoinAndSelect('legalDocuments.documents', 'legalDetails')
+            .where({
+                car_id: data?.carId
+            })
+            .getMany()
+
+            return FormatData("success", "find successfully!", carDb);
+        } catch (error) {
+            return FormatData("failed", "Error find the legal documents.");
+        }
     },
 
 }

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, ManyToOne, ManyToMany, OneToMany } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, ManyToOne, ManyToMany, OneToMany, JoinTable } from "typeorm"
 import { Car } from "./Car";
 import { User } from "./User";
 import { LegalDetails } from "./LegalDetails";
@@ -15,6 +15,7 @@ export class LegalDocuments {
     @Column({default: true})
     reuse!: boolean;
 
+    @JoinTable()
     @ManyToMany(() => Car, (car) => car.legals, { cascade: true })
     car!: Car[]
 
