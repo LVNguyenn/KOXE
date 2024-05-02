@@ -5,12 +5,14 @@ import {
     PrimaryColumn,
     OneToMany,
     ManyToOne,
-    OneToOne
+    OneToOne,
+    ManyToMany
 } from "typeorm";
 import { Length, IsNotEmpty } from "class-validator";
 import { Purchase } from "./Purchase";
 import { Salon } from "./Salon";
 import { Invoice } from "./Invoice";
+import { LegalDocuments } from "./LegalDocuments";
 
 @Entity()
 @Unique(["username"])
@@ -78,6 +80,9 @@ export class User {
 
     @OneToMany(() => Purchase, purchase => purchase.user)
     packages!: Purchase[];
+
+    @ManyToMany(() => LegalDocuments, legal => legal.user)
+    legals!: LegalDocuments[];
 
     init(user_id: string, username: string, password: string, fullname: string, gender: string, phone: string, email: string, address: string, 
         date_of_birth: Date, avatar: string, role: string, facebook: string, google: string, aso: number, permissions: string[]) {

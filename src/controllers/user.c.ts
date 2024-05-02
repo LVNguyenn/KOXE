@@ -35,7 +35,7 @@ const userController = {
         //     });
         // }
 
-        const userDb = await UserRepository.getProfile(userId);
+        const userDb = await UserRepository.getProfileById(userId);
 
         return res.json({
             status: userDb?.status,

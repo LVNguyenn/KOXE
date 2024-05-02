@@ -32,14 +32,27 @@ const UserRepository = {
         }
     },
 
-    async getProfile (userId: string) {
+    async getProfileById (userId: string) {
         const userRepository = getRepository(User);
 
         try {
             const userDb = await userRepository.findOneOrFail({ where: { user_id: userId } });
             const { password, ...others } = userDb;
 
-            return FormatData("success", null, others);;
+            return FormatData("success", null, others);
+        } catch (error) {
+            return FormatData("failed", "Invalid information.");
+        }
+    },
+
+    async getProfileByUsername (username: string) {
+        const userRepository = getRepository(User);
+
+        try {
+            const userDb = await userRepository.findOneOrFail({ where: { username: username } });
+            const { password, ...others } = userDb;
+
+            return FormatData("success", null, others);
         } catch (error) {
             return FormatData("failed", "Invalid information.");
         }
@@ -70,6 +83,17 @@ const UserRepository = {
 
         } catch (error) {
             return FormatData("failed", "Invalid information.")
+        }
+    },
+
+    async registerUser (data: any) {
+        try {
+            const userRepository = getRepository(User);
+            await userRepository.save(data);
+
+            return FormatData("success", "Register successfully!")
+        } catch (error) {
+            return FormatData("failed", "Server error, please try later.")
         }
     }
 };

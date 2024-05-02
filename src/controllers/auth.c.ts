@@ -8,6 +8,7 @@ const { v4: uuidv4 } = require("uuid");
 import redis from "../config/redis";
 import { generateRandomCode } from "../utils/index"
 import { sendMail } from "../config/nodemailer";
+import UserRepository from "../repository/user"
 // import Cache from "../config/node-cache"
 
 require("dotenv").config({ path: "./server/.env" });
@@ -55,13 +56,9 @@ const authController: any = {
     }
 
     try {
-      const userRepository = getRepository(User);
-      const userDb = await userRepository.findOne({
-        select: ["user_id"],
-        where: { username: user.username },
-      });
+      const userDb = await UserRepository.getProfileByUsername(user.username);
 
-      if (userDb != null) {
+      if (userDb.data) {
         return res.json({ status: "failed", msg: "This username is existed." });
       }
 
@@ -73,24 +70,14 @@ const authController: any = {
         });
       }
 
-      try {
-        // add new user to db - Account
-        user.user_id = await uuidv4();
-        const salt = await bcrypt.genSalt(11);
-        user.password = await bcrypt.hash(user.password, salt);
-        await userRepository.save(user);
+      // add new user to db - Account
+      user.user_id = await uuidv4();
+      const salt = await bcrypt.genSalt(11);
+      user.password = await bcrypt.hash(user.password, salt);
+      const userRp = await UserRepository.registerUser(user);
 
-        return res.json({
-          status: "success",
-          msg: "Register successfully!",
-        });
-      } catch (error) {
-        console.log(error);
-        return res.json({
-          status: "failed",
-          msg: "Register failure.",
-        });
-      }
+      return res.json({...userRp})
+
     } catch (error) {
       return res.json({
         status: "failed",
@@ -663,7 +650,7 @@ const authController: any = {
         if (err) {
           console.log(err);
         }
-        user.user_id=  user.userId;
+        user.user_id = user.userId;
         // create new JWT_ACCESS_TOKEN
         const newAccessToken = authController.generateAccessToken(user);
 

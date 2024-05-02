@@ -81,7 +81,7 @@ function isDateInMonth(inputDate: Date, monthCompare: number) {
 const FormatData = (status?: any, msg?: any, data?: any, code?: any) => {
   let result: any = {}
   if (msg) result.msg = msg;
-  result.data = !data ? "Have not data.": data;
+  if (data) result.data = data;
   if (status) result.status = status;
   if (code) result.code = code;
 

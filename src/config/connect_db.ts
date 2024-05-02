@@ -17,6 +17,8 @@ import {
   Warranty,
   Accessory,
   AInvoiceDetail,
+  LegalDocuments,
+  LegalDetails
 } from "../entities";
 import { DataSourceOptions } from "typeorm";
 
@@ -48,6 +50,8 @@ export const connectionString: DataSourceOptions = {
     Warranty,
     Accessory,
     AInvoiceDetail,
+    LegalDocuments,
+    LegalDetails
   ],
   synchronize: true,
   ssl: {

@@ -15,3 +15,5 @@ export * from "./Invoice";
 export * from "./Warranty";
 export * from "./Accessory";
 export * from "./AInvoiceDetail";
+export * from "./LegalDocuments";
+export * from "./LegalDetails";

@@ -10,6 +10,7 @@ import {
 } from "typeorm";
 import { Salon } from "./Salon"; // Import entities Salon
 import { Warranty } from "./Warranty";
+import { LegalDocuments } from "./LegalDocuments";
 
 @Entity()
 export class Car {
@@ -92,6 +93,9 @@ export class Car {
     onDelete: "SET NULL",
   })
   warranties!: Warranty;
+
+  @ManyToMany(() => LegalDocuments, legal => legal.car)
+  legals!: LegalDocuments[];
 
   init(
     name: string,
