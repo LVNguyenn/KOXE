@@ -21,11 +21,7 @@ export class LegalDocuments {
     @JoinTable()
     @ManyToMany(() => Car, (car) => car.legals, { cascade: true })
     car!: Car[]
-
-    @JoinTable()
-    @ManyToMany(() => Car, (car) => car.legals_hoa_tieu, { cascade: true })
-    car_hoa_tieu!: Car[]
-
+@JoinTable()
     @ManyToMany(() => User, (user) => user.legals, { cascade: true })
     user!: User[]
 

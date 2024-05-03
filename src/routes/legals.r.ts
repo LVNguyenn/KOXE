@@ -34,4 +34,9 @@ router.patch(
     legalsController.updateLegalDocuments
 );
 
+router.delete(
+    "/delete-documents",
+    legalsController.removeLegalDocuments
+);
+
 export default router;

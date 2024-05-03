@@ -109,7 +109,16 @@ const LegalsRepository = {
     },
 
     async removeLegalDocuments (data: any) {
-        
+        try {
+            const legalRepository = getRepository(LegalDocuments);
+            const legalDb = await this.findLegalDocumentSalonId(data);
+            await legalRepository.remove(legalDb?.data[0]);
+
+            return FormatData("success", "delete legal documents successfully!", legalDb);
+        } catch (error) {
+            console.log(error)
+            return FormatData("failed", "Error delete the legal documents.");
+        }
     },
 
     async getLegalForUser (data: any) {

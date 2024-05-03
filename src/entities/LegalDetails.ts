@@ -7,7 +7,7 @@ export class LegalDetails {
     id!: string
 
     @JoinColumn()
-    @ManyToOne(() => LegalDocuments, (legal) => legal.documents)
+    @ManyToOne(() => LegalDocuments, (legal) => legal.documents, {onDelete: 'CASCADE'})
     period!: LegalDocuments;
 
     @Column()

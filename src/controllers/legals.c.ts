@@ -48,6 +48,13 @@ const legalsController = {
 
         return res.json({...legalRp});
     },
+
+    removeLegalDocuments: async (req: Request, res: Response) => {
+        const {salonId, period} = req.body;
+        const legalRp = await LegalsRepository.removeLegalDocuments({salonId, period})
+
+        return res.json({...legalRp});
+    },
 }
 
 export default legalsController;
