@@ -22,10 +22,14 @@ export class LegalDocuments {
     @ManyToMany(() => Car, (car) => car.legals, { cascade: true })
     car!: Car[]
 
+    @JoinTable()
+    @ManyToMany(() => Car, (car) => car.legals_hoa_tieu, { cascade: true })
+    car_hoa_tieu!: Car[]
+
     @ManyToMany(() => User, (user) => user.legals, { cascade: true })
     user!: User[]
 
-    @OneToMany(() => LegalDetails, (legal) => legal.period)
+    @OneToMany(() => LegalDetails, (legal) => legal.period, { cascade: ['remove'] })
     documents!: LegalDetails[];
 
     @ManyToOne(() => Salon, (salon) => salon.legals, { cascade: true })

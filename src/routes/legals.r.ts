@@ -19,5 +19,19 @@ router.post(
     legalsController.createLegalDetails
 );
 
+router.delete(
+    "/delete-details",
+    legalsController.removeLegalDetailsForDocuments
+);
+
+router.patch(
+    "/update-details",
+    legalsController.updateLegalDetailsOfDocuments
+);
+
+router.patch(
+    "/update-documents",
+    legalsController.updateLegalDocuments
+);
 
 export default router;

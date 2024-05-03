@@ -52,14 +52,63 @@ const LegalsRepository = {
     },
     
     async removeLegalDetailsForDocuments (data: any) {
-        
+        try {
+            const legalRepository = getRepository(LegalDetails);
+            const legalDb = await this.findLegalDetailsByPeriodSalonId(data);
+            console.log(legalDb?.data)
+            const rmObject: any = {id: legalDb?.data?.id, name: legalDb?.data?.name, update_date: legalDb?.data?.update_date}
+            await legalRepository.remove(rmObject);
+
+            return FormatData("success", "delete legal details successfully!", legalDb?.data);
+        } catch (error) {
+            console.log(error)
+            return FormatData("failed", "Error delete the legal details.");
+        }
+    },
+
+    async findLegalDetailsByPeriodSalonId(data: any) {
+        try {
+            const legalRepository = getRepository(LegalDetails);
+            const legalDb = await legalRepository
+            .createQueryBuilder('LegalDetails')
+            .leftJoinAndSelect('LegalDetails.period', 'legalDocuments', 'LegalDetails.period = :period', { ...data })
+            .innerJoinAndSelect('legalDocuments.salon', 'salon', 'salon.salon_id = :salonId', { ...data })
+            .getOne()
+
+            return FormatData("success", "find successfully!", legalDb);
+        } catch (error) {
+            return FormatData("failed", "Error find the legal documents.");
+        }
+
     },
 
     async updateLegalDetailsOfDocuments (data: any) {
-        
+        try {
+            const legalRepository = getRepository(LegalDetails)
+            let legalDb = await this.findLegalDetailsByPeriodSalonId(data);
+            await legalRepository.save({...legalDb?.data, name: data?.name, update_date: new Date()});
+
+            return FormatData("success", "Updated the legal details successfully!", legalDb);
+        } catch (error) {
+            console.log(error)
+            return FormatData("failed", "Error update the legal details.");
+        }
     },
 
     async updateLegalDocuments (data: any) {
+        try {
+            const legalRepository = getRepository(LegalDocuments)
+            let legalDb = await this.findLegalDocumentSalonId(data);
+            await legalRepository.save({...legalDb?.data[0], name: data?.name, reuse: data?.reuse});
+
+            return FormatData("success", "Updated the legal documents successfully!", legalDb);
+        } catch (error) {
+            console.log(error)
+            return FormatData("failed", "Error update the legal documents.");
+        }
+    },
+
+    async removeLegalDocuments (data: any) {
         
     },
 
@@ -73,7 +122,11 @@ const LegalsRepository = {
 
     async removeLegalForUser (data: any) {
         
-    }
+    },
+
+    async setLegalForCar (data: any) {
+
+    },
 }
 
 export default LegalsRepository;

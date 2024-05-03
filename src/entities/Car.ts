@@ -97,6 +97,9 @@ export class Car {
   @ManyToMany(() => LegalDocuments, legal => legal.car)
   legals!: LegalDocuments[];
 
+  @ManyToMany(() => LegalDocuments, legal => legal.car_hoa_tieu)
+  legals_hoa_tieu!: LegalDocuments[];
+
   init(
     name: string,
     description: string,
