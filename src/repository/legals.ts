@@ -1,6 +1,6 @@
 import { getRepository } from "typeorm";
 import { FormatData } from '../utils/index';
-import { LegalDetails, LegalDocuments } from "../entities";
+import { Car, LegalDetails, LegalDocuments } from "../entities";
 
 const LegalsRepository = {
 
@@ -36,10 +36,15 @@ const LegalsRepository = {
             .createQueryBuilder('legalDocuments')
             .innerJoinAndSelect('legalDocuments.salon', 'salon', 'salon.salon_id = :salonId', { ...data })
             .leftJoinAndSelect('legalDocuments.documents', 'legalDetails')
+            .leftJoinAndSelect('legalDocuments.user', 'user')
             .orderBy('legalDocuments.order', 'ASC')
 
             if (data?.period) {
                 queryBuilder.where({ period: data.period });
+            }
+
+            if (data?.carId) {
+                queryBuilder.innerJoinAndSelect('legalDocuments.car', 'car', 'car.car_id = :carId', { ...data })
             }
             
             const legalDb: any = await queryBuilder.getMany();
@@ -125,8 +130,18 @@ const LegalsRepository = {
         
     },
 
+    // need to review
     async addLegalForUser (data: any) {
-        
+        try {
+            const legalRepository = getRepository(LegalDocuments);
+            const user = !data?.olduser?[data?.user]: [...data?.olduser, data?.user];
+            const legalDb = await legalRepository.save({...data?.legal, user})
+            
+            return FormatData("success", "add legal documents for the user successfully!", legalDb);
+        } catch (error) {
+            console.log(error)
+            return FormatData("failed", "Error add documents for the user.");
+        }
     },
 
     async removeLegalForUser (data: any) {

@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import LegalsRepository from "../repository/legals";
 import SalonRepository from "../repository/salon";
 import CarRepository from "../repository/car";
+import UserRepository from "../repository/user";
 
 const legalsController = {
     createLegalDocuments: async (req: Request, res: Response) => {
@@ -54,6 +55,21 @@ const legalsController = {
         const legalRp = await LegalsRepository.removeLegalDocuments({salonId, period})
 
         return res.json({...legalRp});
+    },
+
+    addLegalForUser: async (req: Request, res: Response) => {
+        const {salonId, phone, carId} = req.body;
+        let legalRp;
+        const customRp = await UserRepository.getProfileByOther({phone});
+        const carRp = await LegalsRepository.findLegalDocumentSalonId({carId, salonId});
+        for (let legal of carRp?.data) {
+            legalRp = await LegalsRepository.addLegalForUser({ user: customRp?.data, olduser: legal?.user, legal});
+        }
+
+        return res.json({
+            status: legalRp?.status,
+            msg: legalRp?.msg
+        });
     },
 }
 

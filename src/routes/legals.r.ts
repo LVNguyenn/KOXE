@@ -39,4 +39,9 @@ router.delete(
     legalsController.removeLegalDocuments
 );
 
+router.post(
+    "/add-user",
+    legalsController.addLegalForUser
+);
+
 export default router;

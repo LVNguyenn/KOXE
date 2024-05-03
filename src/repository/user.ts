@@ -95,7 +95,19 @@ const UserRepository = {
         } catch (error) {
             return FormatData("failed", "Server error, please try later.")
         }
-    }
+    },
+
+    async getProfileByOther (data: any) {
+        const userRepository = getRepository(User);
+
+        try {
+            const userDb = await userRepository.findOneOrFail({ where: { phone: data?.phone }});
+
+            return FormatData("success", null, userDb);
+        } catch (error) {
+            return FormatData("failed", "Invalid information.");
+        }
+    },
 };
 
 export default UserRepository;

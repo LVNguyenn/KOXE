@@ -665,6 +665,20 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
         Để xem dữ liệu có sẵn thì truyền vô "carId": "e13e9396-542c-4c55-8aea-66b4144aa10c".
         salonId: "997af3b3-0ccc-41a2-8133-1c0f7ccf268c" (nếu cần truyền).
     </div>
+    <li>[DELETE] /legals/delete-details</li>
+    Dùng để xóa một loại giấy tờ trong một qui trình. Cần truyền vô: 
+    {id: id của giấy tờ đó, salonId: id của salon, period: id của cái qui trình chứa giấy tờ đó.}
+    <li>[PATCH] /legals/update-details</li>
+    Dùng để cập  nhật tên giấy tờ của qui trình nào đó. Cần truyền vô:
+    {id: id của giấy tờ cần cập nhật, salonId, period: id của cái qui trình chứa giấy tờ đó., name: tên mới cần cập nhật.}
+    <li>[PATCH] /legals/update-documents</li>
+    Dùng để cập nhật tên 1 qui trình gì đó. Cần truyền vô: 
+    {salonId, period: id của cái qui trình cần cập nhật, name: tên mới của qui trình.}
+    <li>[DELETE] /legals/delete-documents</li>
+    Dùng để xóa một qui trình nào đó. Lưu ý là xóa qui trình thì các giấy tờ thuộc qui trình đó tự động cũng được xóa theo. Cần truyền vô:
+    {salonId, period: id của qui trình.}
+    <li>[POST] /legals/add-user</li>
+    Dùng để thêm các qui trình cho một user. Hiện đang suy nghĩ hướng tích cực. Sẽ sớm cập nhật.
     <li>Các phần khác sẽ sớm hoàn thiện. Có vấn đề gì thì trao đổi nhé.</li>
 </body>
 
