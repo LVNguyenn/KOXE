@@ -13,6 +13,8 @@ import { Invoice } from "./Invoice";
 import { Warranty } from "./Warranty";
 import { Accessory } from "./Accessory";
 import { LegalDocuments } from "./LegalDocuments";
+import { Connection } from "./Connection";
+import { Transaction } from "./Transaction";
 
 @Entity()
 export class Salon {
@@ -69,8 +71,14 @@ export class Salon {
   @OneToMany(() => Accessory, (accessory) => accessory.salon)
   accessories!: Accessory[];
 
-  @OneToMany(() => LegalDocuments, legals => legals.salon)
+  @OneToMany(() => LegalDocuments, (legals) => legals.salon)
   legals!: LegalDocuments[];
+
+  @OneToMany(() => Connection, (connection) => connection.user)
+  connections!: Connection[];
+
+  // @OneToMany(() => Transaction, (transaction) => transaction.user)
+  // transactions!: Transaction[];
 
   init(
     name: string,

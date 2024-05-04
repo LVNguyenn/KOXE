@@ -680,6 +680,50 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[POST] /legals/add-user</li>
     Dùng để thêm các qui trình cho một user. Hiện đang suy nghĩ hướng tích cực. Sẽ sớm cập nhật.
     <li>Các phần khác sẽ sớm hoàn thiện. Có vấn đề gì thì trao đổi nhé.</li>
+
+    <h2>Bài đăng bán xe</h2>
+    (Bao gồm các trường: post_id, text, postedBy(userId), salons(mảng id các salon có thể xem), createdAt)
+    Này chỉ có user mới được đăng thôi nhé(nên thằng nào mà có salon thì chắc phải ẩn giao diện)
+    <li>[POST] /posts</li>
+    Dùng để tạo một bài đăng mới cho biết có xe gì ở tỉnh nào cần bán trong khoảng bao nhiêu. Truyền vào 2 trường: text (nghĩa là nội dung) và salons (mảng id các salon được xem bài này).
+    Nếu không truyền vào salons thì nó mặc định là tất cả salon đều được xem
+    <li>[GET] /posts/feed</li>
+    Salon sẽ gọi API này để xem được các bài mà hoa tiêu đăng lên (những bài này chưa được tạo kết nối)
+    <li>[GET] /posts/:id</li>
+    Sẽ lấy ra được nội dung chi tiết của bài đăng (có kèm người đăng)
+
+    <h2>Kết nối</h2>
+    (Bao gồm các trường: connection_id, salonId, userId, postId, createdAt, status )
+    Sau khi xem bài đăng xong thì nếu salon nào quan tâm muốn kết nối thì sẽ gọi API này
+    <li>[POST] /connections</li>
+    Sẽ tạo ra kết nối giữa salon và thằng đăng bài. Cần truyền vào postId
+    <li>[GET] /connections</li>
+    Nếu nó là user thường (người đăng) thì nó sẽ lấy ra được các kết nối giữa nó và các salon.
+    Nếu nó là chủ salon thì nó sẽ lấy ra được các kết nối giữa salon của nó và thông tin những người đăng
+    <li>[GET] /connections/:id</li>
+    Sẽ lấy ra được chi tiết kết nối bao gồm trạng thái, ngày tạo, salon nào, user nào
+    <li>[PATCH] /connections/:id</li>
+    Cần truyền vào status (string). Đây là API sẽ được gọi khi mà 2 progress (xác minh xe, mua xe thành công). Status có 3 trạng thái: ('pending', 'success', 'failure'). Khi tạo ra mặc định ban đầu sẽ là pending
+
+    <h2>Giao dịch</h2>
+    (Bao gồm các trường: transaction_id, commissionAmount, status, connectionId, stage)
+    <li>[POST] /transactions</li>
+    Chỉ cần gọi thì nó sẽ tự động tạo ra 2 progress (stage = 1 nghĩa là giai đoạn xác minh xe, stage = 2 nghĩa là giai đoạn mua xe). Cần truyền vào connectionId. Ban đầu thì trạng thái của 2 giai đoạn này là false nghĩa là chưa thành công và tiền hoa hồng sẽ là 0
+    <li>[GET] /transactions</li>
+    Sẽ lấy ra được lịch sử các giai đoạn giao dịch (có kèm theo connection_id nên nếu tụi ông muốn link thì gọi API [GET] /connections/:id phía trên)
+    <li>[GET] /transactions/:id</li> (id là connectId)
+    Nó sẽ lấy ra được 2 giai đoạn, trạng thái và tiền hoa hồng ở từng giai đoạn
+    <li>[PATCH] /transactions/details</li>
+    Cập nhật thông tin giao dịch cho từng giai đoạn. Ví dụ:
+    <pre>
+    {
+        "connectionId": "c6120782-06d1-49e2-a1a4-311ac833c921", 
+        "stage": 1, 
+        "status": true, 
+        "commissionAmount": 100000 
+    }
+    </pre>
+    <b> Tui cũng đã cho là nếu nó cập nhật giai đoạn 2 là thành công thì cái connection phía trên cũng sẽ thành công. Nếu có giai đoạn thất bại thì sẽ là thất bại. Chắc trên giao diện cần kiểm tra nếu giai đoạn 1 nó thất bại rồi thì chắc cũng khỏi cần hiển thị giai đoạn 2. </b>
 </body>
 
 </html>

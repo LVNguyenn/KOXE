@@ -18,6 +18,9 @@ import warrantyRouter from "./warranty.r";
 import invoiceRouter from "./invoice.r";
 import accessoryRouter from "./accessory.r";
 import legalsRouter from "./legals.r";
+import postRouter from "./post.r";
+import connectionRouter from "./connection.r";
+import transactionRouter from "./transaction.r";
 
 function router(app: Express) {
   app.use("/auth", authRouter);
@@ -39,6 +42,9 @@ function router(app: Express) {
   app.use("/invoice", invoiceRouter);
   app.use("/accessory", accessoryRouter);
   app.use("/legals", legalsRouter);
+  app.use("/posts", postRouter);
+  app.use("/connections", connectionRouter);
+  app.use("/transactions", transactionRouter);
 }
 
 export default router;

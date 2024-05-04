@@ -17,3 +17,6 @@ export * from "./Accessory";
 export * from "./AInvoiceDetail";
 export * from "./LegalDocuments";
 export * from "./LegalDetails";
+export * from "./Post";
+export * from "./Connection";
+export * from "./Transaction";
