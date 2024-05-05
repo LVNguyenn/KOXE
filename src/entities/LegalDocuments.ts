@@ -3,6 +3,7 @@ import { Car } from "./Car";
 import { User } from "./User";
 import { LegalDetails } from "./LegalDetails";
 import { Salon } from "./Salon";
+import { Process } from "./Process";
 
 @Entity()
 export class LegalDocuments {
@@ -31,6 +32,9 @@ export class LegalDocuments {
 
     @ManyToOne(() => Salon, (salon) => salon.legals, { cascade: true })
     salon!: Salon;
+
+    @ManyToOne(() => Process, (process) => process.documents, { cascade: true })
+    process!: Process;
 
     init (name: string, order: number) {
         this.name = name;

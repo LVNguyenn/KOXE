@@ -20,3 +20,4 @@ export * from "./LegalDetails";
 export * from "./Post";
 export * from "./Connection";
 export * from "./Transaction";
+export * from "./Process";
