@@ -102,8 +102,8 @@ export class Car {
   })
   process!: Process;
 
-  @Column('json', {nullable: true})
-  user_legals!: LegalDocuments[];
+  @Column({default: 0})
+  user_legals_period!: number;
 
   init(
     name: string,
@@ -123,7 +123,8 @@ export class Car {
     outColor: string,
     image: string[],
     salon: Salon,
-    available: number
+    available: number,
+    user_legals_period: number
   ) {
     this.name = name;
     this.description = description;
@@ -143,5 +144,6 @@ export class Car {
     this.image = image;
     this.salon = salon;
     this.available = available;
+    this.user_legals_period = user_legals_period;
   }
 }

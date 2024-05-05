@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, ManyToOne, ManyT
 import { User } from "./User";
 import { LegalDetails } from "./LegalDetails";
 import { Process } from "./Process";
+import { Car } from "./Car";
 
 @Entity()
 export class LegalDocuments {
