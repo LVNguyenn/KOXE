@@ -71,9 +71,6 @@ export class Salon {
   @OneToMany(() => Accessory, (accessory) => accessory.salon)
   accessories!: Accessory[];
 
-  @OneToMany(() => LegalDocuments, (legals) => legals.salon)
-  legals!: LegalDocuments[];
-
   @OneToMany(() => Connection, (connection) => connection.user)
   connections!: Connection[];
 

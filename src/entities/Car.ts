@@ -7,10 +7,13 @@ import {
   ManyToMany,
   JoinTable,
   JoinColumn,
+  OneToOne,
+  OneToMany,
 } from "typeorm";
 import { Salon } from "./Salon"; // Import entities Salon
 import { Warranty } from "./Warranty";
 import { LegalDocuments } from "./LegalDocuments";
+import { Process } from "./Process";
 
 @Entity()
 export class Car {
@@ -94,8 +97,13 @@ export class Car {
   })
   warranties!: Warranty;
 
-  @ManyToMany(() => LegalDocuments, legal => legal.car)
-  legals!: LegalDocuments[];
+  @ManyToOne(() => Process, (process) => process.cars, {
+    onDelete: "SET NULL",
+  })
+  process!: Process;
+
+  @Column('json', {nullable: true})
+  user_legals!: LegalDocuments[];
 
   init(
     name: string,

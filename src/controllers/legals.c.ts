@@ -5,6 +5,12 @@ import CarRepository from "../repository/car";
 import UserRepository from "../repository/user";
 
 const legalsController = {
+    createProcess: async (req: Request, res: Response) => {
+        const {carId, name, salonId, reuse, order} = req.body;
+
+        return res.json({});
+    },
+
     createLegalDocuments: async (req: Request, res: Response) => {
         const {carId, name, salonId, reuse, order} = req.body;
         const salonRp = await SalonRepository.findSalonById({salonId});

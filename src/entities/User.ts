@@ -83,9 +83,6 @@ export class User {
   @OneToMany(() => Purchase, (purchase) => purchase.user)
   packages!: Purchase[];
 
-  @ManyToMany(() => LegalDocuments, (legal) => legal.user)
-  legals!: LegalDocuments[];
-
   @OneToMany(() => Post, (post) => post.postedBy)
   posts!: Post[];
 
