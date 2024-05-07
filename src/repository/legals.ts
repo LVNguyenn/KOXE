@@ -1,8 +1,19 @@
 import { getRepository } from "typeorm";
 import { FormatData } from '../utils/index';
-import { Car, LegalDetails, LegalDocuments } from "../entities";
+import { Car, LegalDetails, LegalDocuments, Process } from "../entities";
 
 const LegalsRepository = {
+
+    async createProcess(data: any) {
+        try {
+            const processRepository = getRepository(Process);
+            await processRepository.save(data);
+
+            return FormatData("success", "create process successfully!", data);
+        } catch (error) {
+            return FormatData("failed", "Error create new process.");
+        }
+    },
 
     async createLegalDocuments(data: any) {
         try {

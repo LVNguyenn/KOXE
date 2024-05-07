@@ -6,7 +6,7 @@ export class Car_User_Legals {
     @PrimaryColumn()
     car_id!: string;
 
-    @PrimaryColumn()
+    @Column()
     phone!: string;
 
     @Column("simple-array", { nullable: true })

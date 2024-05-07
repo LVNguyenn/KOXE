@@ -1,14 +1,18 @@
-import { Entity, Column, PrimaryColumn, OneToOne, JoinColumn, OneToMany } from "typeorm"
+import { Entity, Column, PrimaryColumn, OneToOne, JoinColumn, OneToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
 import { LegalDocuments } from "./LegalDocuments";
 import { Car } from "./Car";
+import { Salon } from "./Salon";
 
 @Entity()
 export class Process {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
     id!: string;
 
     @Column()
     name!: string;
+
+    @ManyToOne(() => Salon, (salon) => salon.process, { cascade: true})
+    salon!: Salon;
 
     @OneToMany(() => LegalDocuments, (document) => document.process, { cascade: ['remove'] })
     documents!: LegalDocuments[];

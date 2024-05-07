@@ -15,6 +15,7 @@ import { Accessory } from "./Accessory";
 import { LegalDocuments } from "./LegalDocuments";
 import { Connection } from "./Connection";
 import { Transaction } from "./Transaction";
+import { Process } from "./Process";
 
 @Entity()
 export class Salon {
@@ -73,6 +74,9 @@ export class Salon {
 
   @OneToMany(() => Connection, (connection) => connection.user)
   connections!: Connection[];
+
+  @OneToMany(() => Process, (process) => process.salon)
+  process!: Process[];
 
   // @OneToMany(() => Transaction, (transaction) => transaction.user)
   // transactions!: Transaction[];
