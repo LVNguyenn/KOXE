@@ -1,6 +1,6 @@
 import { getRepository } from "typeorm";
 import { FormatData } from '../utils/index';
-import { Car, LegalDetails, LegalDocuments, Process } from "../entities";
+import { Car, Car_User_Legals, LegalDetails, LegalDocuments, Process } from "../entities";
 
 const LegalsRepository = {
 
@@ -100,6 +100,45 @@ const LegalsRepository = {
 
     },
 
+    async findLegalDetailsByPeriodSalonId(data: any) {
+        try {
+            const legalRepository = getRepository(LegalDetails);
+            const queryBuilder = await legalRepository
+            .createQueryBuilder('LegalDetails')
+            .leftJoinAndSelect('LegalDetails.period', 'legalDocuments', 'LegalDetails.period = :period', { ...data })
+            .innerJoinAndSelect('legalDocuments.salon', 'salon', 'salon.salon_id = :salonId', { ...data })
+
+            if (data?.id) {
+                const legalDb = queryBuilder.where({
+                    id: data.id
+                })
+                .getOne();
+
+                return FormatData("success", "find successfully!", legalDb);
+            }
+
+            queryBuilder.getMany()
+
+            return FormatData("success", "find successfully!", queryBuilder);
+        } catch (error) {
+            return FormatData("failed", "Error find the legal documents.");
+        }
+
+    },
+
+    async findLegalUserByPhone (data: any) {
+        try {
+            const carUserRepository = getRepository(Car_User_Legals);
+            const carUserDb = await carUserRepository.findOneOrFail({
+                where: { phone: data?.phone, car_id: data?.carId }
+            })
+
+            return FormatData("success", "find successfully!", carUserDb);
+        } catch (error) {
+            return FormatData("failed", "Error find the legals for the user by phone.");
+        }
+    },
+
     async updateProcessById (data: any) {
         try {
             const processRepository = getRepository(Process)
@@ -110,50 +149,6 @@ const LegalsRepository = {
         } catch (error) {
             console.log(error)
             return FormatData("failed", "Error update the process.");
-        }
-    },
-    
-    async removeLegalDetailsForDocuments (data: any) {
-        try {
-            const legalRepository = getRepository(LegalDetails);
-            const legalDb = await this.findLegalDetailsByPeriodSalonId(data);
-            console.log(legalDb?.data)
-            const rmObject: any = {id: legalDb?.data?.id, name: legalDb?.data?.name, update_date: legalDb?.data?.update_date}
-            await legalRepository.remove(rmObject);
-
-            return FormatData("success", "delete legal details successfully!", legalDb?.data);
-        } catch (error) {
-            console.log(error)
-            return FormatData("failed", "Error delete the legal details.");
-        }
-    },
-
-    async findLegalDetailsByPeriodSalonId(data: any) {
-        try {
-            const legalRepository = getRepository(LegalDetails);
-            const legalDb = await legalRepository
-            .createQueryBuilder('LegalDetails')
-            .leftJoinAndSelect('LegalDetails.period', 'legalDocuments', 'LegalDetails.period = :period', { ...data })
-            .innerJoinAndSelect('legalDocuments.salon', 'salon', 'salon.salon_id = :salonId', { ...data })
-            .getOne()
-
-            return FormatData("success", "find successfully!", legalDb);
-        } catch (error) {
-            return FormatData("failed", "Error find the legal documents.");
-        }
-
-    },
-
-    async updateLegalDetailsOfDocuments (data: any) {
-        try {
-            const legalRepository = getRepository(LegalDetails)
-            let legalDb = await this.findLegalDetailsByPeriodSalonId(data);
-            await legalRepository.save({...legalDb?.data, name: data?.name, update_date: new Date()});
-
-            return FormatData("success", "Updated the legal details successfully!", legalDb);
-        } catch (error) {
-            console.log(error)
-            return FormatData("failed", "Error update the legal details.");
         }
     },
 
@@ -167,6 +162,33 @@ const LegalsRepository = {
         } catch (error) {
             console.log(error)
             return FormatData("failed", "Error update the legal documents.");
+        }
+    },  
+    
+    async updateLegalDetailsOfDocuments (data: any) {
+        try {
+            const legalRepository = getRepository(LegalDetails)
+            let legalDb = await this.findLegalDetailsByPeriodSalonId(data);
+            await legalRepository.save({...legalDb?.data, name: data?.name, update_date: new Date()});
+
+            return FormatData("success", "Updated the legal details successfully!", legalDb);
+        } catch (error) {
+            console.log(error)
+            return FormatData("failed", "Error update the legal details.");
+        }
+    },
+
+
+    async removeProcess(data: any) {
+        try {
+            const processRepository = getRepository(Process);
+            const processDb = await this.findProcessByIdSalonId(data);
+            await processRepository.remove(processDb?.data);
+
+            return FormatData("success", "delete legal details successfully!", processDb?.data);
+        } catch (error) {
+            console.log(error)
+            return FormatData("failed", "Error delete the legal details.");
         }
     },
 
@@ -182,6 +204,24 @@ const LegalsRepository = {
             return FormatData("failed", "Error delete the legal documents.");
         }
     },
+    
+    async removeLegalDetails (data: any) {
+        try {
+            const legalRepository = getRepository(LegalDetails);
+            const legalDb = await this.findLegalDetailsByPeriodSalonId(data);
+            const rmObject: any = {id: legalDb?.data?.id, name: legalDb?.data?.name, update_date: legalDb?.data?.update_date}
+            await legalRepository.remove(rmObject);
+
+            return FormatData("success", "delete legal details successfully!", legalDb?.data);
+        } catch (error) {
+            console.log(error)
+            return FormatData("failed", "Error delete the legal details.");
+        }
+    },
+
+
+
+
 
     async getLegalForUser (data: any) {
         
@@ -190,24 +230,21 @@ const LegalsRepository = {
     // need to review
     async addLegalForUser (data: any) {
         try {
-            const legalRepository = getRepository(LegalDocuments);
-            const user = !data?.olduser?[data?.user]: [...data?.olduser, data?.user];
-            const legalDb = await legalRepository.save({...data?.legal, user})
+            const carUserRepository = getRepository(Car_User_Legals);
+            const carUserDb = await carUserRepository.save(data);
             
-            return FormatData("success", "add legal documents for the user successfully!", legalDb);
+            return FormatData("success", "add legal documents for the user successfully!", carUserDb);
         } catch (error) {
             console.log(error)
             return FormatData("failed", "Error add documents for the user.");
         }
     },
 
+
     async removeLegalForUser (data: any) {
         
     },
 
-    async setLegalForCar (data: any) {
-
-    },
 }
 
 export default LegalsRepository;

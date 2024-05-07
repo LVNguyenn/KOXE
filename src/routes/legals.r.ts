@@ -54,4 +54,14 @@ router.post(
     legalsController.addLegalForUser
 );
 
+router.post(
+    "/check-details-user",
+    legalsController.addLegalDetailsForUser
+);
+
+router.post(
+    "/get-legals-user",
+    legalsController.getLegalsByPhoneCarId
+);
+
 export default router;

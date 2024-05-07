@@ -12,7 +12,7 @@ export class Car_User_Legals {
     @Column("simple-array", { nullable: true })
     details!: LegalDetails[];
 
-    @Column({default: 0})
+    @Column({default: 1})
     current_period!: number;
 
     init(current_period: number) {
