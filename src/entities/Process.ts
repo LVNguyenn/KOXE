@@ -1,5 +1,4 @@
 import { Entity, Column, PrimaryColumn, OneToOne, JoinColumn, OneToMany } from "typeorm"
-import { Feature } from "./Feature";
 import { LegalDocuments } from "./LegalDocuments";
 import { Car } from "./Car";
 

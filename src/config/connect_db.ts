@@ -22,7 +22,8 @@ import {
   Post,
   Connection,
   Transaction,
-  Process
+  Process,
+  Car_User_Legals
 } from "../entities";
 import { DataSourceOptions } from "typeorm";
 
@@ -59,7 +60,8 @@ export const connectionString: DataSourceOptions = {
     Post,
     Connection,
     Transaction,
-    Process
+    Process,
+    Car_User_Legals
   ],
   synchronize: true,
   ssl: {

@@ -21,3 +21,4 @@ export * from "./Post";
 export * from "./Connection";
 export * from "./Transaction";
 export * from "./Process";
+export * from "./Car_User_Legals";

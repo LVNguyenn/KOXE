@@ -102,12 +102,6 @@ export class Car {
   })
   process!: Process;
 
-  @Column({default: 0})
-  number_of_period!: number;
-
-  @Column({default: 0})
-  user_legals_period!: number;
-
   init(
     name: string,
     description: string,
@@ -126,9 +120,7 @@ export class Car {
     outColor: string,
     image: string[],
     salon: Salon,
-    available: number,
-    number_of_period: number,
-    user_legals_period: number
+    available: number
   ) {
     this.name = name;
     this.description = description;
@@ -148,7 +140,5 @@ export class Car {
     this.image = image;
     this.salon = salon;
     this.available = available;
-    this.number_of_period = number_of_period;
-    this.user_legals_period = user_legals_period;
   }
 }
