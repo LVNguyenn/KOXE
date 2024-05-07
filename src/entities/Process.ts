@@ -5,7 +5,7 @@ import { Salon } from "./Salon";
 
 @Entity()
 export class Process {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn('uuid')
     id!: string;
 
     @Column()

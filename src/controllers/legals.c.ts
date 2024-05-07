@@ -6,11 +6,18 @@ import UserRepository from "../repository/user";
 
 const legalsController = {
     createProcess: async (req: Request, res: Response) => {
-        const {carId, name, salonId, documents, phone} = req.body;
+        const {carId, name, salonId, documents} = req.body;
         // get Salon
         const salonRp = await SalonRepository.findSalonById({salonId});
+        // get Car
+        const carRp = await CarRepository.findCarByCarIdSalonId({salonId, carId});
         //create new process
-        const processRp = await LegalsRepository.createProcess({name, car_id: carId, phone, })
+        const processRp = await LegalsRepository.createProcess({name, car_id: carId, salon: salonRp?.data, cars: carRp?.data});
+        // create new documents
+        for (let document of documents) {
+            // documents = [{name: name 1, data:  [detail 1, detail 2, ...] }, {name: name 2, data:  [detail 3, detail 4, ...] }, ...]
+
+        }
 
         return res.json({});
     },

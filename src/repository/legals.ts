@@ -7,9 +7,9 @@ const LegalsRepository = {
     async createProcess(data: any) {
         try {
             const processRepository = getRepository(Process);
-            await processRepository.save(data);
+            const newProcess = await processRepository.save(data);
 
-            return FormatData("success", "create process successfully!", data);
+            return FormatData("success", "create process successfully!", newProcess);
         } catch (error) {
             return FormatData("failed", "Error create new process.");
         }
