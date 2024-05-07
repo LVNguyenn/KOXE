@@ -6,7 +6,7 @@ import UserRepository from "../repository/user";
 
 const legalsController = {
     createProcess: async (req: Request, res: Response) => {
-        const {carId, name, salonId, reuse, order} = req.body;
+        const {carId, name, salonId} = req.body;
 
         return res.json({});
     },

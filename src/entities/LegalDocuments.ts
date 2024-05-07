@@ -21,7 +21,7 @@ export class LegalDocuments {
     @OneToMany(() => LegalDetails, (legal) => legal.document, { cascade: ['remove'] })
     details!: LegalDetails[];
 
-    @ManyToOne(() => Process, (process) => process.documents, { cascade: true })
+    @ManyToOne(() => Process, (process) => process.documents, {onDelete: 'CASCADE'})
     process!: Process;
 
     init (name: string, order: number) {
