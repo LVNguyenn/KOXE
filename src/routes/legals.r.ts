@@ -5,18 +5,28 @@ import legalsController from "../controllers/legals.c";
 const router = Router();
 
 router.post(
-    "/create",
-    legalsController.createLegalDocuments
+    "/create-process",
+    legalsController.createProcess
 );
 
 router.post(
-    "/",
-    legalsController.getLegalDocuments
+    "/create-documents",
+    legalsController.createLegalDocuments
 );
 
 router.post(
     "/create-details",
     legalsController.createLegalDetails
+);
+
+router.post(
+    "/process",
+    legalsController.getAllProcess
+);
+
+router.patch(
+    "/update-process",
+    legalsController.updateProcess
 );
 
 router.delete(

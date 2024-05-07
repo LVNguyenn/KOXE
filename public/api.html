@@ -636,9 +636,20 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
         việc thêm này là salon thêm sau khi người dùng mua xe tại salon đó. Người dùng chỉ việc xem, còn salon thấy người dùng hoàn thành giai đoạn nào, quá trình tới 
         đâu thì salon tự cập nhật cho người dùng. 
     </div>
-    <li>[POST] /legals/create</li>
+    <li>[POST] /legals/create-process</li>
+    Dùng để tạo ra 1 qui trình (như là qui trình mua xe). Cần truyền vô như sau:
+    <div>
+        {
+            "salonId": "997af3b3-0ccc-41a2-8133-1c0f7ccf268c",
+            "carId": "e13e9396-542c-4c55-8aea-66b4144aa10c",
+            "name": "Quy trinh mua xe",
+            "documents": [{"name": "doc 1", "order": 1, "details": ["de 1", "de 2"]}, {"name": "doc 2", "order": 2, "details": ["de 3"]}]
+        }
+    </div>
+    Lưu ý là nên kiểm tra đầy đủ khi truyền nhé, thiếu cái nào thì hệ thống tự bỏ cái đó nếu bản thân nó tạo lỗi.
+    <li>[POST] /legals/create-documents</li>
     Tạo ra  legal documents (tức là giai đoạn). Salon thực hiện. Cần truyền vô: 
-    {carId, name, salonId, reuse, order}.
+    { name, salonId, order, processId, details: ["de 4", "de 5"],}.
     <div>
         carId: Id của cái xe mà mình cần gán luôn, có thể không truyền thì là không gán, sau này gán sau cũng được, tức là có thể truyền hoặc không.
     </div>
@@ -648,16 +659,38 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
         reuse: cho phép dùng lại giai đoạn này cho các xe khác hay không, mặc định là cho phép dùng lại nếu không truyền vô. Còn muốn giai đoạn này chỉ 
         dùng cho xe gì đó thì truyền vô reuse: false.
         order: số thứ tự của giai đoạn, tức là giai đoạn 1, 2, 3, 4. Cần truyền vô là number.
+        processId: id của qui trình cần thêm vô (vd: id của qui trình mua xe).
+        details: mảng các giấy tờ thuộc giai đoạn đó cần tạo chung luôn.
     </div>
+    <li>[POST] /legals/create-details</li>
+    Dùng để tạo ra các giấy tờ trong mỗi giai đoạn (legal details). Khi kích vào mỗi giai đoạn chúng ta nên có nút cộng để tạo thêm giấy tờ cho giai đoạn đó. Cần truyền vô:
+    <div>
+        {
+            "salonId",
+            "details": ["de 6", "de 7"],
+            "period": id của giai đoạn cần thêm giấy tờ vô. (có kí hiệu là period).
+        }
+    </div>
+    <li>[POST] /legals/process</li>
+    Dùng để lấy ra toàn bộ qui trình của 1 salon. Yêu cầu truyền vô salonId.
+    <li>[PATCH] /legals/update-process</li>
+    dùng để cập nhật tên của qui trình. Cần truyền vô:
+    {salonId, processId, name}
+
+
+
+
+<div>
+    ------------------------------------------------------------------------------------------------------------
+</div>
+<li>API phía trên hoạt động được, bên duới chưa sửa.</li>
+
+
+
     <li>[POST] /legals</li>
     Dùng để lấy ra các legal documents  (các giai đoạn) của một salon. Cần truyền vô:
     {salonId, period: là id của giai đoạn, không truyền thì lấy toàn bộ, truyền thêm period thì lấy theo id.}
 
-    <li>[POST] /legals/create-details</li>
-    Dùng để tạo ra một giấy tờ trong mỗi giai đoạn (legal details). Khi kích vào mỗi giai đoạn chúng ta nên có nút cộng để tạo thêm giấy tờ cho giai đoạn đó. Cần truyền vô:
-    <div>
-        {period: id của legal documents, name: tên của giấy tờ chi tiết (legal details), salonId}.
-    </div>
     <li>[POST] /cars/legals</li>
     Lưu ý là /cars chứ không phải /legals như những api trên. Dùng để lấy ra toàn bộ giấy tờ pháp lý của toàn bộ các quá trình của xe. Cần truyền vô:
     {carId}.

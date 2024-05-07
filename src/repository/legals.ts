@@ -7,9 +7,9 @@ const LegalsRepository = {
     async createProcess(data: any) {
         try {
             const processRepository = getRepository(Process);
-            const newProcess = await processRepository.save(data);
+            const processDb = await processRepository.save(data);
 
-            return FormatData("success", "create process successfully!", newProcess);
+            return FormatData("success", "create process successfully!", processDb);
         } catch (error) {
             return FormatData("failed", "Error create new process.");
         }
@@ -18,9 +18,9 @@ const LegalsRepository = {
     async createLegalDocuments(data: any) {
         try {
             const legalsRepository = getRepository(LegalDocuments);
-            await legalsRepository.save(data);
+            const documentDb = await legalsRepository.save(data);
 
-            return FormatData("success", "create legal documents successfully!", data);
+            return FormatData("success", "create legal documents successfully!", documentDb);
         } catch (error) {
             return FormatData("failed", "Error create new legal documents.");
         }
@@ -40,14 +40,46 @@ const LegalsRepository = {
 
     },
 
+    async findProcessByIdSalonId(data: any) {
+        try {
+            const processRepository = getRepository(Process);
+            const processDb = await processRepository.findOneOrFail({
+                where: {id: data.processId},
+                relations: ['salon']
+            })
+
+            if (processDb.salon?.salon_id !== data?.salonId) 
+                return FormatData("failed", "Error find the process");
+
+            return FormatData("success", "find successfully!", processDb);
+        } catch (error) {
+            return FormatData("failed", "Error find the process");
+        }
+    },
+
+    async getAllProcessBySalonId(data: any) {
+        try {
+            const processRepository = getRepository(Process);
+            const processDb : any = await processRepository
+            .createQueryBuilder('Process')
+            .leftJoinAndSelect('Process.salon', 'salon', 'salon.salon_id = :salonId', { ...data })
+            .leftJoinAndSelect('Process.documents', 'legalDocuments')
+            .leftJoinAndSelect('legalDocuments.details', 'legalDetails')
+            .getMany();
+
+            return FormatData("success", "find successfully!", processDb);
+        } catch (error) {
+            console.log(error)
+            return FormatData("failed", "Error find the legal documents.");
+        }
+    },
+
     async findLegalDocumentSalonId(data: any) {
         try {
             const legalRepository = getRepository(LegalDocuments);
             const queryBuilder : any = await legalRepository
             .createQueryBuilder('legalDocuments')
-            .innerJoinAndSelect('legalDocuments.salon', 'salon', 'salon.salon_id = :salonId', { ...data })
-            .leftJoinAndSelect('legalDocuments.documents', 'legalDetails')
-            .leftJoinAndSelect('legalDocuments.user', 'user')
+            .leftJoinAndSelect('legalDocuments.details', 'legalDetails')
             .orderBy('legalDocuments.order', 'ASC')
 
             if (data?.period) {
@@ -62,9 +94,23 @@ const LegalsRepository = {
 
             return FormatData("success", "find successfully!", legalDb);
         } catch (error) {
+            console.log(error)
             return FormatData("failed", "Error find the legal documents.");
         }
 
+    },
+
+    async updateProcessById (data: any) {
+        try {
+            const processRepository = getRepository(Process)
+            const processDb = await this.findProcessByIdSalonId(data);
+            const newProcess = await processRepository.save({...processDb?.data, name: data?.name});
+
+            return FormatData("success", "Updated the process successfully!", newProcess);
+        } catch (error) {
+            console.log(error)
+            return FormatData("failed", "Error update the process.");
+        }
     },
     
     async removeLegalDetailsForDocuments (data: any) {
