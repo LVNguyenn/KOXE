@@ -134,21 +134,20 @@ const legalsController = {
         return res.json({ ...legalRp });
     },
 
-    addLegalForUser: async (req: Request, res: Response) => {
-        const { salonId, phone, carId, details, period } = req.body;
-        // details = [id detail 1, id 2, ...]
+    addLegalForUser: async (data: any) => {
+        const { salonId, phone, carId } = data;
         const carRp = await CarRepository.findCarByCarIdSalonId({ carId, salonId });
 
         if (!carRp?.data) {
-            return res.json({
+            return {
                 status: "failed",
                 msg: "Error add legals for the user."
-            })
+            }
         }
 
         const userRp = await LegalsRepository.addLegalForUser({ phone, car_id: carId });
 
-        return res.json({ ...userRp });
+        return userRp;
     },
 
     addLegalDetailsForUser: async (req: Request, res: Response) => {

@@ -4,6 +4,7 @@ import { MoreThan, getRepository } from "typeorm";
 import { Invoice, Salon, User } from '../entities';
 import statistics, {averageEachMonth, getTopSeller} from '../helper/statistics';
 import Year from "../utils/year";
+import legalsController from "./legals.c";
 
 
 const invoiceController = {
@@ -47,10 +48,14 @@ const invoiceController = {
       // set status for car is selled.
       await carRepository.save({ ...carDb, available: Number(carDb.available) - 1 });
 
+      // add legal for custormer
+      const legalRp = await legalsController.addLegalForUser({carId, salonId, phone})
+
       return res.json({
         status: "success",
         msg: "Create invoice successfully!",
         invoice: { ...saveInvoice, warranty: carDb?.warranties },
+        legals: legalRp
       });
     } catch (error) {
       console.log(error);
