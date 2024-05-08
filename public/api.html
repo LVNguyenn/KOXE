@@ -678,19 +678,16 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     {salonId, processId, name}
 
 
-
+    <li>[POST] /legals/check-details-user</li>
+    Salon tích vô các chi tiết trong một giai đoạn cho user. Cần truyền vô:
+    {salonId, phone, details: [id của detail 1, id 2, ....]}
+    <li>[POST] /legals/get-legals-user</li>
+    Dùng để lấy ra hiện user đó đã trong giai đoạn nào và có được chi tiết nào rồi. Cần truyền vô: { phone, carId: không truyền thì lấy toàn bộ }
 
 <div>
     ------------------------------------------------------------------------------------------------------------
 </div>
 <li>API phía trên hoạt động được, bên duới chưa sửa.</li>
-
-
-
-    <li>[POST] /legals</li>
-    Dùng để lấy ra các legal documents  (các giai đoạn) của một salon. Cần truyền vô:
-    {salonId, period: là id của giai đoạn, không truyền thì lấy toàn bộ, truyền thêm period thì lấy theo id.}
-
     <li>[POST] /cars/legals</li>
     Lưu ý là /cars chứ không phải /legals như những api trên. Dùng để lấy ra toàn bộ giấy tờ pháp lý của toàn bộ các quá trình của xe. Cần truyền vô:
     {carId}.
@@ -710,9 +707,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[DELETE] /legals/delete-documents</li>
     Dùng để xóa một qui trình nào đó. Lưu ý là xóa qui trình thì các giấy tờ thuộc qui trình đó tự động cũng được xóa theo. Cần truyền vô:
     {salonId, period: id của qui trình.}
-    <li>[POST] /legals/add-user</li>
-    Dùng để thêm các qui trình cho một user. Hiện đang suy nghĩ hướng tích cực. Sẽ sớm cập nhật.
-    <li>Các phần khác sẽ sớm hoàn thiện. Có vấn đề gì thì trao đổi nhé.</li>
+
 
     <h2>Bài đăng bán xe</h2>
     (Bao gồm các trường: post_id, text, postedBy(userId), salons(mảng id các salon có thể xem), createdAt)

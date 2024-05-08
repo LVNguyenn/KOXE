@@ -9,13 +9,13 @@ export class Car_User_Legals {
     @Column()
     phone!: string;
 
-    @Column("simple-array", { nullable: true })
-    details!: LegalDetails[];
+    @Column("json", { nullable: true })
+    details!: any[];
 
-    @Column({default: 1})
-    current_period!: number;
+    @Column()
+    current_period!: string;
 
-    init(current_period: number) {
+    init(current_period: string) {
         this.current_period = current_period;
     }
 }

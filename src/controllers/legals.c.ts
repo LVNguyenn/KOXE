@@ -120,7 +120,7 @@ const legalsController = {
     addLegalForUser: async (req: Request, res: Response) => {
         const { salonId, phone, carId, details, period } = req.body;
         // details = [id detail 1, id 2, ...]
-        const carRp = await CarRepository.findCarByCarIdSalonId({carId, salonId});
+        const carRp = await CarRepository.findCarByCarIdSalonId({ carId, salonId });
 
         if (!carRp?.data) {
             return res.json({
@@ -129,13 +129,13 @@ const legalsController = {
             })
         }
 
-        const userRp = await LegalsRepository.addLegalForUser({phone, car_id: carId});
+        const userRp = await LegalsRepository.addLegalForUser({ phone, car_id: carId });
 
-        return res.json({...userRp});
+        return res.json({ ...userRp });
     },
 
     addLegalDetailsForUser: async (req: Request, res: Response) => {
-        const { salonId, phone, details, period } = req.body;
+        const { salonId, phone, details } = req.body;
         let data: any = {};
 
         if (!phone) {
@@ -146,30 +146,31 @@ const legalsController = {
         }
 
         // find legal car user
-        const carUserRp = await LegalsRepository.findLegalUserByPhone({phone});
-        console.log(carUserRp)
+        const carUserRp = await LegalsRepository.findLegalUserByPhone({ phone });
 
         // details = [id detail 1, id 2, ...]
-        // find details
-        for (let detail of details) {
-            const detailRp = await LegalsRepository.findLegalDetailsByPeriodSalonId({period, salonId, id: detail})
-            
-            if (detailRp?.data) {
-                data.details = !data?.details ? [detailRp?.data] : [...data.details, detailRp?.data];
+        try {
+            for (let detail of details) {
+                const detailRp = await LegalsRepository.findLegalDetailsByPeriodId({ period: carUserRp?.period, salonId, id: detail })
+
+                if (detailRp?.data) {
+                    data.details = !data?.details ? [detailRp?.data] : [...data.details, detailRp?.data];
+                }
             }
-        }
+        } catch (error) { }
+        // find details
 
-        const userRp = await LegalsRepository.addLegalForUser({...carUserRp?.data, details : data?.details});
+        const userRp = await LegalsRepository.addLegalForUser({ ...carUserRp?.data, details: data?.details });
 
-        return res.json({...userRp});
+        return res.json({ ...userRp });
     },
 
     getLegalsByPhoneCarId: async (req: Request, res: Response) => {
-        const { salonId, phone, carId } = req.body;
-        const carUserRp = await LegalsRepository.findLegalUserByPhone({carId, phone});
+        const { phone, carId } = req.body;
+        const carUserRp = await LegalsRepository.findLegalUserByPhone({ carId, phone });
 
-        return res.json({...carUserRp});
-        
+        return res.json({ ...carUserRp });
+
     },
 
 }
