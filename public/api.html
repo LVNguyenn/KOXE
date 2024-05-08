@@ -703,30 +703,22 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[POST] /legals/get-legals-user</li>
     Dùng để lấy ra hiện user đó đã trong giai đoạn nào và có được chi tiết nào rồi. Cần truyền vô: { phone, carId: không truyền thì lấy toàn bộ }
 
+    <li>[POST] /cars/legals</li>
+    Lưu ý là /cars chứ không phải /legals như những api trên. Dùng để lấy ra toàn bộ giấy tờ pháp lý của toàn bộ các quá trình của xe. Cần truyền vô:
+    {carId, salonId}.
+    <div>
+        Để xem dữ liệu có sẵn thì truyền vô "carId": "e13e9396-542c-4c55-8aea-66b4144aa10c".
+        salonId: "997af3b3-0ccc-41a2-8133-1c0f7ccf268c".
+    </div>
 <div>
     ------------------------------------------------------------------------------------------------------------
 </div>
 <li>API phía trên hoạt động được, bên duới chưa sửa.</li>
-    <li>[POST] /cars/legals</li>
-    Lưu ý là /cars chứ không phải /legals như những api trên. Dùng để lấy ra toàn bộ giấy tờ pháp lý của toàn bộ các quá trình của xe. Cần truyền vô:
-    {carId}.
-    <div>
-        Để xem dữ liệu có sẵn thì truyền vô "carId": "e13e9396-542c-4c55-8aea-66b4144aa10c".
-        salonId: "997af3b3-0ccc-41a2-8133-1c0f7ccf268c" (nếu cần truyền).
-    </div>
 
-    <li>[PATCH] /legals/update-details</li>
-    Dùng để cập  nhật tên giấy tờ của qui trình nào đó. Cần truyền vô:
-    {id: id của giấy tờ cần cập nhật, salonId, period: id của cái qui trình chứa giấy tờ đó., name: tên mới cần cập nhật.}
-    <li>[PATCH] /legals/update-documents</li>
-    Dùng để cập nhật tên 1 qui trình gì đó. Cần truyền vô: 
-    {salonId, period: id của cái qui trình cần cập nhật, name: tên mới của qui trình.}
+
     <li>[DELETE] /legals/delete-documents</li>
     Dùng để xóa một qui trình nào đó. Lưu ý là xóa qui trình thì các giấy tờ thuộc qui trình đó tự động cũng được xóa theo. Cần truyền vô:
     {salonId, period: id của qui trình.}
-    <li>[DELETE] /legals/delete-details</li>
-    Dùng để xóa một loại giấy tờ trong một qui trình. Cần truyền vô: 
-    {id: id của giấy tờ đó, salonId: id của salon, period: id của cái qui trình chứa giấy tờ đó.}
 
     <h2>Bài đăng bán xe</h2>
     (Bao gồm các trường: post_id, text, postedBy(userId), salons(mảng id các salon có thể xem), createdAt)

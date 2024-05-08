@@ -369,8 +369,8 @@ const carController = {
     },
 
     getAllLegalByCar: async (req: Request, res: Response) => {
-        const {carId, name, salonId, reuse, period} = req.body;
-        const legalRp = await CarRepository.findLegalByCar({carId})
+        const {carId, salonId} = req.body;
+        const legalRp = await CarRepository.findLegalByCar({carId, salonId})
 
         return res.json({...legalRp});
     }
