@@ -15,7 +15,11 @@ export class Car_User_Legals {
     @Column()
     current_period!: string;
 
-    init(current_period: string) {
+    @Column({default: false})
+    done!: boolean;
+
+    init(current_period: string, done: boolean) {
         this.current_period = current_period;
+        this.done = done;
     }
 }

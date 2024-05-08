@@ -44,11 +44,11 @@ const LegalsRepository = {
         try {
             const processRepository = getRepository(Process);
             const processDb = await processRepository.findOneOrFail({
-                where: {id: data.processId},
+                where: { id: data.processId },
                 relations: ['salon']
             })
 
-            if (processDb.salon?.salon_id !== data?.salonId) 
+            if (processDb.salon?.salon_id !== data?.salonId)
                 return FormatData("failed", "Error find the process");
 
             return FormatData("success", "find successfully!", processDb);
@@ -60,12 +60,12 @@ const LegalsRepository = {
     async getAllProcessBySalonId(data: any) {
         try {
             const processRepository = getRepository(Process);
-            const processDb : any = await processRepository
-            .createQueryBuilder('Process')
-            .leftJoinAndSelect('Process.salon', 'salon', 'salon.salon_id = :salonId', { ...data })
-            .leftJoinAndSelect('Process.documents', 'legalDocuments')
-            .leftJoinAndSelect('legalDocuments.details', 'legalDetails')
-            .getMany();
+            const processDb: any = await processRepository
+                .createQueryBuilder('Process')
+                .leftJoinAndSelect('Process.salon', 'salon', 'salon.salon_id = :salonId', { ...data })
+                .leftJoinAndSelect('Process.documents', 'legalDocuments')
+                .leftJoinAndSelect('legalDocuments.details', 'legalDetails')
+                .getMany();
 
             return FormatData("success", "find successfully!", processDb);
         } catch (error) {
@@ -77,10 +77,10 @@ const LegalsRepository = {
     async findLegalDocumentSalonId(data: any) {
         try {
             const legalRepository = getRepository(LegalDocuments);
-            const queryBuilder : any = await legalRepository
-            .createQueryBuilder('legalDocuments')
-            .leftJoinAndSelect('legalDocuments.details', 'legalDetails')
-            .orderBy('legalDocuments.order', 'ASC')
+            const queryBuilder: any = await legalRepository
+                .createQueryBuilder('legalDocuments')
+                .leftJoinAndSelect('legalDocuments.details', 'legalDetails')
+                .orderBy('legalDocuments.order', 'ASC')
 
             if (data?.period) {
                 queryBuilder.where({ period: data.period });
@@ -89,7 +89,7 @@ const LegalsRepository = {
             if (data?.carId) {
                 queryBuilder.innerJoinAndSelect('legalDocuments.car', 'car', 'car.car_id = :carId', { ...data })
             }
-            
+
             const legalDb: any = await queryBuilder.getMany();
 
             return FormatData("success", "find successfully!", legalDb);
@@ -104,14 +104,14 @@ const LegalsRepository = {
         try {
             const legalRepository = getRepository(LegalDetails);
             const queryBuilder = await legalRepository
-            .createQueryBuilder('LegalDetails')
-            .leftJoinAndSelect('LegalDetails.document', 'legalDocuments', 'LegalDetails.document = :period', { ...data })
+                .createQueryBuilder('LegalDetails')
+                .leftJoinAndSelect('LegalDetails.document', 'legalDocuments', 'LegalDetails.document = :period', { ...data })
 
             if (data?.id) {
                 const legalDb = await queryBuilder.where({
                     id: data.id
                 })
-                .getOne();
+                    .getOne();
 
                 return FormatData("success", "find successfully!", legalDb);
             }
@@ -126,7 +126,7 @@ const LegalsRepository = {
 
     },
 
-    async findLegalUserByPhone (data: any) {
+    async findLegalUserByPhone(data: any) {
         try {
             const carUserRepository = getRepository(Car_User_Legals);
             let carUserDb: any = await carUserRepository.find({
@@ -135,7 +135,7 @@ const LegalsRepository = {
 
             // get documents by period
             for (const carUser of carUserDb) {
-                const documentDb = await this.findDocumentById({data});
+                const documentDb = await this.findDocumentById({ data });
                 carUser.documents = documentDb;
             }
 
@@ -145,11 +145,11 @@ const LegalsRepository = {
         }
     },
 
-    async findDocumentById (data: any) {
+    async findDocumentById(data: any) {
         try {
             const documentRepository = getRepository(LegalDocuments);
             const documentDb = await documentRepository.findOneOrFail({
-                where: {period: data?.period},
+                where: { period: data?.period },
                 relations: ['details']
             })
 
@@ -163,11 +163,11 @@ const LegalsRepository = {
         try {
             const carRepository = getRepository(Car);
             const documentDb = await carRepository
-            .createQueryBuilder('Car')
-            .leftJoinAndSelect('Car.process', 'process')
-            .leftJoinAndSelect('process.documents', 'legalDocuments')
-            .where({car_id: data?.carId})
-            .getOne()
+                .createQueryBuilder('Car')
+                .leftJoinAndSelect('Car.process', 'process')
+                .leftJoinAndSelect('process.documents', 'legalDocuments')
+                .where({ car_id: data?.carId })
+                .getOne()
 
             return FormatData("success", "find successfully!", documentDb);
         } catch (error) {
@@ -176,11 +176,66 @@ const LegalsRepository = {
         }
     },
 
-    async updateProcessById (data: any) {
+    async getPeriodCurrentByCarUser(data: any) {
+        try {
+            const carUserRepository = getRepository(Car_User_Legals);
+            const carUserDb = await carUserRepository.findOneOrFail({
+                where: { car_id: data?.carId, phone: data?.phone }
+            })
+
+            return FormatData("success", "find successfully!", carUserDb);
+        } catch (error) {
+            return FormatData("failed", "Error find the legal documents.");
+        }
+
+    },
+
+    // need to review
+    async getAllLegalsUserForSalon(data: any) {
+        try {
+            const carUserRepository = getRepository(Car_User_Legals);
+            const queryBuilder = await carUserRepository
+            .createQueryBuilder("Car_User_Legals")
+            .leftJoinAndSelect('Car_User_Legals.car_id', 'car')
+            .leftJoinAndSelect('car.salon', 'salon', 'salon.salon_id = :salonId', {...data})
+
+            if (data?.done !== undefined && data?.done !== "undefined") {
+                const carUserDb = queryBuilder.where({done: data?.done}).getMany()
+
+                return FormatData("success", "find successfully!", carUserDb);
+            }
+            const carUserDb = queryBuilder.getMany()
+
+            return FormatData("success", "find successfully!", carUserDb);
+        } catch (error) {
+            return FormatData("failed", "Error find the legal documents.");
+        }
+
+    },
+
+    async getAllLegalsUserForSalon2(data: any) {
+        try {
+            let carUserDb;
+            const carUserRepository = getRepository(Car_User_Legals);
+            if (data?.done !== undefined && data?.done !== "undefined") {
+                carUserDb = await carUserRepository.find({ })
+            } else {
+                carUserDb = await carUserRepository.find({ where: { done: data?.done }})
+            }
+
+            // let dataRs = carUserDb.filter((carUser) => carUser.)
+
+        } catch (error) {
+            return FormatData("failed", "Error find the legal documents.");
+        }
+
+    },
+
+    async updateProcessById(data: any) {
         try {
             const processRepository = getRepository(Process)
             const processDb = await this.findProcessByIdSalonId(data);
-            const newProcess = await processRepository.save({...processDb?.data, name: data?.name});
+            const newProcess = await processRepository.save({ ...processDb?.data, name: data?.name });
 
             return FormatData("success", "Updated the process successfully!", newProcess);
         } catch (error) {
@@ -189,7 +244,7 @@ const LegalsRepository = {
         }
     },
 
-    async updateNameLegalDocuments (data: any) {
+    async updateNameLegalDocuments(data: any) {
         try {
             const legalRepository = getRepository(LegalDocuments);
             let legalDb = await this.findLegalDocumentSalonId(data);
@@ -197,20 +252,20 @@ const LegalsRepository = {
             if (!legalDb?.data[0])
                 return FormatData("failed", "Error update the legal documents");
 
-            const dataDb = await legalRepository.save({...legalDb?.data[0], name: data?.name, order: data?.order});
+            const dataDb = await legalRepository.save({ ...legalDb?.data[0], name: data?.name, order: data?.order });
 
             return FormatData("success", "Updated the legal documents successfully!", dataDb);
         } catch (error) {
             console.log(error)
             return FormatData("failed", "Error update the legal documents.");
         }
-    },  
-    
-    async updateLegalDetailsOfDocuments (data: any) {
+    },
+
+    async updateLegalDetailsOfDocuments(data: any) {
         try {
             const legalRepository = getRepository(LegalDetails)
             let legalDb = await this.findLegalDetailsByPeriodId(data);
-            await legalRepository.save({...legalDb?.data, name: data?.name, update_date: new Date()});
+            await legalRepository.save({ ...legalDb?.data, name: data?.name, update_date: new Date() });
 
             return FormatData("success", "Updated the legal details successfully!", legalDb);
         } catch (error) {
@@ -233,7 +288,7 @@ const LegalsRepository = {
         }
     },
 
-    async removeLegalDocuments (data: any) {
+    async removeLegalDocuments(data: any) {
         try {
             const legalRepository = getRepository(LegalDocuments);
             const legalDb = await this.findLegalDocumentSalonId(data);
@@ -245,12 +300,12 @@ const LegalsRepository = {
             return FormatData("failed", "Error delete the legal documents.");
         }
     },
-    
-    async removeLegalDetails (data: any) {
+
+    async removeLegalDetails(data: any) {
         try {
             const legalRepository = getRepository(LegalDetails);
             const legalDb = await this.findLegalDetailsByPeriodId(data);
-            const rmObject: any = {id: legalDb?.data?.id, name: legalDb?.data?.name, update_date: legalDb?.data?.update_date}
+            const rmObject: any = { id: legalDb?.data?.id, name: legalDb?.data?.name, update_date: legalDb?.data?.update_date }
             await legalRepository.remove(rmObject);
 
             return FormatData("success", "delete legal details successfully!", legalDb?.data);
@@ -260,10 +315,10 @@ const LegalsRepository = {
         }
     },
 
-    async removeAllLegalDetails (data: any) {
+    async removeAllLegalDetails(data: any) {
         try {
             const legalRepository = getRepository(LegalDetails);
-            const legalDb = await legalRepository.delete({document: data?.period})
+            const legalDb = await legalRepository.delete({ document: data?.period })
 
             return FormatData("success", "delete legal details successfully!", legalDb);
         } catch (error) {
@@ -272,11 +327,11 @@ const LegalsRepository = {
         }
     },
 
-    async addLegalForUser (data: any) {
+    async addLegalForUser(data: any) {
         try {
             const carUserRepository = getRepository(Car_User_Legals);
             const carUserDb = await carUserRepository.save(data);
-            
+
             return FormatData("success", "add legal documents for the user successfully!", carUserDb);
         } catch (error) {
             console.log(error)
@@ -284,17 +339,12 @@ const LegalsRepository = {
         }
     },
 
+    async removeLegalDetailsForUser(data: any) {
 
-    async removeLegalDetailsForUser (data: any) {
-        
     },
 
-    async nextPeriodForUser (data: any) {
-        
-    },
+    async getAllCarNotDoneBySalon(data: any) {
 
-    async getAllCarNotDoneBySalon (data: any) {
-        
     },
 
 }

@@ -44,10 +44,6 @@ router.delete(
     legalsController.removeLegalDocuments
 );
 
-// router.post(
-//     "/add-user",
-//     legalsController.addLegalForUser
-// );
 
 router.post(
     "/check-details-user",
@@ -57,6 +53,11 @@ router.post(
 router.post(
     "/get-legals-user",
     legalsController.getLegalsByPhoneCarId
+);
+
+router.patch(
+    "/update-period-user",
+    legalsController.updateNewPeriodForUser
 );
 
 export default router;

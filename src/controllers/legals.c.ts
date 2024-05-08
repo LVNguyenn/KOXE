@@ -83,7 +83,7 @@ const legalsController = {
     updateLegalDocuments: async (req: Request, res: Response) => {
         const { salonId, period, name, order, details } = req.body;
         let detailRp;
-        
+
         try {
             if (!period) {
                 return res.json({
@@ -92,8 +92,8 @@ const legalsController = {
                 })
             }
             // find legal document by salon id and period => the salon is owner.
-            const documentRp = await LegalsRepository.findLegalDocumentSalonId({salonId, period})
-            
+            const documentRp = await LegalsRepository.findLegalDocumentSalonId({ salonId, period })
+
             if (!documentRp?.data) {
                 return res.json({
                     status: "failed",
@@ -101,7 +101,7 @@ const legalsController = {
                 })
             }
             // detele all old details
-            await LegalsRepository.removeAllLegalDetails({period});
+            await LegalsRepository.removeAllLegalDetails({ period });
             // details = [name 1, name 2, ...]
             // add new details
             for (let detail of details) {
@@ -112,11 +112,11 @@ const legalsController = {
         // finaly update new name for documents if existed
         if (name || order) {
             const legalRp = await LegalsRepository.updateNameLegalDocuments({ salonId, period, name, order })
-            
+
             return res.json({ ...legalRp });
         }
-        
-        
+
+
         return res.json({ ...detailRp });
     },
 
@@ -192,12 +192,48 @@ const legalsController = {
 
     },
 
-    nextPeriodForUser: async (req: Request, res: Response) => {
-        const { phone, carId, nextPeriod } = req.body;
-        const carUserRp = await LegalsRepository.findLegalUserByPhone({ carId, phone });
+    updateNewPeriodForUser: async (req: Request, res: Response) => {
+        const { phone, carId, newPeriod, salonId, done } = req.body;
+        let newCarUserRp;
+        // get to check having permission.
+        const documentRp = await LegalsRepository.findLegalDocumentSalonId({ salonId, period: newPeriod });
+        if (!documentRp?.data) {
+            return res.json({
+                status: "failed",
+                msg: "Error update the period for user."
+            })
+        }
+
+        // find old period
+        const oldPeriod = await LegalsRepository.getPeriodCurrentByCarUser({ carId, phone });
+
+        if (done) {
+            newCarUserRp = await LegalsRepository.addLegalForUser({ ...oldPeriod?.data, current_period: newPeriod, done: done });
+        } else {
+            // delete all old details
+            await LegalsRepository.removeAllLegalDetails({ period: oldPeriod?.data?.current_period });
+            // update new period for user
+            newCarUserRp = await LegalsRepository.addLegalForUser({ ...oldPeriod?.data, current_period: newPeriod });
+        }
+
+        if (!newCarUserRp?.data) {
+            return res.json({
+                status: "failed",
+                msg: "Error next period for user"
+            })
+        }
+
+        return res.json({
+            status: "success",
+            msg: "update new period for the user successfully!"
+        })
+    },
+
+    getAllLegalsUserForSalon: async (req: Request, res: Response) => {
+        const { salonId, done } = req.body;
+        const carUserRp = await LegalsRepository.getAllLegalsUserForSalon({ salonId, done });
 
         return res.json({ ...carUserRp });
-
     },
 
 }

@@ -717,6 +717,18 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
         salonId: "997af3b3-0ccc-41a2-8133-1c0f7ccf268c".
     </div>
 
+    <li>[PATCH] /legals/update-period-user</li> 
+    Dùng để cập nhật một giai đoạn mới cho user. Cần truyền vô:
+    <div>
+        {
+            "salonId": "e03942f6-1fc0-4864-9a70-647a070160d7",
+            "carId": "438bc588-400f-413c-b0fa-cb5cadd076fd",
+            "phone": "3333333",
+            "newPeriod": "f190530c-335e-4a2d-92dd-72c970bc8696",
+            "done": true  (Nếu đã là giai đoạn cuối của tiến trình muốn ấn đã hoàn thành thì truyền vô, còn không thì thôi, nếu truyền này thì khỏi truyền newPeriod cũng được.)
+        }
+    </div>
+
     <h2>Bài đăng bán xe</h2>
     (Bao gồm các trường: post_id, text, postedBy(userId), salons(mảng id các salon có thể xem), createdAt)
     Này chỉ có user mới được đăng thôi nhé(nên thằng nào mà có salon thì chắc phải ẩn giao diện)
