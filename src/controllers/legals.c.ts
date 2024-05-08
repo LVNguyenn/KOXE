@@ -120,28 +120,12 @@ const legalsController = {
         return res.json({ ...detailRp });
     },
 
-    // updateLegalDetailsOfDocuments: async (req: Request, res: Response) => {
-    //     const { id, salonId, period, name } = req.body;
-    //     const legalRp = await LegalsRepository.updateLegalDetailsOfDocuments({ id, salonId, period, name })
-
-    //     return res.json({ ...legalRp });
-    // },
-
     removeProcess: async (req: Request, res: Response) => {
         const { processId, salonId } = req.body;
         const legalRp = await LegalsRepository.removeProcess({ processId, salonId })
 
         return res.json({ ...legalRp });
     },
-
-    // removeLegalDetailsForDocuments: async (req: Request, res: Response) => {
-    //     const { id, salonId, period } = req.body;
-    //     const legalRp = await LegalsRepository.removeLegalDetails({ id, salonId, period })
-
-    //     return res.json({ ...legalRp });
-    // },
-
-
 
     removeLegalDocuments: async (req: Request, res: Response) => {
         const { salonId, period } = req.body;

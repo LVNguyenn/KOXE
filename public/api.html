@@ -695,7 +695,13 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
         details: là mảng các giấy tờ sau khi cập nhật giai đoạn. Các giấy tờ cũ sẽ bị xóa đi và thay thành các giấy tờ mới này.
     </div>
 
+    <li>[DELETE] /legals/delete-documents</li>
+    Dùng để xóa một giai đoạn. Lưu ý là xóa giai đoạn thì các giấy tờ thuộc giai đoạn đó tự động cũng được xóa theo. Cần truyền vô:
+    {salonId, period: id của giai đoạn.}
 
+    <li>[DELETE] /legals/delete-process</li>
+    Dùng để xóa một qui trình nào đó. Lưu ý là xóa qui trình thì các giai đoạn và các chi tiết của giai đoạn mà thuộc qui trình đó tự động cũng được xóa theo. Cần truyền vô:
+    {salonId, processId: id của qui trình.}
 
     <li>[POST] /legals/check-details-user</li>
     Salon tích vô các chi tiết trong một giai đoạn cho user. Cần truyền vô:
@@ -716,9 +722,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
 <li>API phía trên hoạt động được, bên duới chưa sửa.</li>
 
 
-    <li>[DELETE] /legals/delete-documents</li>
-    Dùng để xóa một qui trình nào đó. Lưu ý là xóa qui trình thì các giấy tờ thuộc qui trình đó tự động cũng được xóa theo. Cần truyền vô:
-    {salonId, period: id của qui trình.}
+
 
     <h2>Bài đăng bán xe</h2>
     (Bao gồm các trường: post_id, text, postedBy(userId), salons(mảng id các salon có thể xem), createdAt)

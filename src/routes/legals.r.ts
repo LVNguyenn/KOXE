@@ -29,19 +29,14 @@ router.patch(
     legalsController.updateProcess
 );
 
-// router.delete(
-//     "/delete-details",
-//     legalsController.removeLegalDetailsForDocuments
-// );
-
-// router.patch(
-//     "/update-details",
-//     legalsController.updateLegalDetailsOfDocuments
-// );
-
 router.patch(
     "/update-documents",
     legalsController.updateLegalDocuments
+);
+
+router.delete(
+    "/delete-process",
+    legalsController.removeProcess
 );
 
 router.delete(

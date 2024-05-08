@@ -222,7 +222,7 @@ const LegalsRepository = {
             const legalDb = await this.findLegalDocumentSalonId(data);
             await legalRepository.remove(legalDb?.data[0]);
 
-            return FormatData("success", "delete legal documents successfully!", legalDb);
+            return FormatData("success", "delete legal documents successfully!", legalDb?.data);
         } catch (error) {
             console.log(error)
             return FormatData("failed", "Error delete the legal documents.");
