@@ -159,6 +159,23 @@ const LegalsRepository = {
         }
     },
 
+    async getFirstDocumentsByCar(data: any) {
+        try {
+            const carRepository = getRepository(Car);
+            const documentDb = await carRepository
+            .createQueryBuilder('Car')
+            .leftJoinAndSelect('Car.process', 'process')
+            .leftJoinAndSelect('process.documents', 'legalDocuments')
+            .where({car_id: data?.carId})
+            .getOne()
+
+            return FormatData("success", "find successfully!", documentDb);
+        } catch (error) {
+            console.log(error)
+            return FormatData("failed", "Error find the legal documents.");
+        }
+    },
+
     async updateProcessById (data: any) {
         try {
             const processRepository = getRepository(Process)
@@ -255,16 +272,6 @@ const LegalsRepository = {
         }
     },
 
-
-
-
-
-
-    async getLegalForUser (data: any) {
-        
-    },
-
-    // need to review
     async addLegalForUser (data: any) {
         try {
             const carUserRepository = getRepository(Car_User_Legals);
@@ -278,7 +285,15 @@ const LegalsRepository = {
     },
 
 
-    async removeLegalForUser (data: any) {
+    async removeLegalDetailsForUser (data: any) {
+        
+    },
+
+    async nextPeriodForUser (data: any) {
+        
+    },
+
+    async getAllCarNotDoneBySalon (data: any) {
         
     },
 

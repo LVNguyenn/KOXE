@@ -138,6 +138,10 @@ const legalsController = {
         const { salonId, phone, carId } = data;
         const carRp = await CarRepository.findCarByCarIdSalonId({ carId, salonId });
 
+        // get first documents
+        const firstDocumentRp = await LegalsRepository.getFirstDocumentsByCar(data);
+        const firstPeriod = firstDocumentRp?.data.process.documents[0].period;
+
         if (!carRp?.data) {
             return {
                 status: "failed",
@@ -145,7 +149,7 @@ const legalsController = {
             }
         }
 
-        const userRp = await LegalsRepository.addLegalForUser({ phone, car_id: carId });
+        const userRp = await LegalsRepository.addLegalForUser({ phone, car_id: carId, current_period: firstPeriod });
 
         return userRp;
     },
@@ -174,7 +178,6 @@ const legalsController = {
                 }
             }
         } catch (error) { }
-        // find details
 
         const userRp = await LegalsRepository.addLegalForUser({ ...carUserRp?.data, details: data?.details });
 
@@ -183,6 +186,14 @@ const legalsController = {
 
     getLegalsByPhoneCarId: async (req: Request, res: Response) => {
         const { phone, carId } = req.body;
+        const carUserRp = await LegalsRepository.findLegalUserByPhone({ carId, phone });
+
+        return res.json({ ...carUserRp });
+
+    },
+
+    nextPeriodForUser: async (req: Request, res: Response) => {
+        const { phone, carId, nextPeriod } = req.body;
         const carUserRp = await LegalsRepository.findLegalUserByPhone({ carId, phone });
 
         return res.json({ ...carUserRp });
