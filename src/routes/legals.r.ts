@@ -29,15 +29,15 @@ router.patch(
     legalsController.updateProcess
 );
 
-router.delete(
-    "/delete-details",
-    legalsController.removeLegalDetailsForDocuments
-);
+// router.delete(
+//     "/delete-details",
+//     legalsController.removeLegalDetailsForDocuments
+// );
 
-router.patch(
-    "/update-details",
-    legalsController.updateLegalDetailsOfDocuments
-);
+// router.patch(
+//     "/update-details",
+//     legalsController.updateLegalDetailsOfDocuments
+// );
 
 router.patch(
     "/update-documents",
@@ -49,10 +49,10 @@ router.delete(
     legalsController.removeLegalDocuments
 );
 
-router.post(
-    "/add-user",
-    legalsController.addLegalForUser
-);
+// router.post(
+//     "/add-user",
+//     legalsController.addLegalForUser
+// );
 
 router.post(
     "/check-details-user",

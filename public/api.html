@@ -676,6 +676,25 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[PATCH] /legals/update-process</li>
     dùng để cập nhật tên của qui trình. Cần truyền vô:
     {salonId, processId, name}
+    <li>[PATCH] /legals/update-documents</li>
+    Dùng để cập nhật 1 giai đoạn, cần truyền vô: 
+    <div>
+        {
+            "salonId": "997af3b3-0ccc-41a2-8133-1c0f7ccf268c",
+            "period": "8d7ac0ca-ca70-44a7-bcf9-cd13445fa275",
+            "details": ["new detail 1", "new detail 2"],
+            "name": "new name document 1",
+            "order": 1
+        }
+    </div>
+    xin lưu ý:
+    <div>
+        order: là số thứ tự của giai đoạn, nếu cần đổi thì truyền vô không thì thôi.
+        name: là tên mới của giai đoạn, nếu cần đổi thì truyền vô không thì thôi.
+        salonId, period: id của giai đoạn cần cập nhật đó (tên biến gốc là period luôn), 2 trường này phải truyền.
+        details: là mảng các giấy tờ sau khi cập nhật giai đoạn. Các giấy tờ cũ sẽ bị xóa đi và thay thành các giấy tờ mới này.
+    </div>
+
 
 
     <li>[POST] /legals/check-details-user</li>
@@ -695,9 +714,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
         Để xem dữ liệu có sẵn thì truyền vô "carId": "e13e9396-542c-4c55-8aea-66b4144aa10c".
         salonId: "997af3b3-0ccc-41a2-8133-1c0f7ccf268c" (nếu cần truyền).
     </div>
-    <li>[DELETE] /legals/delete-details</li>
-    Dùng để xóa một loại giấy tờ trong một qui trình. Cần truyền vô: 
-    {id: id của giấy tờ đó, salonId: id của salon, period: id của cái qui trình chứa giấy tờ đó.}
+
     <li>[PATCH] /legals/update-details</li>
     Dùng để cập  nhật tên giấy tờ của qui trình nào đó. Cần truyền vô:
     {id: id của giấy tờ cần cập nhật, salonId, period: id của cái qui trình chứa giấy tờ đó., name: tên mới cần cập nhật.}
@@ -707,7 +724,9 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[DELETE] /legals/delete-documents</li>
     Dùng để xóa một qui trình nào đó. Lưu ý là xóa qui trình thì các giấy tờ thuộc qui trình đó tự động cũng được xóa theo. Cần truyền vô:
     {salonId, period: id của qui trình.}
-
+    <li>[DELETE] /legals/delete-details</li>
+    Dùng để xóa một loại giấy tờ trong một qui trình. Cần truyền vô: 
+    {id: id của giấy tờ đó, salonId: id của salon, period: id của cái qui trình chứa giấy tờ đó.}
 
     <h2>Bài đăng bán xe</h2>
     (Bao gồm các trường: post_id, text, postedBy(userId), salons(mảng id các salon có thể xem), createdAt)

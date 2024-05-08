@@ -81,18 +81,51 @@ const legalsController = {
     },
 
     updateLegalDocuments: async (req: Request, res: Response) => {
-        const { salonId, period, name, reuse } = req.body;
-        const legalRp = await LegalsRepository.updateLegalDocuments({ salonId, period, name, reuse })
+        const { salonId, period, name, order, details } = req.body;
+        let detailRp;
+        
+        try {
+            if (!period) {
+                return res.json({
+                    status: "failed",
+                    msg: "Missing period input."
+                })
+            }
+            // find legal document by salon id and period => the salon is owner.
+            const documentRp = await LegalsRepository.findLegalDocumentSalonId({salonId, period})
+            
+            if (!documentRp?.data) {
+                return res.json({
+                    status: "failed",
+                    msg: "Can not update."
+                })
+            }
+            // detele all old details
+            await LegalsRepository.removeAllLegalDetails({period});
+            // details = [name 1, name 2, ...]
+            // add new details
+            for (let detail of details) {
+                detailRp = await LegalsRepository.createLegalDetails({ name: detail, document: documentRp.data[0] })
+            }
+        } catch (error) { }
 
-        return res.json({ ...legalRp });
+        // finaly update new name for documents if existed
+        if (name || order) {
+            const legalRp = await LegalsRepository.updateNameLegalDocuments({ salonId, period, name, order })
+            
+            return res.json({ ...legalRp });
+        }
+        
+        
+        return res.json({ ...detailRp });
     },
 
-    updateLegalDetailsOfDocuments: async (req: Request, res: Response) => {
-        const { id, salonId, period, name } = req.body;
-        const legalRp = await LegalsRepository.updateLegalDetailsOfDocuments({ id, salonId, period, name })
+    // updateLegalDetailsOfDocuments: async (req: Request, res: Response) => {
+    //     const { id, salonId, period, name } = req.body;
+    //     const legalRp = await LegalsRepository.updateLegalDetailsOfDocuments({ id, salonId, period, name })
 
-        return res.json({ ...legalRp });
-    },
+    //     return res.json({ ...legalRp });
+    // },
 
     removeProcess: async (req: Request, res: Response) => {
         const { processId, salonId } = req.body;
@@ -101,12 +134,12 @@ const legalsController = {
         return res.json({ ...legalRp });
     },
 
-    removeLegalDetailsForDocuments: async (req: Request, res: Response) => {
-        const { id, salonId, period } = req.body;
-        const legalRp = await LegalsRepository.removeLegalDetails({ id, salonId, period })
+    // removeLegalDetailsForDocuments: async (req: Request, res: Response) => {
+    //     const { id, salonId, period } = req.body;
+    //     const legalRp = await LegalsRepository.removeLegalDetails({ id, salonId, period })
 
-        return res.json({ ...legalRp });
-    },
+    //     return res.json({ ...legalRp });
+    // },
 
 
 

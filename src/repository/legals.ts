@@ -172,13 +172,17 @@ const LegalsRepository = {
         }
     },
 
-    async updateLegalDocuments (data: any) {
+    async updateNameLegalDocuments (data: any) {
         try {
-            const legalRepository = getRepository(LegalDocuments)
+            const legalRepository = getRepository(LegalDocuments);
             let legalDb = await this.findLegalDocumentSalonId(data);
-            await legalRepository.save({...legalDb?.data[0], name: data?.name, reuse: data?.reuse});
 
-            return FormatData("success", "Updated the legal documents successfully!", legalDb);
+            if (!legalDb?.data[0])
+                return FormatData("failed", "Error update the legal documents");
+
+            const dataDb = await legalRepository.save({...legalDb?.data[0], name: data?.name, order: data?.order});
+
+            return FormatData("success", "Updated the legal documents successfully!", dataDb);
         } catch (error) {
             console.log(error)
             return FormatData("failed", "Error update the legal documents.");
@@ -238,6 +242,19 @@ const LegalsRepository = {
             return FormatData("failed", "Error delete the legal details.");
         }
     },
+
+    async removeAllLegalDetails (data: any) {
+        try {
+            const legalRepository = getRepository(LegalDetails);
+            const legalDb = await legalRepository.delete({document: data?.period})
+
+            return FormatData("success", "delete legal details successfully!", legalDb);
+        } catch (error) {
+            console.log(error)
+            return FormatData("failed", "Error delete the legal details.");
+        }
+    },
+
 
 
 
