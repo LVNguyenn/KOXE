@@ -66,7 +66,6 @@ const LegalsRepository = {
                 .leftJoinAndSelect('Process.salon', 'salon', 'salon.salon_id = :salonId', { ...data })
                 .leftJoinAndSelect('Process.documents', 'legalDocuments')
                 .leftJoinAndSelect('legalDocuments.details', 'legalDetails')
-                .where({type: 0})
 
             if (data?.processId) {
                 processDb =  await queryBuilder.where({ id: data?.processId }).getOne();
