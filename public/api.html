@@ -645,6 +645,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
             "carId": "e13e9396-542c-4c55-8aea-66b4144aa10c",
             "description": "mô tả qui trình"
             "name": "Quy trinh mua xe",
+            "type": number -  qui ước 0: mua xe; 1: hoa tiêu,
             "documents": [{"name": "doc 1", "order": 1, "details": ["de 1", "de 2"]}, {"name": "doc 2", "order": 2, "details": ["de 3"]}]
         }
     </div>
@@ -658,8 +659,6 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <div>
         name: tên của giai đoạn.
         salonId: id salon.
-        reuse: cho phép dùng lại giai đoạn này cho các xe khác hay không, mặc định là cho phép dùng lại nếu không truyền vô. Còn muốn giai đoạn này chỉ 
-        dùng cho xe gì đó thì truyền vô reuse: false.
         order: số thứ tự của giai đoạn, tức là giai đoạn 1, 2, 3, 4. Cần truyền vô là number.
         processId: id của qui trình cần thêm vô (vd: id của qui trình mua xe).
         details: mảng các giấy tờ thuộc giai đoạn đó cần tạo chung luôn.
@@ -677,7 +676,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Dùng để lấy ra toàn bộ qui trình của 1 salon. Yêu cầu truyền vô {salonId, processId: id của process, không truyền thì lấy tất cả, truyền thì lấy theo id}.
     <li>[PATCH] /legals/update-process</li>
     dùng để cập nhật tên của qui trình. Cần truyền vô:
-    {salonId, processId, name, description}
+    {salonId, processId, name, description, type: number}
     <li>[PATCH] /legals/update-documents</li>
     Dùng để cập nhật 1 giai đoạn, cần truyền vô: 
     <div>

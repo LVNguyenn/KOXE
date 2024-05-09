@@ -248,7 +248,7 @@ const LegalsRepository = {
         try {
             const processRepository = getRepository(Process)
             const processDb = await this.findProcessByIdSalonId(data);
-            const newProcess = await processRepository.save({ ...processDb?.data, name: data?.name, description: data?.description });
+            const newProcess = await processRepository.save({ ...processDb?.data, name: data?.name, description: data?.description, type: data?.type });
 
             return FormatData("success", "Updated the process successfully!", newProcess);
         } catch (error) {
