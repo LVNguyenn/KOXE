@@ -673,7 +673,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
         }
     </div>
     <li>[POST] /legals/process</li>
-    Dùng để lấy ra toàn bộ qui trình của 1 salon. Yêu cầu truyền vô salonId.
+    Dùng để lấy ra toàn bộ qui trình của 1 salon. Yêu cầu truyền vô {salonId, processId: id của process, không truyền thì lấy tất cả, truyền thì lấy theo id}.
     <li>[PATCH] /legals/update-process</li>
     dùng để cập nhật tên của qui trình. Cần truyền vô:
     {salonId, processId, name}

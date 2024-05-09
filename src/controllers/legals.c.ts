@@ -67,8 +67,8 @@ const legalsController = {
     },
 
     getAllProcess: async (req: Request, res: Response) => {
-        const { salonId } = req.body;
-        const legalRp = await LegalsRepository.getAllProcessBySalonId({ salonId })
+        const { salonId, processId } = req.body;
+        const legalRp = await LegalsRepository.getAllProcessBySalonId({ salonId, processId })
 
         return res.json({ ...legalRp });
     },
@@ -137,6 +137,7 @@ const legalsController = {
     addLegalForUser: async (data: any) => {
         const { salonId, phone, carId } = data;
         const carRp = await CarRepository.findCarByCarIdSalonId({ carId, salonId });
+        console.log(carRp)
 
         // get first documents
         const firstDocumentRp = await LegalsRepository.getFirstDocumentsByCar(data);

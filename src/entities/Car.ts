@@ -14,6 +14,7 @@ import { Salon } from "./Salon"; // Import entities Salon
 import { Warranty } from "./Warranty";
 import { LegalDocuments } from "./LegalDocuments";
 import { Process } from "./Process";
+import { Car_User_Legals } from "./Car_User_Legals";
 
 @Entity()
 export class Car {

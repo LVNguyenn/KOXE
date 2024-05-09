@@ -60,14 +60,25 @@ const LegalsRepository = {
     async getAllProcessBySalonId(data: any) {
         try {
             const processRepository = getRepository(Process);
-            const processDb: any = await processRepository
+            let processDb
+            const queryBuilder: any = await processRepository
                 .createQueryBuilder('Process')
                 .leftJoinAndSelect('Process.salon', 'salon', 'salon.salon_id = :salonId', { ...data })
                 .leftJoinAndSelect('Process.documents', 'legalDocuments')
                 .leftJoinAndSelect('legalDocuments.details', 'legalDetails')
-                .getMany();
 
-            return FormatData("success", "find successfully!", processDb);
+            if (data?.processId) {
+                processDb =  await queryBuilder.where({ id: data?.processId }).getOne();
+
+                return FormatData("success", "find successfully!", processDb);
+            } else {
+                processDb = await queryBuilder.getMany();
+                const dataRs = processDb.filter((pr: any) => pr?.salon!= null)
+
+                return FormatData("success", "find successfully!", dataRs);
+
+            }
+            
         } catch (error) {
             console.log(error)
             return FormatData("failed", "Error find the legal documents.");
@@ -196,18 +207,20 @@ const LegalsRepository = {
             const carUserRepository = getRepository(Car_User_Legals);
             const queryBuilder = await carUserRepository
             .createQueryBuilder("Car_User_Legals")
-            .leftJoinAndSelect('Car_User_Legals.car_id', 'car')
-            .leftJoinAndSelect('car.salon', 'salon', 'salon.salon_id = :salonId', {...data})
+            .leftJoinAndSelect('Car_User_Legals.car', 'Car')
+            // .leftJoin("Car", "car", "car.car_id = Car_User_Legals.car_id")
+            // .leftJoinAndSelect('car.salon', 'salon', 'salon.salon_id = :salonId', {...data})
 
             if (data?.done !== undefined && data?.done !== "undefined") {
                 const carUserDb = queryBuilder.where({done: data?.done}).getMany()
-
+                console.log("here")
                 return FormatData("success", "find successfully!", carUserDb);
             }
             const carUserDb = queryBuilder.getMany()
 
             return FormatData("success", "find successfully!", carUserDb);
         } catch (error) {
+            console.log(error)
             return FormatData("failed", "Error find the legal documents.");
         }
 

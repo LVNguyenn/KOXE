@@ -60,4 +60,9 @@ router.patch(
     legalsController.updateNewPeriodForUser
 );
 
+router.post(
+    "/get-all",
+    legalsController.getAllLegalsUserForSalon
+);
+
 export default router;
