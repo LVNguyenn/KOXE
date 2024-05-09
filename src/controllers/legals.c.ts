@@ -6,22 +6,25 @@ import UserRepository from "../repository/user";
 
 const legalsController = {
     createProcess: async (req: Request, res: Response) => {
-        const { carId, name, salonId, documents } = req.body;
+        const { carId, name, salonId, documents, description } = req.body;
         // get Salon
         const salonRp = await SalonRepository.findSalonById({ salonId });
         // get Car
         const carRp = await CarRepository.findCarByCarIdSalonId({ salonId, carId });
         //create new process
-        const processRp = await LegalsRepository.createProcess({ name, car_id: carId, salon: salonRp?.data, cars: [carRp?.data] });
-        // create new documents
-        for (let document of documents) {
-            // documents = [{name: name 1, order: 1, details:  [detail 1, detail 2, ...] }, {name: name 2, order: 2, details:  [detail 3, detail 4, ...] }, ...]
-            const documentRp = await LegalsRepository.createLegalDocuments({ name: document.name, order: document.order, process: processRp?.data });
-            // create new details for documents
-            for (let detail of document?.details) {
-                await LegalsRepository.createLegalDetails({ name: detail, document: documentRp?.data });
+        const processRp = await LegalsRepository.createProcess({ name, description, car_id: carId, salon: salonRp?.data, cars: [carRp?.data] });
+        try {
+            // create new documents
+            for (let document of documents) {
+                // documents = [{name: name 1, order: 1, details:  [detail 1, detail 2, ...] }, {name: name 2, order: 2, details:  [detail 3, detail 4, ...] }, ...]
+                const documentRp = await LegalsRepository.createLegalDocuments({ name: document.name, order: document.order, process: processRp?.data });
+                // create new details for documents
+                for (let detail of document?.details) {
+                    await LegalsRepository.createLegalDetails({ name: detail, document: documentRp?.data });
+                }
             }
-        }
+        } catch (error) { }
+
 
         return res.json({ status: processRp?.status, msg: processRp?.msg });
     },
@@ -34,10 +37,13 @@ const legalsController = {
         const processRp = await LegalsRepository.findProcessByIdSalonId({ processId, salonId });
         // create new documents
         const documentRp = await LegalsRepository.createLegalDocuments({ name, order, salon: salonRp?.data, reuse, process: processRp?.data });
-        // create new details for documents
-        for (let detail of details) {
-            await LegalsRepository.createLegalDetails({ name: detail, document: documentRp?.data });
-        }
+        try {
+            // create new details for documents
+            for (let detail of details) {
+                await LegalsRepository.createLegalDetails({ name: detail, document: documentRp?.data });
+            }
+        } catch (error) { }
+
 
         return res.json({ ...documentRp });
     },
@@ -74,8 +80,8 @@ const legalsController = {
     },
 
     updateProcess: async (req: Request, res: Response) => {
-        const { salonId, processId, name } = req.body;
-        const processRp = await LegalsRepository.updateProcessById({ salonId, processId, name })
+        const { salonId, processId, name, description } = req.body;
+        const processRp = await LegalsRepository.updateProcessById({ salonId, processId, name, description })
 
         return res.json({ ...processRp });
     },

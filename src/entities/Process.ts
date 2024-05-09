@@ -11,6 +11,9 @@ export class Process {
     @Column()
     name!: string;
 
+    @Column({nullable: true})
+    description!: string;
+
     @ManyToOne(() => Salon, (salon) => salon.process, { cascade: true})
     salon!: Salon;
 
@@ -20,8 +23,9 @@ export class Process {
     @OneToMany(() => Car, (car) => car.process, { cascade: true })
     cars!: LegalDocuments[];
 
-    init(id: string, name: string) {
+    init(id: string, name: string, description: string) {
         this.id = id;
         this.name = name;
+        this.description = description;
     }
 }

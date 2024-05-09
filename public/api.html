@@ -643,6 +643,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
         {
             "salonId": "997af3b3-0ccc-41a2-8133-1c0f7ccf268c",
             "carId": "e13e9396-542c-4c55-8aea-66b4144aa10c",
+            "description": "mô tả qui trình"
             "name": "Quy trinh mua xe",
             "documents": [{"name": "doc 1", "order": 1, "details": ["de 1", "de 2"]}, {"name": "doc 2", "order": 2, "details": ["de 3"]}]
         }
@@ -676,7 +677,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Dùng để lấy ra toàn bộ qui trình của 1 salon. Yêu cầu truyền vô {salonId, processId: id của process, không truyền thì lấy tất cả, truyền thì lấy theo id}.
     <li>[PATCH] /legals/update-process</li>
     dùng để cập nhật tên của qui trình. Cần truyền vô:
-    {salonId, processId, name}
+    {salonId, processId, name, description}
     <li>[PATCH] /legals/update-documents</li>
     Dùng để cập nhật 1 giai đoạn, cần truyền vô: 
     <div>
