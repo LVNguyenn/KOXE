@@ -747,9 +747,10 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
 
     <h2>Giai đoạn hoa tiêu</h2>
     (Bao gồm các trường: stage_id, name, procedureId(thuộc về quy trình nào), salonId(salon nào tạo), commissionRate(phần trăm hoa hồng), order: thứ tự)
-    <li>[GET] /stages/salon</li>
-    Sẽ lấy ra được các giai đoạn mà salon đó tạo kèm theo chi tiết giai đoạn
-    <li>[GET] /stages/:procedureId</li>
+    Giai đoạn thì nó phải trong 1 quy trình cụ thể, không làm quản lý giai đoạn riêng lẻ 
+    <li>[GET] /stages/:id</li>
+    Sẽ lấy ra được chi tiết giai đoạn kèm theo đó là chi tiết giai đoạn
+    <li>[GET] /stages/procedure/:procedureId</li>
     Sẽ lấy ra được các giai đoạn kèm theo chi tiết giai đoạn của 1 quy trình
     <li>[POST] /stages</li>
     Thêm một giai đoạn mới. Lúc này sẽ truyền vào chi tiết của giai đoạn luôn(detail). Ví dụ:
