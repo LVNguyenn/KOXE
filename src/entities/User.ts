@@ -89,8 +89,8 @@ export class User {
   @OneToMany(() => Connection, (connection) => connection.user)
   connections!: Connection[];
 
-  // @OneToMany(() => Transaction, (transaction) => transaction.user)
-  // transactions!: Transaction[];
+  @OneToMany(() => Transaction, (transaction) => transaction.user)
+  transactions!: Transaction[];
 
   init(
     user_id: string,

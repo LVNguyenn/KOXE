@@ -70,7 +70,7 @@ createConnection(connectionString)
       await redis.connect();
       console.log("Connected Redis.");
     } catch (error) {
-      console.log("Error connection Redis.", error)
+      console.log("Error connection Redis.", error);
     }
 
     // cache

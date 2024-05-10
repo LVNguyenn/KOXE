@@ -732,49 +732,97 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
 
     <li>Lấy ra danh sách các khách hàng chưa hoàn thành thủ tục, hoàn thành rồi, lấy tất cả: sẽ sớm có.</li>
 
-    <h2>Bài đăng bán xe</h2>
-    (Bao gồm các trường: post_id, text, postedBy(userId), salons(mảng id các salon có thể xem), createdAt)
-    Này chỉ có user mới được đăng thôi nhé(nên thằng nào mà có salon thì chắc phải ẩn giao diện)
+    <h2>Quy trình</h2>
+    (Bao gồm các trường: procedure_id, name, type, salonId)
+    <li>[GET] /procedures</li>
+    Nó sẽ lấy ra được tất cả các quy trình của salon đó. Nếu có truyền vào querystring. Ví dụ: http://localhost:5000/procedures?type=hoatieu thì nó sẽ lấy ra các quy trình hoa tiêu thôi(không truyền lấy cả 2)
+    <li>[GET] /procedures/:id</li>
+    Sẽ lấy ra được chi tiết quy trình kèm theo các giai đoạn và chi tiết giai đoạn thuộc về quy trình đó
+    <li>[POST] /procedures</li>
+    Thêm quy trình mới. Truyền vào name, type(hoatieu, giayto)
+    <li>[PATCH] /procedures/:id</li>
+    Chỉ cập nhật lại được tên quy trình và type
+    <li>[DELETE] /procedures/:id</li>
+    Xóa quy trình. Khi xóa thì giai đoạn và chi tiết giai đoạn cũng sẽ tự động xóa theo
+
+    <h2>Giai đoạn hoa tiêu</h2>
+    (Bao gồm các trường: stage_id, name, procedureId(thuộc về quy trình nào), salonId(salon nào tạo), commissionRate(phần trăm hoa hồng), order: thứ tự)
+    <li>[GET] /stages/salon</li>
+    Sẽ lấy ra được các giai đoạn mà salon đó tạo kèm theo chi tiết giai đoạn
+    <li>[GET] /stages/:procedureId</li>
+    Sẽ lấy ra được các giai đoạn kèm theo chi tiết giai đoạn của 1 quy trình
+    <li>[POST] /stages</li>
+    Thêm một giai đoạn mới. Lúc này sẽ truyền vào chi tiết của giai đoạn luôn(detail). Ví dụ:
+    <pre>
+    {
+        "name": "giai đoạn 2",
+        "processId": "f4e30897-3300-4b13-bcad-39805ccbf0f7",
+        "order": 2,
+        "commissionRate": 1,
+        "details": ["CMND"]
+    }
+    </pre>
+    Nếu như order đã có rồi thì nó sẽ báo lỗi
+    <li>[PATCH] /stages/:id</li>
+    Các trường có thể cập nhật bao gồm: name, commissionRate, order, details
+    <li>[DELETE] /stages/:id</li>
+    Sẽ xóa giai đoạn kèm theo chi tiết giai đoạn đó luôn
+
+    <h2>Yêu cầu đăng bán xe</h2>
+    (Bao gồm các trường: post_id, title, text(nội dung), postedBy(userId), salons(mảng id các salon có thể xem), image(tối đa 20 ảnh), brand(hãng xe), type(dòng xe), mfg(năm sản xuất), version(phiên bản), gear(hộp số), fuel(nhiên liệu), origin(xuất xứ), design(kiểu dáng), seat(số ghế ngồi), color(màu sắc), licensePlate(biển số xe), ownerNumber(số đời chủ), accessory(phụ kiện đi kèm) boolean, registrationDeadline(hạn đăng kiểm) boolean, kilometer(số km đã đi), price(giá), address(địa chỉ hoa tiêu) createdAt)
+    .Này chỉ có user mới được đăng thôi nhé(nên thằng nào mà có salon thì chắc phải ẩn giao diện)
     <li>[POST] /posts</li>
-    Dùng để tạo một bài đăng mới cho biết có xe gì ở tỉnh nào cần bán trong khoảng bao nhiêu. Truyền vào 2 trường: text (nghĩa là nội dung) và salons (mảng id các salon được xem bài này).
+    Dùng để tạo một bài đăng mới. Truyền vào các trường như trên: text và salons (mảng id các salon được xem bài này)...
     Nếu không truyền vào salons thì nó mặc định là tất cả salon đều được xem
+    <b>Lúc này sẽ có thông báo đến thằng salon đó. (Tui vẫn để như cái notification như Quý làm hồi trước, trong đây có id của bài đăng để link tới)</b>
     <li>[GET] /posts/feed</li>
     Salon sẽ gọi API này để xem được các bài mà hoa tiêu đăng lên (những bài này chưa được tạo kết nối)
     <li>[GET] /posts/:id</li>
     Sẽ lấy ra được nội dung chi tiết của bài đăng (có kèm người đăng)
 
     <h2>Kết nối</h2>
-    (Bao gồm các trường: connection_id, salonId, userId, postId, createdAt, status )
-    Sau khi xem bài đăng xong thì nếu salon nào quan tâm muốn kết nối thì sẽ gọi API này
+    (Bao gồm các trường: connection_id, salonId, userId, postId, createdAt, status, procedureId(Id của quy trình mà salon sẽ áp dụng cho thằng này) )
+    .Sau khi xem bài đăng xong thì nếu salon nào quan tâm muốn kết nối thì sẽ gọi API này
     <li>[POST] /connections</li>
-    Sẽ tạo ra kết nối giữa salon và thằng đăng bài. Cần truyền vào postId
+    Sẽ tạo ra kết nối giữa salon và thằng đăng bài. Cần truyền vào postId và procedureId(này dùng để cho thằng đăng xem được các bước và phần trăm hoa hồng giúp nó có chấp nhận hay không).
+    Lúc này sẽ có thông báo đến thằng user    
     <li>[GET] /connections</li>
     Nếu nó là user thường (người đăng) thì nó sẽ lấy ra được các kết nối giữa nó và các salon.
     Nếu nó là chủ salon thì nó sẽ lấy ra được các kết nối giữa salon của nó và thông tin những người đăng
     <li>[GET] /connections/:id</li>
-    Sẽ lấy ra được chi tiết kết nối bao gồm trạng thái, ngày tạo, salon nào, user nào
+    Sẽ lấy ra được chi tiết kết nối bao gồm trạng thái, ngày tạo, salon nào, user nào, quy trình nào để thằng đăng nó đọc xem có chập nhận không
     <li>[PATCH] /connections/:id</li>
-    Cần truyền vào status (string). Đây là API sẽ được gọi khi mà 2 progress (xác minh xe, mua xe thành công). Status có 3 trạng thái: ('pending', 'success', 'failure'). Khi tạo ra mặc định ban đầu sẽ là pending
+    Cần truyền vào status (string). Status có 3 trạng thái: ('pending', 'accepted', 'rejected'). Khi tạo ra mặc định ban đầu sẽ là pending.
+    Lúc từ chối kết nối thì sẽ có thông báo đến salon. Nếu chấp nhận cũng có thông báo và nó sẽ chạy quy trình gồm các bước mà salon đã đặt ra
 
-    <h2>Giao dịch</h2>
-    (Bao gồm các trường: transaction_id, commissionAmount, status, connectionId, stage)
-    <li>[POST] /transactions</li>
-    Chỉ cần gọi thì nó sẽ tự động tạo ra 2 progress (stage = 1 nghĩa là giai đoạn xác minh xe, stage = 2 nghĩa là giai đoạn mua xe). Cần truyền vào connectionId. Ban đầu thì trạng thái của 2 giai đoạn này là false nghĩa là chưa thành công và tiền hoa hồng sẽ là 0
-    <li>[GET] /transactions</li>
-    Sẽ lấy ra được lịch sử các giai đoạn giao dịch (có kèm theo connection_id nên nếu tụi ông muốn link thì gọi API [GET] /connections/:id phía trên)
-    <li>[GET] /transactions/:id</li> (id là connectId)
-    Nó sẽ lấy ra được 2 giai đoạn, trạng thái và tiền hoa hồng ở từng giai đoạn
-    <li>[PATCH] /transactions/details</li>
-    Cập nhật thông tin giao dịch cho từng giai đoạn. Ví dụ:
+    <h2>Ghi nhận hoa hồng</h2>
+    (Bao gồm các trường: transaction_id, connectionId, checked(mảng này cho biết là id chi tiết giai đoạn nào đã check),userId, salonId, procedureId(thực hiện theo quy trình nào), stageId(đang tời giai đoạn nào), commissionAmount(mảng hoa hồng của các giai đoạn), status)
+    <div>
+        <b>Ý tường mà tui làm sẽ là:</b>
+        Lúc mà nó chấp nhận kết nối thì bảng này sẽ tự động tạo và nó sẽ gán mặc định giai đoạn đầu tiên của quy trình đó vào stageId, mảng checked ban đầu sẽ là rỗng. Sau đó check gì sẽ có API để cập nhật lại, nếu xong rồi thì khi nhấn next sẽ có API kiểm tra xem nó có đủ điều kiện qua không. Tại bước này cần nhập hoa hồng(số tiền mà salon đã chi ra thực tế cho hoa tiêu đó. Cái trên chỉ là phần trăm hoa hồng thôi. Nũa mình dùng thông tin này để thống kê). Nếu nó đủ điều kiện qua nghĩa là ở giai đoạn đó đã check hết thì nó sẽ tự động cập nhật lại stageId sang giai đoạn tiếp theo và checked sẽ quay lại mảng rỗng. Đến khi nào gọi API mà nó có status là completed thì có nghĩa là xong, nó tự cập nhật lại status. Lúc này tụi ông nhớ kiểm tra và đừng cho nó gọi next nữa
+    </div>
+    <li>[GET] /transactions/salon</li>
+    Sẽ lấy ra được tất cả các giao dịch của salon mình với các hoa tiêu. Lấy ra đươc tình trạng, tên user, quy trình áp dụng, ngày tạo kết nối 
+    <li>[GET] /transactions/:id</li>
+    Nó sẽ lấy ra được chi tiết của giao dịch đó
+    <li>[PATCH] /transactions/details/:id</li>
+    Cập nhật lại chi tiết giai đoạn. Truyền vào mảng id các chi tiết giai đoạn đã check. Ví dụ:
     <pre>
     {
-        "connectionId": "c6120782-06d1-49e2-a1a4-311ac833c921", 
-        "stage": 1, 
-        "status": true, 
-        "commissionAmount": 100000 
+        "checked": ["d3f52dc8-d67f-48c5-8dd4-c76c0b08e38b"]
     }
     </pre>
-    <b> Tui cũng đã cho là nếu nó cập nhật giai đoạn 2 là thành công thì cái connection phía trên cũng sẽ thành công. Nếu có giai đoạn thất bại thì sẽ là thất bại. Chắc trên giao diện cần kiểm tra nếu giai đoạn 1 nó thất bại rồi thì chắc cũng khỏi cần hiển thị giai đoạn 2. </b>
+    <li>[PATCH] /transactions/next/:id</li>
+    Có thể truyền vào commission. Ví dụ:
+    <pre>
+    {
+        "commission": 123
+    }
+    </pre>
+    Nó sẽ ghi nhận lại hoa hồng ở giai đoạn đó. Còn không truyền thì giai đoạn đó hoa hồng = 0
+    <div>
+        <b> Cái back và chặn user thì tui sẽ bổ sung sau. </b>
+    </div>
 </body>
 
 </html>

@@ -21,6 +21,8 @@ import legalsRouter from "./legals.r";
 import postRouter from "./post.r";
 import connectionRouter from "./connection.r";
 import transactionRouter from "./transaction.r";
+import procedureRouter from "./procedure.r";
+import stageRouter from "./stage.r";
 
 function router(app: Express) {
   app.use("/auth", authRouter);
@@ -45,6 +47,8 @@ function router(app: Express) {
   app.use("/posts", postRouter);
   app.use("/connections", connectionRouter);
   app.use("/transactions", transactionRouter);
+  app.use("/procedures", procedureRouter);
+  app.use("/stages", stageRouter);
 }
 
 export default router;

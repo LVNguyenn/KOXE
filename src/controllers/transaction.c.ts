@@ -3,74 +3,40 @@ import { getRepository, In } from "typeorm";
 import { Transaction } from "../entities/Transaction";
 import { User } from "../entities/User";
 import { Connection } from "../entities/Connection";
+import { Procedure } from "../entities/Procedure";
+import { Stage } from "../entities/Stage";
+import { getUserInfo } from "../helper/mInvoice";
+import { getNextElement } from "../utils/index";
 
 const transactionController = {
-  getAllTransactions: async (req: Request, res: Response) => {
-    const transactionRepository = getRepository(Transaction);
-    const connectionRepository = getRepository(Connection);
-
-    const userId: any = req.headers["userId"] || "";
-    const user = await getRepository(User).findOne({
-      where: [{ user_id: userId }],
-      relations: ["salonId"],
-    });
-    let salonId = "";
-    if (user?.salonId) {
-      salonId = user.salonId.salon_id;
-    }
-
-    try {
-      let connectionList;
-      if (salonId !== "") {
-        connectionList = await connectionRepository.find({
-          where: { salon: { salon_id: salonId } },
-          select: ["connection_id"],
-        });
-      } else {
-        connectionList = await connectionRepository.find({
-          where: { user: { user_id: userId } },
-          select: ["connection_id"],
-        });
-      }
-
-      const connectionIds = connectionList.map(
-        (connection) => connection.connection_id
-      );
-
-      const transactions = await transactionRepository.find({
-        where: { connection: { connection_id: In(connectionIds) } },
-        relations: ["connection"],
-      });
-
-      return res.status(200).json({
-        status: "success",
-        transactions: transactions,
-      });
-    } catch (error) {
-      return res
-        .status(500)
-        .json({ status: "failed", msg: "Internal server error" });
-    }
-  },
-  getTransactionByConnectionId: async (req: Request, res: Response) => {
+  getTransactionById: async (req: Request, res: Response) => {
     const transactionRepository = getRepository(Transaction);
     const { id } = req.params;
 
     try {
-      const transaction = await transactionRepository.find({
-        where: { connection: { connection_id: id } },
+      const transaction = await transactionRepository.findOne({
+        where: { transaction_id: id },
+        relations: ["user", "procedure", "stage"],
       });
 
       if (!transaction) {
         return res.status(404).json({
           status: "failed",
-          msg: `No transaction with connection id: ${id}`,
+          msg: `No transaction with transactionId: ${id}`,
         });
       }
 
+      const formatTransaction = {
+        ...transaction,
+        user: {
+          user_id: transaction.user.user_id,
+          fullname: transaction.user.fullname,
+        },
+      };
+
       return res.status(200).json({
         status: "success",
-        transaction: transaction,
+        transaction: formatTransaction,
       });
     } catch (error) {
       return res
@@ -78,26 +44,48 @@ const transactionController = {
         .json({ status: "failed", msg: "Internal server error" });
     }
   },
-  createTransaction: async (req: Request, res: Response) => {
+  getTransactionBySalonId: async (req: Request, res: Response) => {
     const transactionRepository = getRepository(Transaction);
-    const { connectionId } = req.body;
+    const userId: any = req.headers["userId"] || "";
+    const user = await getUserInfo(userId);
+
+    if (!user?.salonId) {
+      return res.status(403).json({
+        status: "failed",
+        msg: "You do not have sufficient permissions",
+      });
+    }
+
+    const salonId = user.salonId.salon_id;
 
     try {
-      const newTransaction1 = {
-        connection: { connection_id: connectionId },
-        stage: 1,
-      };
-      await transactionRepository.save(newTransaction1);
+      const transactionList = await transactionRepository.find({
+        where: { salon: { salon_id: salonId } },
+        relations: ["user", "connection", "procedure"],
+      });
 
-      const newTransaction2 = {
-        connection: { connection_id: connectionId },
-        stage: 2,
-      };
-      await transactionRepository.save(newTransaction2);
+      if (!transactionList) {
+        return res.status(404).json({
+          status: "failed",
+          msg: `No transaction with salonId: ${salonId}`,
+        });
+      }
 
-      return res.status(201).json({
+      const formatTransactions = transactionList.map((transaction) => ({
+        ...transaction,
+        user: {
+          user_id: transaction.user.user_id,
+          name: transaction.user.fullname,
+        },
+        connection: {
+          connection_id: transaction.connection.connection_id,
+          created_at: transaction.connection.createdAt,
+        },
+      }));
+
+      return res.status(200).json({
         status: "success",
-        msg: "Create successfully!",
+        transaction: formatTransactions,
       });
     } catch (error) {
       return res
@@ -106,23 +94,13 @@ const transactionController = {
     }
   },
   updateTransaction: async (req: Request, res: Response) => {
-    const { connectionId, stage, status, commissionAmount } = req.body;
     const transactionRepository = getRepository(Transaction);
-    const connectionRepository = getRepository(Connection);
+    const { id } = req.params;
+    const { checked } = req.body;
 
     try {
-      const connection = await connectionRepository.findOne({
-        where: { connection_id: connectionId },
-      });
-
-      if (!connection) {
-        return res
-          .status(404)
-          .json({ status: "failed", msg: "Connection not found" });
-      }
-
       const transaction = await transactionRepository.findOne({
-        where: { connection, stage },
+        where: { transaction_id: id },
       });
 
       if (!transaction) {
@@ -131,31 +109,98 @@ const transactionController = {
           .json({ status: "failed", msg: "Transaction not found" });
       }
 
-      if (status !== undefined) {
-        transaction.status = status;
-      }
-
-      if (commissionAmount !== undefined) {
-        transaction.commissionAmount = commissionAmount;
-      }
-
-      if (status === false) {
-        connection.status = "failure";
-        await connectionRepository.save(connection);
-      }
-
-      if (stage === 2 && status === true) {
-        connection.status = "success";
-        await connectionRepository.save(connection);
+      if (Array.isArray(checked) && checked.length > 0) {
+        transaction.checked = checked;
       }
 
       await transactionRepository.save(transaction);
 
       return res.status(200).json({
         status: "success",
-        mgs: "Transaction updated successfully",
+        msg: "Transaction updated successfully",
         transaction,
       });
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(500)
+        .json({ status: "failed", msg: "Internal server error" });
+    }
+  },
+  nextStage: async (req: Request, res: Response) => {
+    const transactionRepository = getRepository(Transaction);
+    const stageRepository = getRepository(Stage);
+    const procedureRepository = getRepository(Procedure);
+    const { id } = req.params;
+    const { commission } = req.body;
+
+    try {
+      const transaction = await transactionRepository.findOne({
+        where: { transaction_id: id },
+        relations: ["stage", "procedure"],
+      });
+
+      if (!transaction) {
+        return res
+          .status(404)
+          .json({ status: "failed", msg: "Transaction not found" });
+      }
+
+      let stageList: any = [];
+      const stageDetail = await procedureRepository.findOne({
+        where: { procedure_id: transaction.procedure.procedure_id },
+        relations: ["stages"],
+      });
+      stageDetail?.stages.map((stage) => {
+        stageList.push(stage.stage_id);
+      });
+
+      let detailList: any = [];
+      const detail = await stageRepository.findOne({
+        where: { stage_id: transaction.stage.stage_id },
+        relations: ["commissionDetails"],
+      });
+      detail?.commissionDetails.map((detail) => {
+        detailList.push(detail.id);
+      });
+
+      const details = JSON.stringify(detailList);
+      const checked = JSON.stringify(transaction.checked);
+
+      if (details === checked) {
+        const nextElement = getNextElement(
+          stageList,
+          transaction.stage.stage_id
+        );
+
+        if (commission) {
+          transaction.commissionAmount.push(commission);
+        } else {
+          transaction.commissionAmount.push(0);
+        }
+
+        if (nextElement !== null) {
+          transaction.checked = [];
+          transaction.stage.stage_id = nextElement;
+          await transactionRepository.save(transaction);
+          return res.status(200).json({
+            status: "success",
+            msg: "Next stage successfully",
+          });
+        } else {
+          transaction.status = "success";
+          await transactionRepository.save(transaction);
+          return res.status(200).json({
+            status: "completed",
+            msg: "The process has been completed",
+          });
+        }
+      } else {
+        return res.status(400).json({
+          status: "failed",
+          msg: "Next stage failed",
+        });
+      }
     } catch (error) {
       console.log(error);
       return res

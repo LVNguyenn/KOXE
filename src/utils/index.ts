@@ -79,13 +79,22 @@ function isDateInMonth(inputDate: Date, monthCompare: number) {
 }
 
 const FormatData = (status?: any, msg?: any, data?: any, code?: any) => {
-  let result: any = {}
+  let result: any = {};
   if (msg) result.msg = msg;
   if (data) result.data = data;
   if (status) result.status = status;
   if (code) result.code = code;
 
   return result;
+};
+
+function getNextElement(array: any, element: any) {
+  for (let i = 0; i < array.length - 1; i++) {
+    if (array[i] === element) {
+      return array[i + 1];
+    }
+  }
+  return null;
 }
 
 export {
@@ -97,5 +106,6 @@ export {
   extractTime,
   formatDate,
   isDateInMonth,
-  FormatData
+  FormatData,
+  getNextElement,
 };

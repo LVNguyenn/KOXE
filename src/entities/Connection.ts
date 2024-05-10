@@ -8,6 +8,7 @@ import {
 import { Salon } from "./Salon";
 import { User } from "./User";
 import { Post } from "./Post";
+import { Procedure } from "./Procedure";
 import { Transaction } from "./Transaction";
 
 @Entity()
@@ -23,6 +24,9 @@ export class Connection {
 
   @ManyToOne(() => Post, (post) => post.connections)
   post!: Post;
+
+  @ManyToOne(() => Procedure, (procedure) => procedure.connections)
+  procedure!: Procedure;
 
   @Column({ type: "timestamptz" })
   createdAt!: Date;

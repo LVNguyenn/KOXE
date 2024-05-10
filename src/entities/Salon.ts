@@ -16,6 +16,8 @@ import { LegalDocuments } from "./LegalDocuments";
 import { Connection } from "./Connection";
 import { Transaction } from "./Transaction";
 import { Process } from "./Process";
+import { Stage } from "./Stage";
+import { Procedure } from "./Procedure";
 
 @Entity()
 export class Salon {
@@ -78,8 +80,14 @@ export class Salon {
   @OneToMany(() => Process, (process) => process.salon)
   process!: Process[];
 
-  // @OneToMany(() => Transaction, (transaction) => transaction.user)
-  // transactions!: Transaction[];
+  @OneToMany(() => Transaction, (transaction) => transaction.user)
+  transactions!: Transaction[];
+
+  @OneToMany(() => Stage, (stage) => stage.salon)
+  stages!: Stage[];
+
+  @OneToMany(() => Procedure, (procedure) => procedure.salon)
+  procedures!: Procedure[];
 
   init(
     name: string,

@@ -22,3 +22,6 @@ export * from "./Connection";
 export * from "./Transaction";
 export * from "./Process";
 export * from "./Car_User_Legals";
+export * from "./Procedure";
+export * from "./Stage";
+export * from "./CommissionDetails";

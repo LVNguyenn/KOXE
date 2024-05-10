@@ -3,13 +3,58 @@ import { getRepository, Not } from "typeorm";
 import moment from "moment";
 import { Post } from "../entities/Post";
 import { User } from "../entities/User";
+import { Salon } from "../entities/Salon";
 import { Connection } from "../entities/Connection";
+import createNotification from "../helper/createNotification";
+import { getUserInfo } from "../helper/mInvoice";
+
+const cloudinary = require("cloudinary").v2;
+
+interface MulterFile {
+  path: string;
+  filename: string;
+}
+
+interface MulterFileRequest extends Request {
+  files?: MulterFile[];
+}
 
 const postController = {
-  createPost: async (req: Request, res: Response) => {
+  createPost: async (req: Request | MulterFileRequest, res: Response) => {
     const postRepository = getRepository(Post);
+    const salonRepository = getRepository(Salon);
     const userId: any = req.headers["userId"] || "";
-    const { text, salons } = req.body;
+    const user = await getUserInfo(userId);
+    const {
+      title,
+      text,
+      salons,
+      brand,
+      type,
+      mfg,
+      version,
+      gear,
+      fuel,
+      origin,
+      design,
+      seat,
+      color,
+      licensePlate,
+      ownerNumber,
+      accessory,
+      kilometer,
+      price,
+      registrationDeadline,
+      address,
+    } = req.body;
+
+    let image = [""],
+      filename = [""];
+    if ("files" in req && req.files) {
+      const arrayImages = req.files;
+      image = arrayImages.map((obj) => obj.path);
+      filename = arrayImages.map((obj) => obj.filename);
+    }
 
     try {
       const maxLength = 500;
@@ -23,6 +68,25 @@ const postController = {
         text,
         postedBy: { user_id: userId },
         createdAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
+        image,
+        title,
+        brand,
+        type,
+        mfg,
+        version,
+        gear,
+        fuel,
+        origin,
+        design,
+        seat,
+        color,
+        licensePlate,
+        ownerNumber,
+        accessory,
+        kilometer,
+        price,
+        registrationDeadline,
+        address,
       };
 
       if (Array.isArray(salons) && salons.length > 0) {
@@ -31,12 +95,55 @@ const postController = {
 
       const savedPost = await postRepository.save(newPost);
 
+      // Send notification
+      if (salons === undefined) {
+        const salonList = await salonRepository.find({
+          select: ["salon_id"],
+        });
+        for (const salon of salonList) {
+          createNotification({
+            to: salon.salon_id,
+            description: `${user?.fullname} vừa gửi yêu cầu bán xe đến salon của bạn.`,
+            types: "request",
+            data: savedPost.post_id,
+            avatar: user?.avatar,
+            isUser: true,
+          });
+        }
+      } else if (salons.length !== 36) {
+        for (const salon of salons) {
+          createNotification({
+            to: salon,
+            description: `${user?.fullname} vừa gửi yêu cầu bán xe đến salon của bạn.`,
+            types: "request",
+            data: savedPost.post_id,
+            avatar: user?.avatar,
+            isUser: true,
+          });
+        }
+      } else {
+        createNotification({
+          to: salons,
+          description: `${user?.fullname} vừa gửi yêu cầu bán xe đến salon của bạn.`,
+          types: "request",
+          data: savedPost.post_id,
+          avatar: user?.avatar,
+          isUser: true,
+        });
+      }
+
       return res.status(201).json({
         status: "success",
         msg: "Create successfully!",
         post: savedPost,
       });
     } catch (error) {
+      console.log(error);
+      if (filename.length !== 0) {
+        filename.forEach(async (url) => {
+          cloudinary.uploader.destroy(url);
+        });
+      }
       return res
         .status(500)
         .json({ status: "failed", msg: "Internal server error" });
@@ -51,52 +158,69 @@ const postController = {
       relations: ["salonId"],
     });
     const salonId = user?.salonId.salon_id;
+    let formatPosts;
 
     try {
-      const connectedPostIds = await connectionRepository
-        .createQueryBuilder("connection")
-        .select("connection.postPostId")
-        .where("connection.salonSalonId = :salonId", { salonId })
-        .getRawMany();
+      if (!salonId) {
+        const post = await postRepository.findOne({
+          where: { postedBy: { user_id: userId } },
+          relations: ["postedBy"],
+        });
 
-      const connectedIds = connectedPostIds.map((item) => item.postPostId);
-
-      let posts;
-      if (connectedIds.length > 0) {
-        posts = await postRepository
-          .createQueryBuilder("post")
-          .leftJoinAndSelect("post.postedBy", "user")
-          .where("post.salons LIKE :salonId OR post.salons LIKE :all", {
-            salonId: `%${salonId}%`,
-            all: "%All%",
-          })
-          .andWhere("post.post_id NOT IN (:...connectedIds)", {
-            connectedIds,
-          })
-          .orderBy("post.createdAt", "DESC")
-          .getMany();
-      } else {
-        posts = await postRepository
-          .createQueryBuilder("post")
-          .leftJoinAndSelect("post.postedBy", "user")
-          .where("post.salons LIKE :salonId OR post.salons LIKE :all", {
-            salonId: `%${salonId}%`,
-            all: "%All%",
-          })
-          .orderBy("post.createdAt", "DESC")
-          .getMany();
-      }
-
-      const formatPosts = {
-        posts: posts.map((post) => ({
+        formatPosts = {
           ...post,
           postedBy: {
-            user_id: post.postedBy.user_id,
-            fullname: post.postedBy.fullname,
-            avatar: post.postedBy.avatar,
+            user_id: post?.postedBy.user_id,
+            fullname: post?.postedBy.fullname,
+            avatar: post?.postedBy.avatar,
           },
-        })),
-      };
+        };
+      } else {
+        const connectedPostIds = await connectionRepository
+          .createQueryBuilder("connection")
+          .select("connection.postPostId")
+          .where("connection.salonSalonId = :salonId", { salonId })
+          .getRawMany();
+
+        const connectedIds = connectedPostIds.map((item) => item.postPostId);
+
+        let posts;
+        if (connectedIds.length > 0) {
+          posts = await postRepository
+            .createQueryBuilder("post")
+            .leftJoinAndSelect("post.postedBy", "user")
+            .where("post.salons LIKE :salonId OR post.salons LIKE :all", {
+              salonId: `%${salonId}%`,
+              all: "%All%",
+            })
+            .andWhere("post.post_id NOT IN (:...connectedIds)", {
+              connectedIds,
+            })
+            .orderBy("post.createdAt", "DESC")
+            .getMany();
+        } else {
+          posts = await postRepository
+            .createQueryBuilder("post")
+            .leftJoinAndSelect("post.postedBy", "user")
+            .where("post.salons LIKE :salonId OR post.salons LIKE :all", {
+              salonId: `%${salonId}%`,
+              all: "%All%",
+            })
+            .orderBy("post.createdAt", "DESC")
+            .getMany();
+        }
+
+        formatPosts = {
+          posts: posts.map((post) => ({
+            ...post,
+            postedBy: {
+              user_id: post.postedBy.user_id,
+              fullname: post.postedBy.fullname,
+              avatar: post.postedBy.avatar,
+            },
+          })),
+        };
+      }
 
       res.status(200).json({
         status: "success",
