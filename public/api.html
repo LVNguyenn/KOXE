@@ -730,8 +730,12 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
         }
     </div>
 
-    <li>Lấy ra danh sách các khách hàng chưa hoàn thành thủ tục, hoàn thành rồi, lấy tất cả: sẽ sớm có.</li>
-
+    <li>[POST] /invoice/all</li>
+    Dùng để lấy ra toàn bộ hóa đơn của salon, trong đó sẽ có qui trình của user luôn. Cần truyền vô:
+    <div>
+        {salonId, done: không truyền lấy tất cả, = false thì lấy ra các giao dịch chưa hoàn thành (user chưa hoàn thành thủ tục ), = true thì hoàn thành rồi.}
+    </div>
+    Trong này nó sẽ trả về thông tin xe và qui trình của xe luôn (nếu có xe đó).
     <h2>Quy trình</h2>
     (Bao gồm các trường: procedure_id, name, type, salonId)
     <li>[GET] /procedures</li>

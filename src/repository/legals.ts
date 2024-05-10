@@ -212,11 +212,11 @@ const LegalsRepository = {
             // .leftJoin("Car", "car", "car.car_id = Car_User_Legals.car_id")
             // .leftJoinAndSelect('car.salon', 'salon', 'salon.salon_id = :salonId', {...data})
 
-            if (data?.done !== undefined && data?.done !== "undefined") {
-                const carUserDb = queryBuilder.where({done: data?.done}).getMany()
-                console.log("here")
-                return FormatData("success", "find successfully!", carUserDb);
-            }
+            // if (data?.done !== undefined && data?.done !== "undefined") {
+            //     const carUserDb = queryBuilder.where({done: data?.done}).getMany()
+            //     console.log("here")
+            //     return FormatData("success", "find successfully!", carUserDb);
+            // }
             const carUserDb = queryBuilder.getMany()
 
             return FormatData("success", "find successfully!", carUserDb);
@@ -227,23 +227,23 @@ const LegalsRepository = {
 
     },
 
-    async getAllLegalsUserForSalon2(data: any) {
-        try {
-            let carUserDb;
-            const carUserRepository = getRepository(Car_User_Legals);
-            if (data?.done !== undefined && data?.done !== "undefined") {
-                carUserDb = await carUserRepository.find({ })
-            } else {
-                carUserDb = await carUserRepository.find({ where: { done: data?.done }})
-            }
+    // async getAllLegalsUserForSalon2(data: any) {
+    //     try {
+    //         let carUserDb;
+    //         const carUserRepository = getRepository(Car_User_Legals);
+    //         if (data?.done !== undefined && data?.done !== "undefined") {
+    //             carUserDb = await carUserRepository.find({ })
+    //         } else {
+    //             carUserDb = await carUserRepository.find({ where: { done: data?.done }})
+    //         }
 
-            // let dataRs = carUserDb.filter((carUser) => carUser.)
+    //         // let dataRs = carUserDb.filter((carUser) => carUser.)
 
-        } catch (error) {
-            return FormatData("failed", "Error find the legal documents.");
-        }
+    //     } catch (error) {
+    //         return FormatData("failed", "Error find the legal documents.");
+    //     }
 
-    },
+    // },
 
     async updateProcessById(data: any) {
         try {

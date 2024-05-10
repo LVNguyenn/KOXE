@@ -141,7 +141,7 @@ const legalsController = {
     },
 
     addLegalForUser: async (data: any) => {
-        const { salonId, phone, carId } = data;
+        const { salonId, phone, carId, invoice } = data;
         const carRp = await CarRepository.findCarByCarIdSalonId({ carId, salonId });
         console.log(carRp)
 
@@ -156,7 +156,7 @@ const legalsController = {
             }
         }
 
-        const userRp = await LegalsRepository.addLegalForUser({ phone, car_id: carId, current_period: firstPeriod });
+        const userRp = await LegalsRepository.addLegalForUser({ phone, car_id: carId, current_period: firstPeriod, invoice });
 
         return userRp;
     },
@@ -213,15 +213,10 @@ const legalsController = {
 
         // find old period
         const oldPeriod = await LegalsRepository.getPeriodCurrentByCarUser({ carId, phone });
-
-        if (done) {
-            newCarUserRp = await LegalsRepository.addLegalForUser({ ...oldPeriod?.data, current_period: newPeriod, done: done });
-        } else {
-            // delete all old details
-            await LegalsRepository.removeAllLegalDetails({ period: oldPeriod?.data?.current_period });
-            // update new period for user
-            newCarUserRp = await LegalsRepository.addLegalForUser({ ...oldPeriod?.data, current_period: newPeriod });
-        }
+        // delete all old details
+        await LegalsRepository.removeAllLegalDetails({ period: oldPeriod?.data?.current_period });
+        // update new period for user
+        newCarUserRp = await LegalsRepository.addLegalForUser({ ...oldPeriod?.data, current_period: newPeriod });
 
         if (!newCarUserRp?.data) {
             return res.json({
@@ -234,13 +229,6 @@ const legalsController = {
             status: "success",
             msg: "update new period for the user successfully!"
         })
-    },
-
-    getAllLegalsUserForSalon: async (req: Request, res: Response) => {
-        const { salonId, done } = req.body;
-        const carUserRp = await LegalsRepository.getAllLegalsUserForSalon({ salonId, done });
-
-        return res.json({ ...carUserRp });
     },
 
 }

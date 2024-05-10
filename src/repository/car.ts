@@ -44,6 +44,21 @@ const CarRepository = {
             return FormatData("failed", "Error find the legal documents.");
         }
     },
+
+    async getProcessByCarId (data: any) {
+        try {
+            const carRepository = getRepository(Car);
+            const carDb = await carRepository.findOneOrFail({
+                where: {car_id: data?.carId},
+                relations: ['process']
+            })
+
+            return FormatData("success", "find successfully!", carDb);
+        } catch (error) {
+            console.log(error)
+            return FormatData("failed", "Error find the legal documents.");
+        }
+    },
 }
 
 export default CarRepository;

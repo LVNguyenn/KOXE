@@ -4,8 +4,10 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  OneToOne,
 } from "typeorm";
 import { Salon } from "./Salon";
+import { Car_User_Legals } from "./Car_User_Legals";
 
 @Entity()
 export class Invoice {
@@ -51,11 +53,17 @@ export class Invoice {
   @Column({ nullable: true })
   policy!: string;
 
+  @Column({default: false})
+  done!: boolean;
+
   @Column("simple-array", { nullable: true })
   maintenanceServices!: string[];
 
   @Column("simple-array", { nullable: true })
   accessories!: string[];
+
+  @OneToOne(() => Car_User_Legals, legal => legal.invoice, { cascade: true })
+  legals_user!: Car_User_Legals;
 
   init(
     type: string,
@@ -69,7 +77,8 @@ export class Invoice {
     months: number,
     policy: string,
     maintenanceServices: string[],
-    accessories: string[]
+    accessories: string[],
+    legals_user: Car_User_Legals
   ) {
     this.type = type;
     this.expense = expense;
@@ -83,5 +92,6 @@ export class Invoice {
     this.policy = policy;
     this.maintenanceServices = maintenanceServices;
     this.accessories = accessories;
+    this.legals_user = legals_user;
   }
 }

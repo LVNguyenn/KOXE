@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryColumn, OneToOne, JoinColumn, OneToMany } from "typeorm"
 import { LegalDetails } from "./LegalDetails";
 import { Car } from "./Car";
+import { Invoice } from "./Invoice";
 
 @Entity()
 export class Car_User_Legals {
@@ -16,15 +17,11 @@ export class Car_User_Legals {
     @Column()
     current_period!: string;
 
-    @Column({default: false})
-    done!: boolean;
-
-    // @OneToOne(() => Car)
-    // @JoinColumn({ name: "car_id" })
-    // car!: Car;
+    @OneToOne(() => Invoice, invoice => invoice.legals_user)
+    @JoinColumn()
+    invoice!: Invoice;
 
     init(current_period: string, done: boolean) {
         this.current_period = current_period;
-        this.done = done;
     }
 }
