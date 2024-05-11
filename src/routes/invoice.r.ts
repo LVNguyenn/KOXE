@@ -31,7 +31,8 @@ router.post("/all", middlewareController.verifyToken, middlewareController.haveP
 router.post("/statistics", middlewareController.verifyToken, middlewareController.havePermission("R_IV"), invoiceController.revenueStatistics);
 router.post("/get-top", invoiceController.getTopThingBestSeller);
 router.post("/get-invoice-buy-car", middlewareController.verifyToken, invoiceController.getInvoiceByPhone);
-router.post("/tick-done", middlewareController.verifyToken, invoiceController.tickDoneInvoice);
+router.post("/tick-done", invoiceController.tickDoneInvoice);
+router.post("/remove", invoiceController.removeInvoice);
 
 // admin
 router.post("/statistics-admin", middlewareController.verifyToken, middlewareController.isAdminTeam, invoiceController.revenueStatisticsAdmin);

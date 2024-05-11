@@ -171,22 +171,21 @@ const LegalsRepository = {
         }
     },
 
-    async getFirstDocumentsByCar(data: any) {
-        try {
-            const carRepository = getRepository(Car);
-            const documentDb = await carRepository
-                .createQueryBuilder('Car')
-                .leftJoinAndSelect('Car.process', 'process')
-                .leftJoinAndSelect('process.documents', 'legalDocuments')
-                .where({ car_id: data?.carId })
-                .getOne()
+    // async getFirstDocumentsByCar(data: any) {
+    //     try {
+    //         const carRepository = getRepository(Car);
+    //         const documentDb = await carRepository
+    //             .createQueryBuilder('Car')
+    //             .leftJoinAndSelect('Car.process', 'process')
+    //             .where({ car_id: data?.carId })
+    //             .getOne()
 
-            return FormatData("success", "find successfully!", documentDb);
-        } catch (error) {
-            console.log(error)
-            return FormatData("failed", "Error find the legal documents.");
-        }
-    },
+    //         return FormatData("success", "find successfully!", documentDb);
+    //     } catch (error) {
+    //         console.log(error)
+    //         return FormatData("failed", "Error find the legal documents.");
+    //     }
+    // },
 
     async getPeriodCurrentByCarUser(data: any) {
         try {
@@ -359,6 +358,23 @@ const LegalsRepository = {
 
     async getAllCarNotDoneBySalon(data: any) {
 
+    },
+
+    async getProcessDocumentsById (data: any) {
+        try {
+            const processRepository = getRepository(Process);
+            const processDb = await processRepository
+                .createQueryBuilder('Process')
+                .leftJoin('Process.salon', 'salon', 'salon.salon_id = :salonId', {...data})
+                .leftJoinAndSelect('Process.documents', 'legalDocuments')
+                .where({ id: data?.processId })
+                .orderBy('legalDocuments.order', 'ASC')
+                .getOne()
+
+            return FormatData("success", "find successfully!", processDb);
+        } catch (error) {
+            return FormatData("success", "find error");
+        }
     },
 
 }

@@ -8,13 +8,13 @@ const CarRepository = {
         try {
             const carRepository = getRepository(Car);
             const carDb: Car = await carRepository.findOneOrFail({
-                where: {car_id: data.carId}
-                // relations: ['salon']
+                where: {car_id: data.carId},
+                relations: ['salon']
             })
 
-            // if (carDb.salon?.salon_id !== data.salonId) {
-            //     return FormatData("failed", "Error information.");
-            // }
+            if (carDb.salon?.salon_id !== data.salonId) {
+                return FormatData("failed", "Error information.");
+            }
 
             return FormatData("success", "find successfully!", carDb);
         } catch (error) {

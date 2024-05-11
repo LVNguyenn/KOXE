@@ -14,14 +14,18 @@ export class Car_User_Legals {
     @Column("json", { nullable: true })
     details!: any[];
 
-    @Column()
+    @Column({nullable: true})
     current_period!: string;
 
-    @OneToOne(() => Invoice, invoice => invoice.legals_user)
+    @Column({nullable: true})
+    processId!: string;
+
+    @OneToOne(() => Invoice, invoice => invoice.legals_user, {onDelete: 'CASCADE'})
     @JoinColumn()
     invoice!: Invoice;
 
-    init(current_period: string, done: boolean) {
+    init(current_period: string, processId: string) {
         this.current_period = current_period;
+        this.processId = processId;
     }
 }

@@ -141,13 +141,11 @@ const legalsController = {
     },
 
     addLegalForUser: async (data: any) => {
-        const { salonId, phone, carId, invoice } = data;
+        const { salonId, phone, carId, invoice, processId } = data;
         const carRp = await CarRepository.findCarByCarIdSalonId({ carId, salonId });
-        console.log(carRp)
 
-        // get first documents
-        const firstDocumentRp = await LegalsRepository.getFirstDocumentsByCar(data);
-        const firstPeriod = firstDocumentRp?.data.process.documents[0].period;
+        // get first documents for process
+        const processDb = await LegalsRepository.getProcessDocumentsById({salonId, processId})
 
         if (!carRp?.data) {
             return {
@@ -156,7 +154,7 @@ const legalsController = {
             }
         }
 
-        const userRp = await LegalsRepository.addLegalForUser({ phone, car_id: carId, current_period: firstPeriod, invoice });
+        const userRp = await LegalsRepository.addLegalForUser({ phone, car_id: carId, current_period: processDb?.data?.documents[0].period, invoice, processId });
 
         return userRp;
     },

@@ -11,7 +11,7 @@ import CarRepository from "../repository/car";
 
 const invoiceController = {
   printInvoiceBuyCar: async (req: Request, res: Response) => {
-    const { carId, salonId, note, fullname, email, phone, expense } = req.body;
+    const { carId, salonId, note, fullname, email, phone, expense, processId } = req.body;
 
     try {
       const invoiceRepository = getRepository(Invoice);
@@ -51,13 +51,12 @@ const invoiceController = {
       await carRepository.save({ ...carDb, available: Number(carDb.available) - 1 });
 
       // add legal for custormer
-      const legalRp = await legalsController.addLegalForUser({ carId, salonId, phone, invoice: invoiceDb })
+      await legalsController.addLegalForUser({ carId, salonId, phone, invoice: invoiceDb, processId })
 
       return res.json({
         status: "success",
         msg: "Create invoice successfully!",
         invoice: { ...saveInvoice, warranty: carDb?.warranties },
-        legals: legalRp
       });
     } catch (error) {
       console.log(error);
@@ -113,16 +112,16 @@ const invoiceController = {
         invoiceDb = await queryBuilder.getMany();
       }
 
-      // get process
-      let index = 0;
-      for (let iv of invoiceDb) {
-        if (iv?.legals_user?.car_id) {
-          const carDb = await CarRepository.getProcessByCarId({ carId: iv.legals_user.car_id })
-          invoiceDb[index].car = carDb?.data;
-          index++;
-        }
+      // // get process
+      // let index = 0;
+      // for (let iv of invoiceDb) {
+      //   if (iv?.legals_user?.car_id) {
+      //     const carDb = await CarRepository.getProcessByCarId({ carId: iv.legals_user.car_id })
+      //     invoiceDb[index].car = carDb?.data;
+      //     index++;
+      //   }
 
-      }
+      // }
 
       return res.json({
         status: "success",
@@ -261,9 +260,7 @@ const invoiceController = {
   tickDoneInvoice: async (req: Request, res: Response) => {
     try {
       const { salonId, invoiceId } = req.body;
-
       const invoiceRepository = getRepository(Invoice);
-
       const invoiceDb = await invoiceRepository.findOneOrFail({
         where: { invoice_id: invoiceId },
         relations: ['seller']
@@ -286,6 +283,38 @@ const invoiceController = {
       return res.json({
         status: "failed",
         msg: "Error tick."
+      })
+    }
+  },
+
+  removeInvoice: async (req: Request, res: Response) => {
+    try {
+      const { salonId, invoiceId } = req.body;
+      const invoiceRepository = getRepository(Invoice);
+      const invoiceDb = await invoiceRepository.findOneOrFail({
+        where: { invoice_id: invoiceId },
+        relations: ['seller']
+      })
+
+      if (invoiceDb.seller.salon_id !== salonId) {
+        return res.json({
+          status: "failed",
+          msg: "You dont have the permission."
+        })
+      }
+
+      const removeDb = await invoiceRepository.remove(invoiceDb);
+
+      return res.json({
+        status: "success",
+        msg: "Removed invoice successfully!",
+        invoice: removeDb
+      })
+    } catch (error) {
+      console.log(error)
+      return res.json({
+        status: "failed",
+        msg: "Error remove invoice."
       })
     }
   }

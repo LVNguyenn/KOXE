@@ -98,10 +98,10 @@ export class Car {
   })
   warranties!: Warranty;
 
-  @ManyToOne(() => Process, (process) => process.cars, {
-    onDelete: "SET NULL",
-  })
-  process!: Process;
+  // @ManyToOne(() => Process, (process) => process.cars, {
+  //   onDelete: "SET NULL",
+  // })
+  // process!: Process;
 
   init(
     name: string,

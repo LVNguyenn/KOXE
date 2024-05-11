@@ -62,7 +62,9 @@ export class Invoice {
   @Column("simple-array", { nullable: true })
   accessories!: string[];
 
-  @OneToOne(() => Car_User_Legals, legal => legal.invoice, { cascade: true })
+  @OneToOne(() => Car_User_Legals, legal => legal.invoice, {
+    cascade: ["remove"],
+  })
   legals_user!: Car_User_Legals;
 
   init(

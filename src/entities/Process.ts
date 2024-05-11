@@ -34,8 +34,8 @@ export class Process {
   })
   documents!: LegalDocuments[];
 
-  @OneToMany(() => Car, (car) => car.process, { cascade: true })
-  cars!: LegalDocuments[];
+  // @OneToMany(() => Car, (car) => car.process, { cascade: true })
+  // cars!: LegalDocuments[];
 
   init(id: string, name: string, description: string, type: number) {
     this.id = id;
