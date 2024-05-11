@@ -762,7 +762,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[GET] /stages/procedure/:procedureId</li>
     Sẽ lấy ra được các giai đoạn kèm theo chi tiết giai đoạn của 1 quy trình
     <li>[POST] /stages</li>
-    Thêm một giai đoạn mới. Lúc này sẽ truyền vào chi tiết của giai đoạn luôn(detail). Ví dụ:
+    Thêm một giai đoạn mới. Lúc này sẽ truyền vào chi tiết của giai đoạn luôn(details). Ví dụ:
     <pre>
     {
         "name": "giai đoạn 2",
@@ -809,14 +809,14 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     (Bao gồm các trường: transaction_id, connectionId, checked(mảng này cho biết là id chi tiết giai đoạn nào đã check),userId, salonId, procedureId(thực hiện theo quy trình nào), stageId(đang tời giai đoạn nào), commissionAmount(mảng hoa hồng của các giai đoạn), status)
     <div>
         <b>Ý tường mà tui làm sẽ là:</b>
-        Lúc mà nó chấp nhận kết nối thì bảng này sẽ tự động tạo và nó sẽ gán mặc định giai đoạn đầu tiên của quy trình đó vào stageId, mảng checked ban đầu sẽ là rỗng. Sau đó check gì sẽ có API để cập nhật lại, nếu xong rồi thì khi nhấn next sẽ có API kiểm tra xem nó có đủ điều kiện qua không. Tại bước này cần nhập hoa hồng(số tiền mà salon đã chi ra thực tế cho hoa tiêu đó. Cái trên chỉ là phần trăm hoa hồng thôi. Nũa mình dùng thông tin này để thống kê). Nếu nó đủ điều kiện qua nghĩa là ở giai đoạn đó đã check hết thì nó sẽ tự động cập nhật lại stageId sang giai đoạn tiếp theo và checked sẽ quay lại mảng rỗng. Đến khi nào gọi API mà nó có status là completed thì có nghĩa là xong, nó tự cập nhật lại status. Lúc này tụi ông nhớ kiểm tra và đừng cho nó gọi next nữa
+        Lúc mà nó chấp nhận kết nối thì bảng này sẽ tự động tạo và nó sẽ gán mặc định giai đoạn đầu tiên của quy trình đó vào stageId, mảng checked ban đầu sẽ là rỗng. Sau đó check gì sẽ có API để cập nhật lại, nếu xong rồi thì khi nhấn next sẽ có API kiểm tra xem nó có đủ điều kiện qua không. Tại bước này cần nhập hoa hồng(số tiền mà salon đã chi ra thực tế cho hoa tiêu đó. Cái trên chỉ là phần trăm hoa hồng thôi. Nũa mình dùng thông tin này để thống kê). Nếu nó đủ điều kiện qua nghĩa là ở giai đoạn đó đã check hết thì nó sẽ tự động cập nhật lại stageId sang giai đoạn tiếp theo và checked sẽ quay lại mảng rỗng. Đến khi nào gọi API mà nó có status là completed thì có nghĩa là xong, nó tự cập nhật lại status là success. Lúc này tụi ông nhớ kiểm tra và đừng cho nó gọi next nữa
     </div>
     <li>[GET] /transactions/salon</li>
     Sẽ lấy ra được tất cả các giao dịch của salon mình với các hoa tiêu. Lấy ra đươc tình trạng, tên user, quy trình áp dụng, ngày tạo kết nối 
     <li>[GET] /transactions/:id</li>
     Nó sẽ lấy ra được chi tiết của giao dịch đó
     <li>[PATCH] /transactions/details/:id</li>
-    Cập nhật lại chi tiết giai đoạn. Truyền vào mảng id các chi tiết giai đoạn đã check. Ví dụ:
+    Cập nhật lại chi tiết giai đoạn. Truyền vào mảng id các chi tiết giai đoạn đã check. Ví dụ ban đầu check 1 chi tiết thì truyền 1, lúc sau check 2 thì phải truyền cả 2 qua:
     <pre>
     {
         "checked": ["d3f52dc8-d67f-48c5-8dd4-c76c0b08e38b"]

@@ -49,6 +49,8 @@ const procedureController = {
           .json({ status: "failed", msg: `No procedure with id: ${id}` });
       }
 
+      procedure.stages.sort((a, b) => a.order - b.order);
+
       let stageList = [];
       for (const stage of procedure.stages) {
         const detail = await stageRepository.findOne({

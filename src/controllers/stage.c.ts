@@ -13,6 +13,9 @@ const stageController = {
       const stage = await stageRepository.find({
         where: { procedure: { procedure_id: procedureId } },
         relations: ["commissionDetails"],
+        order: {
+          order: "ASC",
+        },
       });
 
       if (!stage) {

@@ -87,6 +87,7 @@ const connectionController = {
 
       let stageList = [];
       if (procedure) {
+        procedure.stages.sort((a, b) => a.order - b.order);
         for (const stage of procedure?.stages) {
           const detail = await stageRepository.findOne({
             where: { stage_id: stage.stage_id },
