@@ -212,6 +212,8 @@ const connectionController = {
           relations: ["stages"],
         });
 
+        process?.stages.sort((a, b) => a.order - b.order);
+
         const newTransaction = {
           user: { user_id: result?.user.user_id },
           salon: { salon_id: result?.salon.salon_id },

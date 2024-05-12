@@ -790,6 +790,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <h2>Yêu cầu đăng bán xe</h2>
     (Bao gồm các trường: post_id, title, text(nội dung), postedBy(userId), salons(mảng id các salon có thể xem), image(tối đa 20 ảnh), brand(hãng xe), type(dòng xe), mfg(năm sản xuất), version(phiên bản), gear(hộp số), fuel(nhiên liệu), origin(xuất xứ), design(kiểu dáng), seat(số ghế ngồi), color(màu sắc), licensePlate(biển số xe), ownerNumber(số đời chủ), accessory(phụ kiện đi kèm) boolean, registrationDeadline(hạn đăng kiểm) boolean, kilometer(số km đã đi), price(giá), address(địa chỉ hoa tiêu) createdAt)
     .Này chỉ có user mới được đăng thôi nhé(nên thằng nào mà có salon thì chắc phải ẩn giao diện)
+    <b>(Truyền theo form-data)</b>
     <li>[POST] /posts</li>
     Dùng để tạo một bài đăng mới. Truyền vào các trường như trên: text và salons (mảng id các salon được xem bài này)...
     Nếu không truyền vào salons thì nó mặc định là tất cả salon đều được xem
@@ -804,7 +805,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     .Sau khi xem bài đăng xong thì nếu salon nào quan tâm muốn kết nối thì sẽ gọi API này
     <li>[POST] /connections</li>
     Sẽ tạo ra kết nối giữa salon và thằng đăng bài. Cần truyền vào postId và processId(này dùng để cho thằng đăng xem được các bước và phần trăm hoa hồng giúp nó có chấp nhận hay không).
-    Lúc này sẽ có thông báo đến thằng user    
+    Lúc này sẽ có thông báo đến thằng user(trong data có connection_id để link tới)  
     <li>[GET] /connections</li>
     Nếu nó là user thường (người đăng) thì nó sẽ lấy ra được các kết nối giữa nó và các salon.
     Nếu nó là chủ salon thì nó sẽ lấy ra được các kết nối giữa salon của nó và thông tin những người đăng
@@ -812,7 +813,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Sẽ lấy ra được chi tiết kết nối bao gồm trạng thái, ngày tạo, salon nào, user nào, quy trình nào để thằng đăng nó đọc xem có chập nhận không
     <li>[PATCH] /connections/:id</li>
     Cần truyền vào status (string). Status có 3 trạng thái: ('pending', 'accepted', 'rejected'). Khi tạo ra mặc định ban đầu sẽ là pending.
-    Lúc từ chối kết nối thì sẽ có thông báo đến salon. Nếu chấp nhận cũng có thông báo và nó sẽ chạy quy trình gồm các bước mà salon đã đặt ra
+    Lúc từ chối kết nối thì sẽ có thông báo đến salon. Nếu chấp nhận cũng có thông báo và nó sẽ chạy quy trình gồm các bước mà salon đã đặt ra (có connection_id để link tới)
 
     <h2>Ghi nhận hoa hồng</h2>
     (Bao gồm các trường: transaction_id, connectionId, checked(mảng này cho biết là id chi tiết giai đoạn nào đã check),userId, salonId, processId(thực hiện theo quy trình nào), stageId(đang tời giai đoạn nào), commissionAmount(mảng hoa hồng của các giai đoạn), status)
@@ -824,14 +825,14 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Sẽ lấy ra được tất cả các giao dịch của salon mình với các hoa tiêu. Lấy ra đươc tình trạng, tên user, quy trình áp dụng, ngày tạo kết nối 
     <li>[GET] /transactions/:id</li>
     Nó sẽ lấy ra được chi tiết của giao dịch đó
-    <li>[PATCH] /transactions/details/:id</li>
+    <li>[PATCH] /transactions/:id/details</li>
     Cập nhật lại chi tiết giai đoạn. Truyền vào mảng id các chi tiết giai đoạn đã check. Ví dụ ban đầu check 1 chi tiết thì truyền 1, lúc sau check 2 thì phải truyền cả 2 qua:
     <pre>
     {
         "checked": ["d3f52dc8-d67f-48c5-8dd4-c76c0b08e38b"]
     }
     </pre>
-    <li>[PATCH] /transactions/next/:id</li>
+    <li>[PATCH] /transactions/:id/next</li>
     Có thể truyền vào commission. Ví dụ:
     <pre>
     {
@@ -839,8 +840,11 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     }
     </pre>
     Nó sẽ ghi nhận lại hoa hồng ở giai đoạn đó. Còn không truyền thì giai đoạn đó hoa hồng = 0
+    <li>[PATCH] /transactions/:id/back</li>
+    Cần truyền vào stageId để biết là quay lại giai đoạn nào
+    (Chắc bên giao diện thì nếu nó quay lại xem thôi thì không có gì, còn muốn uncheck chi tiết trong giai đoạn đó thì mình phải cho nó gọi API này trước để biết là nó quay lại về giai đoạn nào thì khi next mới biết kiểm tra xem nó có đủ điều kiện không)
     <div>
-        <b> Cái back và chặn user thì tui sẽ bổ sung sau. </b>
+        <b> Chặn user thì tui sẽ bổ sung sau. </b>
     </div>
 </body>
 

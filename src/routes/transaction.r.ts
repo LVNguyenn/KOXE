@@ -11,14 +11,19 @@ router.get(
 );
 router.get("/:id", transactionController.getTransactionById);
 router.patch(
-  "/details/:id",
+  "/:id/details",
   middlewareController.verifyToken,
   transactionController.updateTransaction
 );
 router.patch(
-  "/next/:id",
+  "/:id/next",
   middlewareController.verifyToken,
   transactionController.nextStage
+);
+router.patch(
+  "/:id/back",
+  middlewareController.verifyToken,
+  transactionController.backStage
 );
 
 export default router;
