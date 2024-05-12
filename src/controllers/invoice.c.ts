@@ -74,7 +74,7 @@ const invoiceController = {
       const invoiceRepository = getRepository(Invoice);
       let invoiceDb: any = await invoiceRepository.find({
         where: { invoice_id: invoiceId, phone, licensePlate, type },
-        relations: ["seller"],
+        relations: ["seller", "legals_user"],
       });
 
       invoiceDb = invoiceDb.filter(
