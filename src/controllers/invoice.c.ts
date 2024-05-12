@@ -260,6 +260,7 @@ const invoiceController = {
   tickDoneInvoice: async (req: Request, res: Response) => {
     try {
       const { salonId, invoiceId } = req.body;
+      console.log(salonId, invoiceId )
       const invoiceRepository = getRepository(Invoice);
       const invoiceDb = await invoiceRepository.findOneOrFail({
         where: { invoice_id: invoiceId },
@@ -272,6 +273,8 @@ const invoiceController = {
           msg: "You dont have the permission."
         })
       }
+
+      console.log(invoiceDb)
 
       await invoiceRepository.save({ ...invoiceDb, done: true });
 
