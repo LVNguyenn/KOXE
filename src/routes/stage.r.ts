@@ -5,7 +5,7 @@ import middlewareController from "../middleware/middleware";
 const router = Router();
 
 router.get("/:id", stageController.getStageById);
-router.get("/procedure/:procedureId", stageController.getStageByProcedureId);
+router.get("/process/:processId", stageController.getStageByProcessId);
 router.post("/", middlewareController.verifyToken, stageController.createStage);
 router.patch(
   "/:id",

@@ -46,12 +46,40 @@ const salonController = {
         nbHits: salons.length,
       };
       // Cache.set("salon", saveSalon);
-      
+
       return res.status(200).json({
         status: "success",
-        salons: saveSalon
+        salons: saveSalon,
       });
     } catch (error) {
+      return res
+        .status(500)
+        .json({ status: "failed", msg: "Internal server error" });
+    }
+  },
+  getAllSalonsNoBlock: async (req: Request, res: Response) => {
+    const userId: any = req.headers["userId"] || "";
+    const salonRepository = getRepository(Salon);
+    try {
+      const salons = await salonRepository
+        .createQueryBuilder("salon")
+        .leftJoinAndSelect("salon.user", "user")
+        .where(
+          `'${userId}' NOT IN (salon.blockUsers) OR salon.blockUsers IS NULL`
+        )
+        .getMany();
+
+      const formattedSalons = salons.map((salon) => ({
+        salon_id: salon.salon_id,
+        name: salon.name,
+      }));
+
+      return res.status(200).json({
+        status: "success",
+        salons: formattedSalons,
+      });
+    } catch (error) {
+      console.log(error);
       return res
         .status(500)
         .json({ status: "failed", msg: "Internal server error" });
@@ -116,7 +144,7 @@ const salonController = {
 
     // get value from cache
     // const valueCache = Cache.get(id+"salon");
-    
+
     // if (valueCache) {
     //   return res.status(200).json({
     //     status: "success",
@@ -138,7 +166,7 @@ const salonController = {
           .json({ status: "failed", msg: `No salon with id: ${id}` });
       }
       // Cache.set(id+"salon", salon);
-      
+
       return res.status(200).json({
         status: "success",
         salon: salon,
@@ -199,8 +227,8 @@ const salonController = {
       // set owner permission for the user.
       const userRepository = getRepository(User);
       let userDb = await userRepository.findOneOrFail({
-        where: { user_id: user_id }
-      })
+        where: { user_id: user_id },
+      });
       userDb.permissions = ["OWNER"];
       userDb.salonId = savedSalon;
       await userRepository.save(userDb);
@@ -424,8 +452,8 @@ const salonController = {
         description: `${userDb.fullname} has accepted your invitation to your salon.`,
         types: "invite",
         avatar: userDb.avatar,
-        isUser: true
-      })
+        isUser: true,
+      });
 
       return res.json({
         status: "success",
@@ -452,8 +480,8 @@ const salonController = {
       });
 
       for (let i in salonDb.employees) {
-        let per = salonDb.employees[i].permissions
-        salonDb.employees[i].permissions = per && await parsePermission(per);
+        let per = salonDb.employees[i].permissions;
+        salonDb.employees[i].permissions = per && (await parsePermission(per));
       }
 
       return res.json({
@@ -474,39 +502,36 @@ const salonController = {
     const userRepository = getRepository(User);
     try {
       let userDb: User = await userRepository.findOneOrFail({
-        where: { user_id: userId }
-      })
+        where: { user_id: userId },
+      });
 
       await userRepository.save({ ...userDb, permissions: permission });
 
       // notification to user
       const fromUser = await userRepository.findOneOrFail({
-        where: { user_id: req.user as string }
-      })
+        where: { user_id: req.user as string },
+      });
 
       createNotification({
         to: userDb.user_id,
         description: `Chủ salon đã thay đổi quyền của bạn.`,
         types: "permission",
         avatar: fromUser.avatar,
-        isUser: false
-      })
+        isUser: false,
+      });
 
       return res.json({
         status: "success",
         msg: "add permission successfully!",
-        permissions: await parsePermission(userDb.permissions)
-
-      })
-
+        permissions: await parsePermission(userDb.permissions),
+      });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return res.json({
         status: "failed",
-        msg: "error with add permission."
-      })
+        msg: "error with add permission.",
+      });
     }
-
   },
 
   inviteByEmail: async (req: Request, res: Response) => {
@@ -533,15 +558,14 @@ const salonController = {
       // check email is existed yet.
       const userRepository = getRepository(User);
       const userDb: any = await userRepository.findOne({
-        where: { email: email }
+        where: { email: email },
       });
-
 
       if (userDb) {
         // get info of from user
         const fromUser = await userRepository.findOneOrFail({
-          where: { user_id: userId }
-        })
+          where: { user_id: userId },
+        });
         // user is existed already => send notification to this user
         createNotification({
           to: userDb.user_id,
@@ -549,17 +573,17 @@ const salonController = {
           types: "invite",
           data: token,
           avatar: fromUser.avatar,
-          isUser: false
-        })
+          isUser: false,
+        });
 
         return res.status(200).json({
           status: "success",
-          msg: "Invited successfully!"
+          msg: "Invited successfully!",
         });
       }
 
       // user is existed yet => send mail.
-      const content = `<div dir="ltr"> Hi! There, you have recently visited our website and entered your email. Please follow the given link to join in the salon:<a target="_blank" href="${process.env.URL_CLIENT}/auth/verify-token-email/${token}">Click here</a> </div>`
+      const content = `<div dir="ltr"> Hi! There, you have recently visited our website and entered your email. Please follow the given link to join in the salon:<a target="_blank" href="${process.env.URL_CLIENT}/auth/verify-token-email/${token}">Click here</a> </div>`;
 
       let rs: any = await sendMail(content, email);
 
@@ -574,7 +598,6 @@ const salonController = {
         status: "success",
         msg: "Sent mail successfully!",
       });
-
     } catch (error) {
       return res.json({
         status: "failed",
@@ -592,33 +615,37 @@ const salonController = {
     if (!token) {
       return res.json({
         status: "failed",
-        "msg": "Token is invalid."
-      })
+        msg: "Token is invalid.",
+      });
     }
 
-    jwt.verify(token, process.env.JWT_SECRETKEY_MAIL || "jwt_key_mail", async (err, decoded: any) => {
-      if (!err) {
-        email = decoded.email;
-        salonId = decoded.salonId;
-      } else {
-        return res.json({
-          status: "failed",
-          msg: "Token is not valid or expired",
-        })
+    jwt.verify(
+      token,
+      process.env.JWT_SECRETKEY_MAIL || "jwt_key_mail",
+      async (err, decoded: any) => {
+        if (!err) {
+          email = decoded.email;
+          salonId = decoded.salonId;
+        } else {
+          return res.json({
+            status: "failed",
+            msg: "Token is not valid or expired",
+          });
+        }
       }
-    })
+    );
 
     try {
       await userRepository.findOneOrFail({
-        where: { email: email }
-      })
+        where: { email: email },
+      });
 
       // user joined the salon before.
       return res.json({
         status: "failed",
-        msg: "You are in the salon here aldready."
-      })
-    } catch (error) { };
+        msg: "You are in the salon here aldready.",
+      });
+    } catch (error) {}
 
     try {
       // create new account.
@@ -633,7 +660,7 @@ const salonController = {
       const salonRepository = getRepository(Salon);
       let salonDb: Salon | undefined = await salonRepository.findOneOrFail({
         where: { salon_id: salonId },
-        relations: ['employees']
+        relations: ["employees"],
       });
       userDb.password = ""; // error is delete here - CDQ.
       salonDb?.employees.push(userDb);
@@ -651,7 +678,9 @@ const salonController = {
       // }
 
       // gen new token for the user.
-      const { accessToken, refreshToken } = await authController.genToken(userDb);
+      const { accessToken, refreshToken } = await authController.genToken(
+        userDb
+      );
 
       // notification to salon
       createNotification({
@@ -659,10 +688,10 @@ const salonController = {
         description: `${userDb.username} has accepted your invitation to your salon.`,
         types: "invite",
         avatar: userDb.avatar,
-        isUser: true
-      })
+        isUser: true,
+      });
 
-      // set cookie and return data 
+      // set cookie and return data
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: true,
@@ -676,16 +705,14 @@ const salonController = {
         accessToken,
         refreshToken,
         user: userDb,
-      })
+      });
     } catch (error) {
       res.json({
         status: "failed",
-        msg: "Join salon failed."
-      })
+        msg: "Join salon failed.",
+      });
     }
-
   },
-
-}
+};
 
 export default salonController;

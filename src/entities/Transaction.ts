@@ -3,7 +3,7 @@ import { Connection } from "./Connection";
 import { Stage } from "./Stage";
 import { User } from "./User";
 import { Salon } from "./Salon";
-import { Procedure } from "./Procedure";
+import { Process } from "./Process";
 
 @Entity()
 export class Transaction {
@@ -19,8 +19,8 @@ export class Transaction {
   @ManyToOne(() => Connection, (connection) => connection.transactions)
   connection!: Connection;
 
-  @ManyToOne(() => Procedure, (procedure) => procedure.transactions)
-  procedure!: Procedure;
+  @ManyToOne(() => Process, (process) => process.transactions)
+  process!: Process;
 
   @ManyToOne(() => Stage, (stage) => stage.transactions)
   stage!: Stage;

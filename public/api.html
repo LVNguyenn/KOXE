@@ -742,27 +742,27 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[POST] /invoice/create-invoice</li> Có cập nhật thêm processId vào input. Có cập nhật cho phép xóa hóa đơn.
 
     <h2>Quy trình</h2>
-    (Bao gồm các trường: procedure_id, name, type, salonId)
-    <li>[GET] /procedures</li>
-    Nó sẽ lấy ra được tất cả các quy trình của salon đó. Nếu có truyền vào querystring. Ví dụ: http://localhost:5000/procedures?type=hoatieu thì nó sẽ lấy ra các quy trình hoa tiêu thôi(không truyền lấy cả 2)
-    <li>[GET] /procedures/:id</li>
+    (Bao gồm các trường: process_id, name, type, salonId, description)
+    <li>[GET] /process</li>
+    Nó sẽ lấy ra được tất cả các quy trình của salon đó. Nếu có truyền vào QueryString. Ví dụ: http://localhost:5000/process?type=hoatieu thì nó sẽ lấy ra các quy trình hoa tiêu thôi(không truyền lấy cả 2)
+    <li>[GET] /process/:id</li>
     Sẽ lấy ra được chi tiết quy trình kèm theo các giai đoạn và chi tiết giai đoạn thuộc về quy trình đó
-    <li>[POST] /procedures</li>
-    Thêm quy trình mới. Truyền vào name, type(hoatieu, giayto)
-    <li>[PATCH] /procedures/:id</li>
-    Chỉ cập nhật lại được tên quy trình và type
-    <li>[DELETE] /procedures/:id</li>
+    <li>[POST] /process</li>
+    Thêm quy trình mới. Truyền vào name, type(hoatieu hoac giayto), description
+    <li>[PATCH] /process/:id</li>
+    Chỉ cập nhật lại được tên quy trình, type(hoatieu hoac giayto), description
+    <li>[DELETE] /process/:id</li>
     Xóa quy trình. Khi xóa thì giai đoạn và chi tiết giai đoạn cũng sẽ tự động xóa theo
 
     <h2>Giai đoạn hoa tiêu</h2>
-    (Bao gồm các trường: stage_id, name, procedureId(thuộc về quy trình nào), salonId(salon nào tạo), commissionRate(phần trăm hoa hồng), order: thứ tự)
+    (Bao gồm các trường: stage_id, name, processId(thuộc về quy trình nào), salonId(salon nào tạo), commissionRate(phần trăm hoa hồng), order: thứ tự)
     Giai đoạn thì nó phải trong 1 quy trình cụ thể, không làm quản lý giai đoạn riêng lẻ 
     <li>[GET] /stages/:id</li>
     Sẽ lấy ra được chi tiết giai đoạn kèm theo đó là chi tiết giai đoạn
-    <li>[GET] /stages/procedure/:procedureId</li>
+    <li>[GET] /stages/process/:processId</li>
     Sẽ lấy ra được các giai đoạn kèm theo chi tiết giai đoạn của 1 quy trình
     <li>[POST] /stages</li>
-    Thêm một giai đoạn mới. Lúc này sẽ truyền vào chi tiết của giai đoạn luôn(detail). Ví dụ:
+    Thêm một giai đoạn mới. Lúc này sẽ truyền vào chi tiết của giai đoạn luôn(details). Ví dụ:
     <pre>
     {
         "name": "giai đoạn 2",
@@ -791,10 +791,10 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Sẽ lấy ra được nội dung chi tiết của bài đăng (có kèm người đăng)
 
     <h2>Kết nối</h2>
-    (Bao gồm các trường: connection_id, salonId, userId, postId, createdAt, status, procedureId(Id của quy trình mà salon sẽ áp dụng cho thằng này) )
+    (Bao gồm các trường: connection_id, salonId, userId, postId, createdAt, status, processId(Id của quy trình mà salon sẽ áp dụng cho thằng này) )
     .Sau khi xem bài đăng xong thì nếu salon nào quan tâm muốn kết nối thì sẽ gọi API này
     <li>[POST] /connections</li>
-    Sẽ tạo ra kết nối giữa salon và thằng đăng bài. Cần truyền vào postId và procedureId(này dùng để cho thằng đăng xem được các bước và phần trăm hoa hồng giúp nó có chấp nhận hay không).
+    Sẽ tạo ra kết nối giữa salon và thằng đăng bài. Cần truyền vào postId và processId(này dùng để cho thằng đăng xem được các bước và phần trăm hoa hồng giúp nó có chấp nhận hay không).
     Lúc này sẽ có thông báo đến thằng user    
     <li>[GET] /connections</li>
     Nếu nó là user thường (người đăng) thì nó sẽ lấy ra được các kết nối giữa nó và các salon.
@@ -806,17 +806,17 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Lúc từ chối kết nối thì sẽ có thông báo đến salon. Nếu chấp nhận cũng có thông báo và nó sẽ chạy quy trình gồm các bước mà salon đã đặt ra
 
     <h2>Ghi nhận hoa hồng</h2>
-    (Bao gồm các trường: transaction_id, connectionId, checked(mảng này cho biết là id chi tiết giai đoạn nào đã check),userId, salonId, procedureId(thực hiện theo quy trình nào), stageId(đang tời giai đoạn nào), commissionAmount(mảng hoa hồng của các giai đoạn), status)
+    (Bao gồm các trường: transaction_id, connectionId, checked(mảng này cho biết là id chi tiết giai đoạn nào đã check),userId, salonId, processId(thực hiện theo quy trình nào), stageId(đang tời giai đoạn nào), commissionAmount(mảng hoa hồng của các giai đoạn), status)
     <div>
         <b>Ý tường mà tui làm sẽ là:</b>
-        Lúc mà nó chấp nhận kết nối thì bảng này sẽ tự động tạo và nó sẽ gán mặc định giai đoạn đầu tiên của quy trình đó vào stageId, mảng checked ban đầu sẽ là rỗng. Sau đó check gì sẽ có API để cập nhật lại, nếu xong rồi thì khi nhấn next sẽ có API kiểm tra xem nó có đủ điều kiện qua không. Tại bước này cần nhập hoa hồng(số tiền mà salon đã chi ra thực tế cho hoa tiêu đó. Cái trên chỉ là phần trăm hoa hồng thôi. Nũa mình dùng thông tin này để thống kê). Nếu nó đủ điều kiện qua nghĩa là ở giai đoạn đó đã check hết thì nó sẽ tự động cập nhật lại stageId sang giai đoạn tiếp theo và checked sẽ quay lại mảng rỗng. Đến khi nào gọi API mà nó có status là completed thì có nghĩa là xong, nó tự cập nhật lại status. Lúc này tụi ông nhớ kiểm tra và đừng cho nó gọi next nữa
+        Lúc mà nó chấp nhận kết nối thì bảng này sẽ tự động tạo và nó sẽ gán mặc định giai đoạn đầu tiên của quy trình đó vào stageId, mảng checked ban đầu sẽ là rỗng. Sau đó check gì sẽ có API để cập nhật lại, nếu xong rồi thì khi nhấn next sẽ có API kiểm tra xem nó có đủ điều kiện qua không. Tại bước này cần nhập hoa hồng(số tiền mà salon đã chi ra thực tế cho hoa tiêu đó. Cái trên chỉ là phần trăm hoa hồng thôi. Nũa mình dùng thông tin này để thống kê). Nếu nó đủ điều kiện qua nghĩa là ở giai đoạn đó đã check hết thì nó sẽ tự động cập nhật lại stageId sang giai đoạn tiếp theo. Đến khi nào gọi API mà nó có status là completed thì có nghĩa là xong, nó tự cập nhật lại status là success. Lúc này tụi ông nhớ kiểm tra và đừng cho nó gọi next nữa
     </div>
     <li>[GET] /transactions/salon</li>
     Sẽ lấy ra được tất cả các giao dịch của salon mình với các hoa tiêu. Lấy ra đươc tình trạng, tên user, quy trình áp dụng, ngày tạo kết nối 
     <li>[GET] /transactions/:id</li>
     Nó sẽ lấy ra được chi tiết của giao dịch đó
     <li>[PATCH] /transactions/details/:id</li>
-    Cập nhật lại chi tiết giai đoạn. Truyền vào mảng id các chi tiết giai đoạn đã check. Ví dụ:
+    Cập nhật lại chi tiết giai đoạn. Truyền vào mảng id các chi tiết giai đoạn đã check. Ví dụ ban đầu check 1 chi tiết thì truyền 1, lúc sau check 2 thì phải truyền cả 2 qua:
     <pre>
     {
         "checked": ["d3f52dc8-d67f-48c5-8dd4-c76c0b08e38b"]

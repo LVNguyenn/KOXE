@@ -97,6 +97,10 @@ function getNextElement(array: any, element: any) {
   return null;
 }
 
+function isArraySubset(subset: any, array: any) {
+  return subset.every((element: any) => array.includes(element));
+}
+
 export {
   generateRandomCode,
   isValidUUID,
@@ -108,4 +112,5 @@ export {
   isDateInMonth,
   FormatData,
   getNextElement,
+  isArraySubset,
 };
