@@ -11,8 +11,8 @@ export class Car_User_Legals {
     @Column()
     phone!: string;
 
-    @Column("json", { nullable: true })
-    details!: any[];
+    @Column("simple-array", { nullable: true })
+    details!: string[];
 
     @Column({nullable: true})
     current_period!: string;

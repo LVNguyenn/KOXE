@@ -117,7 +117,8 @@ const LegalsRepository = {
             const legalRepository = getRepository(LegalDetails);
             const queryBuilder = await legalRepository
                 .createQueryBuilder('LegalDetails')
-                .leftJoinAndSelect('LegalDetails.document', 'legalDocuments', 'LegalDetails.document = :period', { ...data })
+                // .leftJoinAndSelect('LegalDetails.document', 'legalDocuments', 'LegalDetails.document = :period', { ...data })
+                .leftJoinAndSelect('LegalDetails.document', 'legalDocuments')
 
             if (data?.id) {
                 const legalDb = await queryBuilder.where({
@@ -343,7 +344,8 @@ const LegalsRepository = {
     async addLegalForUser(data: any) {
         try {
             const carUserRepository = getRepository(Car_User_Legals);
-            const carUserDb = await carUserRepository.save(data);
+            // console.log({...data[0]?.data, details: data?.details})
+            const carUserDb = await carUserRepository.save({...data?.data, details: data?.details});
 
             return FormatData("success", "add legal documents for the user successfully!", carUserDb);
         } catch (error) {

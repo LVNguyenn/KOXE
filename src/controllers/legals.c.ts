@@ -160,8 +160,7 @@ const legalsController = {
     },
 
     addLegalDetailsForUser: async (req: Request, res: Response) => {
-        const { salonId, phone, details } = req.body;
-        let data: any = {};
+        const { salonId, phone, details, period } = req.body;
 
         if (!phone) {
             return res.json({
@@ -172,19 +171,11 @@ const legalsController = {
 
         // find legal car user
         const carUserRp = await LegalsRepository.findLegalUserByPhone({ phone });
+        // car by carId, salonId => To check role.
+        const checkRole = await CarRepository.findCarByCarIdSalonId({salonId, carId: carUserRp?.car_id})
+        // detail = [chi tiet 1, chi tiet 2]
 
-        // details = [id detail 1, id 2, ...]
-        try {
-            for (let detail of details) {
-                const detailRp = await LegalsRepository.findLegalDetailsByPeriodId({ period: carUserRp?.period, salonId, id: detail })
-
-                if (detailRp?.data) {
-                    data.details = !data?.details ? [detailRp?.data] : [...data.details, detailRp?.data];
-                }
-            }
-        } catch (error) { }
-
-        const userRp = await LegalsRepository.addLegalForUser({ ...carUserRp?.data, details: data?.details });
+        const userRp = await LegalsRepository.addLegalForUser({ data: {...carUserRp?.data}, details: details });
 
         return res.json({ ...userRp });
     },
