@@ -1,30 +1,33 @@
 import { Request, Response } from "express";
-import { Procedure } from "../entities/Procedure";
+import { Process } from "../entities/Process";
 import { Stage } from "../entities/Stage";
 import { getRepository } from "typeorm";
 import { getUserInfo } from "../helper/mInvoice";
 
-const procedureController = {
-  getAllProcedures: async (req: Request, res: Response) => {
-    const procedureRepository = getRepository(Procedure);
+const processController = {
+  getAllProcesses: async (req: Request, res: Response) => {
+    const processRepository = getRepository(Process);
     const userId: any = req.headers["userId"] || "";
     const user = await getUserInfo(userId);
     const salonId = user?.salonId.salon_id;
-    const type: any = req.query.type;
+    let type: any = req.query.type;
 
     try {
-      const procedures = await procedureRepository.find({
+      if (type === "giayto") type = 0;
+      else type = 1;
+
+      const processes = await processRepository.find({
         where: { salon: { salon_id: salonId }, type: type },
       });
 
-      const procedureSave = {
-        procedures,
-        nbHits: procedures.length,
+      const processesSave = {
+        processes,
+        nbHits: processes.length,
       };
 
       return res.status(200).json({
         status: "success",
-        procedures: procedureSave,
+        processes: processesSave,
       });
     } catch (error) {
       return res
@@ -32,41 +35,41 @@ const procedureController = {
         .json({ status: "failed", msg: "Internal server error" });
     }
   },
-  getProcedureById: async (req: Request, res: Response) => {
-    const procedureRepository = getRepository(Procedure);
+  getProcessById: async (req: Request, res: Response) => {
+    const processRepository = getRepository(Process);
     const stageRepository = getRepository(Stage);
     const { id } = req.params;
 
     try {
-      const procedure = await procedureRepository.findOne({
-        where: { procedure_id: id },
+      const process = await processRepository.findOne({
+        where: { id: id },
         relations: ["stages"],
       });
 
-      if (!procedure) {
+      if (!process) {
         return res
           .status(404)
-          .json({ status: "failed", msg: `No procedure with id: ${id}` });
+          .json({ status: "failed", msg: `No process with id: ${id}` });
       }
 
-      procedure.stages.sort((a, b) => a.order - b.order);
+      process.stages.sort((a, b) => a.order - b.order);
 
       let stageList = [];
-      for (const stage of procedure.stages) {
+      for (const stage of process.stages) {
         const detail = await stageRepository.findOne({
           where: { stage_id: stage.stage_id },
           relations: ["commissionDetails"],
         });
         stageList.push(detail);
       }
-      const formatProcedure = {
-        ...procedure,
+      const formatProcess = {
+        ...process,
         stages: stageList,
       };
 
       return res.status(200).json({
         status: "success",
-        procedure: formatProcedure,
+        process: formatProcess,
       });
     } catch (error) {
       return res
@@ -74,10 +77,10 @@ const procedureController = {
         .json({ status: "failed", msg: "Internal server error" });
     }
   },
-  createProcedure: async (req: Request, res: Response) => {
+  createProcess: async (req: Request, res: Response) => {
     const userId: any = req.headers["userId"] || "";
-    const procedureRepository = getRepository(Procedure);
-    const { name, type } = req.body;
+    const processRepository = getRepository(Process);
+    let { name, type, descripton } = req.body;
 
     const user = await getUserInfo(userId);
 
@@ -88,20 +91,24 @@ const procedureController = {
       });
     }
 
+    if (type === "giayto") type = 0;
+    else type = 1;
+
     const salonId = user.salonId.salon_id;
     try {
-      const newProcedure = {
+      const newProcess = {
         name,
+        descripton,
         type,
         salon: { salon_id: salonId },
       };
 
-      const savedProcedure = await procedureRepository.save(newProcedure);
+      const savedProcess = await processRepository.save(newProcess);
 
       return res.status(201).json({
         status: "success",
         msg: "Create successfully!",
-        procedure: savedProcedure,
+        process: savedProcess,
       });
     } catch (error) {
       console.log(error);
@@ -110,32 +117,35 @@ const procedureController = {
         .json({ status: "failed", msg: "Internal server error" });
     }
   },
-  updateProcedure: async (req: Request, res: Response) => {
+  updateProcess: async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { name, type } = req.body;
-    const procedureRepository = getRepository(Procedure);
+    let { name, type, description } = req.body;
+    const processRepository = getRepository(Process);
 
     try {
-      const procedure = await procedureRepository.findOne({
-        where: { procedure_id: id },
+      const process = await processRepository.findOne({
+        where: { id: id },
         relations: ["stages"],
       });
 
-      if (!procedure) {
+      if (!process) {
         return res
           .status(404)
-          .json({ status: "failed", msg: `No procedure with id: ${id}` });
+          .json({ status: "failed", msg: `No process with id: ${id}` });
       }
 
-      procedure.name = name;
-      procedure.type = type;
+      process.name = name;
+      if (type === "giayto") type = 0;
+      else type = 1;
+      process.type = type;
+      process.description = description;
 
-      await procedureRepository.save(procedure);
+      const saveProcess = await processRepository.save(process);
 
       return res.status(200).json({
         status: "success",
         msg: "Update successfully!",
-        procedure: procedure,
+        process: saveProcess,
       });
     } catch (error) {
       console.log(error);
@@ -144,21 +154,21 @@ const procedureController = {
         .json({ status: "failed", msg: "Internal server error" });
     }
   },
-  deleteProcedure: async (req: Request, res: Response) => {
+  deleteProcess: async (req: Request, res: Response) => {
     const { id } = req.params;
-    const procedureRepository = getRepository(Procedure);
+    const processRepository = getRepository(Process);
     try {
-      const procedure = await procedureRepository.findOne({
-        where: { procedure_id: id },
+      const process = await processRepository.findOne({
+        where: { id: id },
       });
 
-      if (!procedure) {
+      if (!process) {
         return res
           .status(404)
-          .json({ status: "failed", msg: `No procedure with id: ${id}` });
+          .json({ status: "failed", msg: `No process with id: ${id}` });
       }
 
-      await procedureRepository.remove(procedure);
+      await processRepository.remove(process);
 
       res.status(200).json({
         status: "success",
@@ -173,4 +183,4 @@ const procedureController = {
   },
 };
 
-export default procedureController;
+export default processController;

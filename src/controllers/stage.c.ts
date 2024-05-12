@@ -5,13 +5,13 @@ import { getRepository } from "typeorm";
 import { getUserInfo } from "../helper/mInvoice";
 
 const stageController = {
-  getStageByProcedureId: async (req: Request, res: Response) => {
+  getStageByProcessId: async (req: Request, res: Response) => {
     const stageRepository = getRepository(Stage);
-    const { procedureId } = req.params;
+    const { processId } = req.params;
 
     try {
       const stage = await stageRepository.find({
-        where: { procedure: { procedure_id: procedureId } },
+        where: { process: { id: processId } },
         relations: ["commissionDetails"],
         order: {
           order: "ASC",
@@ -21,7 +21,7 @@ const stageController = {
       if (!stage) {
         return res.status(404).json({
           status: "failed",
-          msg: `No stage with procedure id: ${procedureId}`,
+          msg: `No stage with process id: ${processId}`,
         });
       }
 
@@ -114,7 +114,7 @@ const stageController = {
 
     try {
       const stageList = await stageRepository.find({
-        where: { procedure: { procedure_id: processId } },
+        where: { process: { id: processId } },
       });
 
       stageList.forEach((stage) => {
@@ -134,7 +134,7 @@ const stageController = {
       const newStage = {
         name,
         salon: { salon_id: salonId },
-        procedure: { procedure_id: processId },
+        process: { id: processId },
         order: order,
         commissionRate,
       };
@@ -172,7 +172,7 @@ const stageController = {
 
     try {
       const stageList = await stageRepository.find({
-        where: { procedure: { procedure_id: id } },
+        where: { process: { id: id } },
       });
 
       stageList.forEach((stage) => {

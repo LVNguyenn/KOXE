@@ -21,7 +21,7 @@ import legalsRouter from "./legals.r";
 import postRouter from "./post.r";
 import connectionRouter from "./connection.r";
 import transactionRouter from "./transaction.r";
-import procedureRouter from "./procedure.r";
+import processRouter from "./procedure.r";
 import stageRouter from "./stage.r";
 
 function router(app: Express) {
@@ -47,7 +47,7 @@ function router(app: Express) {
   app.use("/posts", postRouter);
   app.use("/connections", connectionRouter);
   app.use("/transactions", transactionRouter);
-  app.use("/procedures", procedureRouter);
+  app.use("/process", processRouter);
   app.use("/stages", stageRouter);
 }
 

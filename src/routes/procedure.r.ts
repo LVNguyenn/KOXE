@@ -1,5 +1,5 @@
 import { Router } from "express";
-import procedureController from "../controllers/procedure.c";
+import processController from "../controllers/procedure.c";
 import middlewareController from "../middleware/middleware";
 
 const router = Router();
@@ -7,15 +7,15 @@ const router = Router();
 router.get(
   "/",
   middlewareController.verifyToken,
-  procedureController.getAllProcedures
+  processController.getAllProcesses
 );
-router.get("/:id", procedureController.getProcedureById);
+router.get("/:id", processController.getProcessById);
 router.post(
   "/",
   middlewareController.verifyToken,
-  procedureController.createProcedure
+  processController.createProcess
 );
-router.patch("/:id", procedureController.updateProcedure);
-router.delete("/:id", procedureController.deleteProcedure);
+router.patch("/:id", processController.updateProcess);
+router.delete("/:id", processController.deleteProcess);
 
 export default router;

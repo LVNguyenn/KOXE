@@ -3,7 +3,7 @@ import { getRepository } from "typeorm";
 import { User } from "../entities/User";
 import { Connection } from "../entities/Connection";
 import { Salon } from "../entities/Salon";
-import { Procedure } from "../entities/Procedure";
+import { Process } from "../entities/Process";
 import { Stage } from "../entities/Stage";
 import createNotification from "../helper/createNotification";
 import moment from "moment";
@@ -70,25 +70,25 @@ const connectionController = {
   },
   getConnectionById: async (req: Request, res: Response) => {
     const connectionRepository = getRepository(Connection);
-    const procedureRepository = getRepository(Procedure);
+    const processRepository = getRepository(Process);
     const stageRepository = getRepository(Stage);
     const { id } = req.params;
 
     try {
       const connection = await connectionRepository.findOne({
         where: { connection_id: id },
-        relations: ["salon", "user", "post", "procedure"],
+        relations: ["salon", "user", "post", "process"],
       });
 
-      const procedure = await procedureRepository.findOne({
-        where: { procedure_id: connection?.procedure.procedure_id },
+      const process = await processRepository.findOne({
+        where: { id: connection?.process.id },
         relations: ["stages"],
       });
 
       let stageList = [];
-      if (procedure) {
-        procedure.stages.sort((a, b) => a.order - b.order);
-        for (const stage of procedure?.stages) {
+      if (process) {
+        process.stages.sort((a, b) => a.order - b.order);
+        for (const stage of process?.stages) {
           const detail = await stageRepository.findOne({
             where: { stage_id: stage.stage_id },
             relations: ["commissionDetails"],
@@ -114,8 +114,8 @@ const connectionController = {
           fullname: connection?.user.fullname,
           avatar: connection?.user.avatar,
         },
-        procedure: {
-          ...procedure,
+        process: {
+          ...process,
           stages: stageList,
         },
       };
@@ -139,14 +139,14 @@ const connectionController = {
       relations: ["salonId"],
     });
     const salonId = user?.salonId.salon_id;
-    const { postId, procedureId } = req.body;
+    const { postId, processId } = req.body;
 
     try {
       const newConnection = {
         user: { user_id: userId },
         salon: { salon_id: salonId },
         post: { post_id: postId },
-        procedure: { procedure_id: procedureId },
+        process: { id: processId },
         createdAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
       };
 
@@ -181,7 +181,7 @@ const connectionController = {
     const { id } = req.params;
     const { status } = req.body;
     const connectionRepository = getRepository(Connection);
-    const procedureRepository = getRepository(Procedure);
+    const processRepository = getRepository(Process);
 
     try {
       const connection = await connectionRepository.update(id, {
@@ -194,7 +194,7 @@ const connectionController = {
       }
       const result = await connectionRepository.findOne({
         where: { connection_id: id },
-        relations: ["user", "salon", "procedure"],
+        relations: ["user", "salon", "process"],
       });
 
       if (status === "accepted") {
@@ -207,8 +207,8 @@ const connectionController = {
           isUser: true,
         });
 
-        const process = await procedureRepository.findOne({
-          where: { procedure_id: result?.procedure.procedure_id },
+        const process = await processRepository.findOne({
+          where: { id: result?.process.id },
           relations: ["stages"],
         });
 
@@ -216,7 +216,7 @@ const connectionController = {
           user: { user_id: result?.user.user_id },
           salon: { salon_id: result?.salon.salon_id },
           connection: { connection_id: result?.connection_id },
-          procedure: { procedure_id: result?.procedure.procedure_id },
+          process: { id: result?.process.id },
           stage: { stage_id: process?.stages[0].stage_id },
           checked: [],
           commissionAmount: [],

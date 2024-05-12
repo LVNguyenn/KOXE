@@ -3,10 +3,10 @@ import { getRepository, In } from "typeorm";
 import { Transaction } from "../entities/Transaction";
 import { User } from "../entities/User";
 import { Connection } from "../entities/Connection";
-import { Procedure } from "../entities/Procedure";
+import { Process } from "../entities/Process";
 import { Stage } from "../entities/Stage";
 import { getUserInfo } from "../helper/mInvoice";
-import { getNextElement } from "../utils/index";
+import { getNextElement, isArraySubset } from "../utils/index";
 
 const transactionController = {
   getTransactionById: async (req: Request, res: Response) => {
@@ -16,7 +16,7 @@ const transactionController = {
     try {
       const transaction = await transactionRepository.findOne({
         where: { transaction_id: id },
-        relations: ["user", "procedure", "stage"],
+        relations: ["user", "process", "stage"],
       });
 
       if (!transaction) {
@@ -61,7 +61,7 @@ const transactionController = {
     try {
       const transactionList = await transactionRepository.find({
         where: { salon: { salon_id: salonId } },
-        relations: ["user", "connection", "procedure"],
+        relations: ["user", "connection", "process"],
       });
 
       if (!transactionList) {
@@ -130,14 +130,14 @@ const transactionController = {
   nextStage: async (req: Request, res: Response) => {
     const transactionRepository = getRepository(Transaction);
     const stageRepository = getRepository(Stage);
-    const procedureRepository = getRepository(Procedure);
+    const processRepository = getRepository(Process);
     const { id } = req.params;
     const { commission } = req.body;
 
     try {
       const transaction = await transactionRepository.findOne({
         where: { transaction_id: id },
-        relations: ["stage", "procedure"],
+        relations: ["stage", "process"],
       });
 
       if (!transaction) {
@@ -147,8 +147,8 @@ const transactionController = {
       }
 
       let stageList: any = [];
-      const stageDetail = await procedureRepository.findOne({
-        where: { procedure_id: transaction.procedure.procedure_id },
+      const stageDetail = await processRepository.findOne({
+        where: { id: transaction.process.id },
         relations: ["stages"],
       });
       stageDetail?.stages.map((stage) => {
@@ -164,10 +164,10 @@ const transactionController = {
         detailList.push(detail.id);
       });
 
-      const details = JSON.stringify(detailList);
-      const checked = JSON.stringify(transaction.checked);
+      //const details = JSON.stringify(detailList);
+      //const checked = JSON.stringify(transaction.checked);
 
-      if (details === checked) {
+      if (isArraySubset(detailList, transaction.checked)) {
         const nextElement = getNextElement(
           stageList,
           transaction.stage.stage_id
@@ -180,7 +180,7 @@ const transactionController = {
         }
 
         if (nextElement !== null) {
-          transaction.checked = [];
+          //transaction.checked = [];
           transaction.stage.stage_id = nextElement;
           await transactionRepository.save(transaction);
           return res.status(200).json({

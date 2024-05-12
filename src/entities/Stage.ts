@@ -5,7 +5,7 @@ import {
   ManyToOne,
   OneToMany,
 } from "typeorm";
-import { Procedure } from "./Procedure";
+import { Process } from "./Process";
 import { Salon } from "./Salon";
 import { CommissionDetails } from "./CommissionDetails";
 import { Transaction } from "./Transaction";
@@ -18,10 +18,10 @@ export class Stage {
   @Column()
   name!: string;
 
-  @ManyToOne(() => Procedure, (procedure) => procedure.stages, {
+  @ManyToOne(() => Process, (process) => process.stages, {
     onDelete: "CASCADE",
   })
-  procedure!: Procedure;
+  process!: Process;
 
   @OneToMany(() => CommissionDetails, (com) => com.stage)
   commissionDetails!: CommissionDetails[];

@@ -24,7 +24,6 @@ import {
   Transaction,
   Process,
   Car_User_Legals,
-  Procedure,
   Stage,
   CommissionDetails,
 } from "../entities";
@@ -65,7 +64,6 @@ export const connectionString: DataSourceOptions = {
     Transaction,
     Process,
     Car_User_Legals,
-    Procedure,
     Stage,
     CommissionDetails,
   ],

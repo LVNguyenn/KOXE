@@ -11,6 +11,9 @@ import {
 import { LegalDocuments } from "./LegalDocuments";
 import { Car } from "./Car";
 import { Salon } from "./Salon";
+import { Stage } from "./Stage";
+import { Connection } from "./Connection";
+import { Transaction } from "./Transaction";
 
 @Entity()
 export class Process {
@@ -36,6 +39,15 @@ export class Process {
 
   // @OneToMany(() => Car, (car) => car.process, { cascade: true })
   // cars!: LegalDocuments[];
+
+  @OneToMany(() => Stage, (stage) => stage.process)
+  stages!: Stage[];
+
+  @OneToMany(() => Connection, (connection) => connection.process)
+  connections!: Connection[];
+
+  @OneToMany(() => Transaction, (transaction) => transaction.process)
+  transactions!: Transaction[];
 
   init(id: string, name: string, description: string, type: number) {
     this.id = id;
