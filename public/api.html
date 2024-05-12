@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API SERVER</title>
+    <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
@@ -520,6 +521,11 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[POST] /invoice/remove</li>
     Xóa invoice. Cần truyền vô: {"salonId", "invoiceId"}. Xóa hóa đơn thì sẽ xóa luôn cả tiến trình người dùng nếu có.
      Không hiểu sao delete bên postman lỗi nên dùng post để delete.
+
+    <li class="hot">[PATCH] /invoice/tick-done</li>
+        Dùng để tick là hóa đơn đó đã hoàn thành tất cả qui trình cho khách hàng rồi. Cần truyền vô: {salonId, invoiceId}
+
+
     <h3>Hóa đơn bảo dưỡng</h3>
     <li>[GET] /invoice</li>
     Nó sẽ lấy ra được thông tin tất cả các hóa đơn bảo dưỡng (xe gì, ai làm và những dịch vụ đã thực hiện, những phụ tùng đã dùng để sửa chữa) tại salon mình (Đối với chủ salon)
@@ -708,8 +714,10 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     {salonId, processId: id của qui trình.}
 
     <li>[POST] /legals/check-details-user</li>
+    Theo như thảo luận thì cần truyền vô một mảng tất cả giấy tờ đã tick cho user. Vd muốn hủy tick giấy tờ (chi tiết) nào đó thì bên fe cần xóa giấy tờ đó ra khỏi mảng, thêm mới thì 
+    thêm vô mảng. Sau cùng truyền mảng đó cho be để cập nhật.
     Salon tích vô các chi tiết trong một giai đoạn cho user. Cần truyền vô:
-    {salonId, phone, details: [id của detail 1, id 2, ....]}
+    {salonId, phone, details: ["Giay to xe", "giay to tuy than", ...], carId}
     <li>[POST] /legals/get-legals-user</li>
     Dùng để lấy ra hiện user đó đã trong giai đoạn nào và có được chi tiết nào rồi. Cần truyền vô: { phone, carId: không truyền thì lấy toàn bộ }
 
@@ -722,6 +730,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     </div>
 
     <li>[PATCH] /legals/update-period-user</li> 
+    Theo như thảo luận với bên web thì giai đoạn hiện tại chỉ có ý nghĩa để xem. Bên fe cần check theo tên, nếu khách hàng đủ giấy tờ cho giai đoạn đó rồi thì cần hiện 1 nút next để chuyển sang giai đoạn tiếp theo.
     Dùng để cập nhật một giai đoạn mới cho user. Cần truyền vô:
     <div>
         {

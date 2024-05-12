@@ -145,7 +145,7 @@ const legalsController = {
         const carRp = await CarRepository.findCarByCarIdSalonId({ carId, salonId });
 
         // get first documents for process
-        const processDb = await LegalsRepository.getProcessDocumentsById({salonId, processId})
+        const processDb = await LegalsRepository.getProcessDocumentsById({ salonId, processId })
 
         if (!carRp?.data) {
             return {
@@ -160,7 +160,7 @@ const legalsController = {
     },
 
     addLegalDetailsForUser: async (req: Request, res: Response) => {
-        const { salonId, phone, details, period } = req.body;
+        const { salonId, phone, details, carId } = req.body;
 
         if (!phone) {
             return res.json({
@@ -170,12 +170,19 @@ const legalsController = {
         }
 
         // find legal car user
-        const carUserRp = await LegalsRepository.findLegalUserByPhone({ phone });
+        const carUserRp = await LegalsRepository.findLegalUserByPhone({ phone, carId });
+        if (!carUserRp?.data[0]) {
+            return res.json({ ...carUserRp });
+        }
         // car by carId, salonId => To check role.
-        const checkRole = await CarRepository.findCarByCarIdSalonId({salonId, carId: carUserRp?.car_id})
-        // detail = [chi tiet 1, chi tiet 2]
+        const checkRole = await CarRepository.findCarByCarIdSalonId({ salonId, carId: carId });
+        if (!checkRole?.data) {
+            return res.json({ ...checkRole });
+        }
 
-        const userRp = await LegalsRepository.addLegalForUser({ data: {...carUserRp?.data}, details: details });
+        // detail = [chi tiet 1, chi tiet 2]
+        // add new details.
+        const userRp = await LegalsRepository.addLegalForUser({ ...carUserRp?.data[0], details: details });
 
         return res.json({ ...userRp });
     },
@@ -189,7 +196,7 @@ const legalsController = {
     },
 
     updateNewPeriodForUser: async (req: Request, res: Response) => {
-        const { phone, carId, newPeriod, salonId, done } = req.body;
+        const { phone, carId, newPeriod, salonId } = req.body;
         let newCarUserRp;
         // get to check having permission.
         const documentRp = await LegalsRepository.findLegalDocumentSalonId({ salonId, period: newPeriod });
@@ -202,15 +209,13 @@ const legalsController = {
 
         // find old period
         const oldPeriod = await LegalsRepository.getPeriodCurrentByCarUser({ carId, phone });
-        // delete all old details
-        await LegalsRepository.removeAllLegalDetails({ period: oldPeriod?.data?.current_period });
         // update new period for user
         newCarUserRp = await LegalsRepository.addLegalForUser({ ...oldPeriod?.data, current_period: newPeriod });
 
         if (!newCarUserRp?.data) {
             return res.json({
                 status: "failed",
-                msg: "Error next period for user"
+                msg: "Error update period for user"
             })
         }
 

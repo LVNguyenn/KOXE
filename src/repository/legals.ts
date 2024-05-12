@@ -147,10 +147,10 @@ const LegalsRepository = {
             })
 
             // get documents by period
-            for (const carUser of carUserDb) {
-                const documentDb = await this.findDocumentById({ data });
-                carUser.documents = documentDb;
-            }
+            // for (const carUser of carUserDb) {
+            //     const documentDb = await this.findDocumentById({ data });
+            //     carUser.documents = documentDb;
+            // }
 
             return FormatData("success", "find successfully!", carUserDb);
         } catch (error) {
@@ -345,7 +345,7 @@ const LegalsRepository = {
         try {
             const carUserRepository = getRepository(Car_User_Legals);
             // console.log({...data[0]?.data, details: data?.details})
-            const carUserDb = await carUserRepository.save({...data?.data, details: data?.details});
+            const carUserDb = await carUserRepository.save(data);
 
             return FormatData("success", "add legal documents for the user successfully!", carUserDb);
         } catch (error) {
