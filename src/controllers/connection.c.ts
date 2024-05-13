@@ -5,6 +5,7 @@ import { Connection } from "../entities/Connection";
 import { Salon } from "../entities/Salon";
 import { Process } from "../entities/Process";
 import { Stage } from "../entities/Stage";
+import { Post } from "../entities/Post";
 import createNotification from "../helper/createNotification";
 import moment from "moment";
 import { Transaction } from "../entities";
@@ -133,6 +134,7 @@ const connectionController = {
   createConnection: async (req: Request, res: Response) => {
     const connectionRepository = getRepository(Connection);
     const salonRepository = getRepository(Salon);
+    const postRepository = getRepository(Post);
     const userId: any = req.headers["userId"] || "";
     const user = await getRepository(User).findOne({
       where: [{ user_id: userId }],
@@ -142,8 +144,12 @@ const connectionController = {
     const { postId, processId } = req.body;
 
     try {
+      const post = await postRepository.findOne({
+        where: { post_id: postId },
+      });
+
       const newConnection = {
-        user: { user_id: userId },
+        user: { user_id: post?.postedBy.user_id },
         salon: { salon_id: salonId },
         post: { post_id: postId },
         process: { id: processId },
