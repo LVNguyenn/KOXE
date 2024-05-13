@@ -12,5 +12,5 @@ router.post("/", uploadCloud.array("image", 5), middlewareController.verifyToken
 router.patch("/:id", uploadCloud.array("image", 5),  middlewareController.verifyToken, middlewareController.havePermission("U_CAR"), carController.updateCar);
 router.delete("/:id", middlewareController.verifyToken, middlewareController.havePermission("D_CAR"), carController.deleteCar); 
 
-router.post("/legals", carController.getAllLegalByCar);
+// router.post("/legals", carController.getAllLegalByCar);
 export default router;

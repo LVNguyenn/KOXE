@@ -10,9 +10,10 @@ const legalsController = {
         // get Salon
         const salonRp = await SalonRepository.findSalonById({ salonId });
         // get Car
-        const carRp = await CarRepository.findCarByCarIdSalonId({ salonId, carId });
+        // const carRp = await CarRepository.findCarByCarIdSalonId({ salonId, carId });
         //create new process
-        const processRp = await LegalsRepository.createProcess({ name, description, car_id: carId, salon: salonRp?.data, cars: [carRp?.data], type });
+        // const processRp = await LegalsRepository.createProcess({ name, description, car_id: carId, salon: salonRp?.data, cars: [carRp?.data], type });
+        const processRp = await LegalsRepository.createProcess({ name, description, salon: salonRp?.data, type });
         try {
             // create new documents
             for (let document of documents) {

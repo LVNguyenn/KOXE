@@ -641,17 +641,19 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <h2>Giấy tờ pháp lý</h2>
     Khi tạo hóa đơn thành công thì người dùng tự đồng được thêm vào tiến trình theo số điện thoại.
     <div>
-        Note: Chia thành 2 loại là legal documents và legal details. legal documents là một giai đoạn chứa các loại giấy tờ là legal details. Cần làm là cho phép
+        Note: Chia thành 3 loại là process(qui trình bao gồm nhiều legal documents),  legal documents và legal details. legal documents là một giai đoạn chứa các loại giấy tờ là legal details. Cần làm là cho phép
         Salon thêm giai đoạn, tạo và thêm các details vô giai đoạn đó. Thêm người dùng vào các giai đoạn mà người dùng đã hoàn tất giấy tờ pháp lý ở ngoài thực tế,
         việc thêm này là salon thêm sau khi người dùng mua xe tại salon đó. Người dùng chỉ việc xem, còn salon thấy người dùng hoàn thành giai đoạn nào, quá trình tới 
         đâu thì salon tự cập nhật cho người dùng. 
+    </div>
+    <div>
+        Note2: Ban đầu thì cần gán qui trình cho xe thì bây giờ không cần nữa, lúc tạo hóa đơn mua xe thì chọn qui trình rồi gán cho user thôi.
     </div>
     <li>[POST] /legals/create-process</li>
     Dùng để tạo ra 1 qui trình (như là qui trình mua xe). Cần truyền vô như sau:
     <div>
         {
             "salonId": "997af3b3-0ccc-41a2-8133-1c0f7ccf268c",
-            "carId": "e13e9396-542c-4c55-8aea-66b4144aa10c",
             "description": "mô tả qui trình"
             "name": "Quy trinh mua xe",
             "type": number -  qui ước 0: mua xe; 1: hoa tiêu,
@@ -662,9 +664,6 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[POST] /legals/create-documents</li>
     Tạo ra  legal documents (tức là giai đoạn). Salon thực hiện. Cần truyền vô: 
     { name, salonId, order, processId, details: ["de 4", "de 5"],}.
-    <div>
-        carId: Id của cái xe mà mình cần gán luôn, có thể không truyền thì là không gán, sau này gán sau cũng được, tức là có thể truyền hoặc không.
-    </div>
     <div>
         name: tên của giai đoạn.
         salonId: id salon.
@@ -720,14 +719,6 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     {salonId, phone, details: ["Giay to xe", "giay to tuy than", ...], carId}
     <li>[POST] /legals/get-legals-user</li>
     Dùng để lấy ra hiện user đó đã trong giai đoạn nào và có được chi tiết nào rồi. Cần truyền vô: { phone, carId: không truyền thì lấy toàn bộ }
-
-    <li>[POST] /cars/legals</li>
-    Lưu ý là /cars chứ không phải /legals như những api trên. Dùng để lấy ra toàn bộ giấy tờ pháp lý của toàn bộ các quá trình của xe. Cần truyền vô:
-    {carId, salonId}.
-    <div>
-        Để xem dữ liệu có sẵn thì truyền vô "carId": "e13e9396-542c-4c55-8aea-66b4144aa10c".
-        salonId: "997af3b3-0ccc-41a2-8133-1c0f7ccf268c".
-    </div>
 
     <li>[PATCH] /legals/update-period-user</li> 
     Theo như thảo luận với bên web thì giai đoạn hiện tại chỉ có ý nghĩa để xem. Bên fe cần check theo tên, nếu khách hàng đủ giấy tờ cho giai đoạn đó rồi thì cần hiện 1 nút next để chuyển sang giai đoạn tiếp theo.
