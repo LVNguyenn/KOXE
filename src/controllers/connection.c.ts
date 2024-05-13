@@ -146,6 +146,7 @@ const connectionController = {
     try {
       const post = await postRepository.findOne({
         where: { post_id: postId },
+        relations: ["postedBy"],
       });
 
       const newConnection = {
@@ -178,6 +179,7 @@ const connectionController = {
         connection: savedConnection,
       });
     } catch (error) {
+      console.log(error);
       return res
         .status(500)
         .json({ status: "failed", msg: "Internal server error" });
