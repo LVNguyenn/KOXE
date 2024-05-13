@@ -242,7 +242,7 @@ const invoiceController = {
 
       const invoiceDb = await invoiceRepository.find({
         where: { phone: phone, type: "buy car" },
-        relations: ['seller']
+        relations: ['seller', 'legals_user']
       })
 
       return res.json({
