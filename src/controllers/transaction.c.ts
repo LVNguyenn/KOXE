@@ -44,44 +44,65 @@ const transactionController = {
         .json({ status: "failed", msg: "Internal server error" });
     }
   },
-  getTransactionBySalonId: async (req: Request, res: Response) => {
+  getAllTransactions: async (req: Request, res: Response) => {
     const transactionRepository = getRepository(Transaction);
     const userId: any = req.headers["userId"] || "";
-    const user = await getUserInfo(userId);
 
-    if (!user?.salonId) {
-      return res.status(403).json({
-        status: "failed",
-        msg: "You do not have sufficient permissions",
-      });
+    const user = await getRepository(User).findOne({
+      where: [{ user_id: userId }],
+      relations: ["salonId"],
+    });
+
+    let salonId = "";
+    if (user?.salonId) {
+      salonId = user.salonId.salon_id;
     }
 
-    const salonId = user.salonId.salon_id;
-
     try {
-      const transactionList = await transactionRepository.find({
-        where: { salon: { salon_id: salonId } },
-        relations: ["user", "connection", "process"],
-      });
-
-      if (!transactionList) {
-        return res.status(404).json({
-          status: "failed",
-          msg: `No transaction with salonId: ${salonId}`,
+      let transactionList;
+      let formatTransactions;
+      if (salonId !== "") {
+        transactionList = await transactionRepository.find({
+          where: { salon: { salon_id: salonId } },
+          relations: ["user", "connection", "process"],
         });
+
+        formatTransactions = transactionList.map((transaction) => ({
+          ...transaction,
+          user: {
+            user_id: transaction.user.user_id,
+            name: transaction.user.fullname,
+          },
+          connection: {
+            connection_id: transaction.connection.connection_id,
+            created_at: transaction.connection.createdAt,
+          },
+        }));
+      } else {
+        transactionList = await transactionRepository.find({
+          where: { user: { user_id: userId } },
+          relations: ["salon", "connection", "process"],
+        });
+
+        formatTransactions = transactionList.map((transaction) => ({
+          ...transaction,
+          salon: {
+            salon_id: transaction.salon.salon_id,
+            name: transaction.salon.name,
+          },
+          connection: {
+            connection_id: transaction.connection.connection_id,
+            created_at: transaction.connection.createdAt,
+          },
+        }));
       }
 
-      const formatTransactions = transactionList.map((transaction) => ({
-        ...transaction,
-        user: {
-          user_id: transaction.user.user_id,
-          name: transaction.user.fullname,
-        },
-        connection: {
-          connection_id: transaction.connection.connection_id,
-          created_at: transaction.connection.createdAt,
-        },
-      }));
+      // if (!transactionList) {
+      //   return res.status(404).json({
+      //     status: "failed",
+      //     msg: `No transaction with salonId: ${salonId}`,
+      //   });
+      // }
 
       return res.status(200).json({
         status: "success",

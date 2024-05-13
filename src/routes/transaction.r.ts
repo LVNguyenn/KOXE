@@ -5,9 +5,9 @@ import middlewareController from "../middleware/middleware";
 const router = Router();
 
 router.get(
-  "/salon",
+  "/",
   middlewareController.verifyToken,
-  transactionController.getTransactionBySalonId
+  transactionController.getAllTransactions
 );
 router.get("/:id", transactionController.getTransactionById);
 router.patch(

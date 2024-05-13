@@ -785,7 +785,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[POST] /posts</li>
     Dùng để tạo một bài đăng mới. Truyền vào các trường như trên: text và salons (mảng id các salon được xem bài này)...
     Nếu không truyền vào salons thì nó mặc định là tất cả salon đều được xem
-    <b>Lúc này sẽ có thông báo đến thằng salon đó. (Tui vẫn để như cái notification như Quý làm hồi trước, trong đây có id của bài đăng để link tới)</b>
+    <b>Lúc này sẽ có thông báo đến thằng salon đó(type = "request"). (Tui vẫn để như cái notification như Quý làm hồi trước, trong đây có id của bài đăng để link tới)</b>
     <li>[GET] /posts/feed</li>
     Salon sẽ gọi API này để xem được các bài mà hoa tiêu đăng lên (những bài này chưa được tạo kết nối)
     <li>[GET] /posts/:id</li>
@@ -796,7 +796,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     .Sau khi xem bài đăng xong thì nếu salon nào quan tâm muốn kết nối thì sẽ gọi API này
     <li>[POST] /connections</li>
     Sẽ tạo ra kết nối giữa salon và thằng đăng bài. Cần truyền vào postId và processId(này dùng để cho thằng đăng xem được các bước và phần trăm hoa hồng giúp nó có chấp nhận hay không).
-    Lúc này sẽ có thông báo đến thằng user(trong data có connection_id để link tới)  
+    Lúc này sẽ có thông báo đến thằng user(trong data có connection_id để link tới, type = "connection")  
     <li>[GET] /connections</li>
     Nếu nó là user thường (người đăng) thì nó sẽ lấy ra được các kết nối giữa nó và các salon.
     Nếu nó là chủ salon thì nó sẽ lấy ra được các kết nối giữa salon của nó và thông tin những người đăng
@@ -805,6 +805,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[PATCH] /connections/:id</li>
     Cần truyền vào status (string). Status có 3 trạng thái: ('pending', 'accepted', 'rejected'). Khi tạo ra mặc định ban đầu sẽ là pending.
     Lúc từ chối kết nối thì sẽ có thông báo đến salon. Nếu chấp nhận cũng có thông báo và nó sẽ chạy quy trình gồm các bước mà salon đã đặt ra (có connection_id để link tới)
+    Lúc cập status thành accepted xong thì nó sẽ tự tạo ra dòng dữ liệu (transaction)
 
     <h2>Ghi nhận hoa hồng</h2>
     (Bao gồm các trường: transaction_id, connectionId, checked(mảng này cho biết là id chi tiết giai đoạn nào đã check),userId, salonId, processId(thực hiện theo quy trình nào), stageId(đang tời giai đoạn nào), commissionAmount(mảng hoa hồng của các giai đoạn), status)
@@ -812,8 +813,8 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
         <b>Ý tường mà tui làm sẽ là:</b>
         Lúc mà nó chấp nhận kết nối thì bảng này sẽ tự động tạo và nó sẽ gán mặc định giai đoạn đầu tiên của quy trình đó vào stageId, mảng checked ban đầu sẽ là rỗng. Sau đó check gì sẽ có API để cập nhật lại, nếu xong rồi thì khi nhấn next sẽ có API kiểm tra xem nó có đủ điều kiện qua không. Tại bước này cần nhập hoa hồng(số tiền mà salon đã chi ra thực tế cho hoa tiêu đó. Cái trên chỉ là phần trăm hoa hồng thôi. Nũa mình dùng thông tin này để thống kê). Nếu nó đủ điều kiện qua nghĩa là ở giai đoạn đó đã check hết thì nó sẽ tự động cập nhật lại stageId sang giai đoạn tiếp theo. Đến khi nào gọi API mà nó có status là completed thì có nghĩa là xong, nó tự cập nhật lại status là success. Lúc này tụi ông nhớ kiểm tra và đừng cho nó gọi next nữa
     </div>
-    <li>[GET] /transactions/salon</li>
-    Sẽ lấy ra được tất cả các giao dịch của salon mình với các hoa tiêu. Lấy ra đươc tình trạng, tên user, quy trình áp dụng, ngày tạo kết nối 
+    <li>[GET] /transactions/</li>
+    Sẽ lấy ra được tất cả các giao dịch của salon mình với các hoa tiêu. Nếu là user thì lấy ra được tất cả các giao dịch của mình với các salon (Lấy ra đươc tình trạng, tên user, quy trình áp dụng, ngày tạo kết nối)
     <li>[GET] /transactions/:id</li>
     Nó sẽ lấy ra được chi tiết của giao dịch đó
     <li>[PATCH] /transactions/:id/details</li>

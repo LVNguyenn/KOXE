@@ -160,7 +160,7 @@ const connectionController = {
       createNotification({
         to: savedConnection.user.user_id,
         description: `${salon?.name} đã đồng ý yêu cầu kết nối của bạn. Click vào đây để cập nhật lại trạng thái`,
-        types: "request",
+        types: "connection",
         data: savedConnection.connection_id,
         avatar: savedConnection.salon.image,
         isUser: false,
@@ -201,7 +201,7 @@ const connectionController = {
         createNotification({
           to: result?.salon.salon_id,
           description: `${result?.user.fullname} đã chấp nhận yêu cầu kết nối của bạn`,
-          types: "request",
+          types: "connection",
           data: result?.connection_id,
           avatar: result?.user.fullname,
           isUser: true,
@@ -230,7 +230,7 @@ const connectionController = {
         createNotification({
           to: result?.salon.salon_id,
           description: `${result?.user.fullname} đã từ chối yêu cầu kết nối của bạn`,
-          types: "request",
+          types: "connection",
           data: result?.connection_id,
           avatar: result?.user.fullname,
           isUser: true,

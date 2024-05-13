@@ -58,7 +58,7 @@ const postController = {
 
     try {
       const maxLength = 500;
-      if (text.length > maxLength) {
+      if (text?.length > maxLength) {
         return res
           .status(400)
           .json({ error: `Text must be less than ${maxLength} characters` });
