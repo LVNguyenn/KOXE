@@ -89,9 +89,7 @@ const postController = {
         address,
       };
 
-      if (Array.isArray(salons) && salons.length > 0) {
-        newPost.salons = salons;
-      }
+      if (salons !== null) newPost.salons = salons;
 
       const savedPost = await postRepository.save(newPost);
 

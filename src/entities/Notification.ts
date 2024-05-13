@@ -11,7 +11,7 @@ export class Notification {
   @Column()
   description!: string;
 
-  @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   create_at!: Date;
 
   @Column({ nullable: true })
