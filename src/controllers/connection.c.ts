@@ -161,7 +161,7 @@ const connectionController = {
 
       const salon = await salonRepository.findOne({
         where: { salon_id: savedConnection.salon.salon_id },
-        select: ["name"],
+        select: ["name", "image"],
       });
 
       createNotification({
@@ -169,7 +169,7 @@ const connectionController = {
         description: `${salon?.name} đã đồng ý yêu cầu kết nối của bạn. Click vào đây để cập nhật lại trạng thái`,
         types: "connection",
         data: savedConnection.connection_id,
-        avatar: savedConnection.salon.image,
+        avatar: salon?.image,
         isUser: false,
       });
 
