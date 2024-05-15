@@ -166,7 +166,7 @@ const connectionController = {
 
       createNotification({
         to: savedConnection.user.user_id,
-        description: `${salon?.name} đã đồng ý yêu cầu kết nối của bạn. Click vào đây để cập nhật lại trạng thái`,
+        description: `${salon?.name} đã đồng ý yêu cầu kết nối của bạn. Xác nhận kết nối với salon ngay`,
         types: "connection",
         data: savedConnection.connection_id,
         avatar: salon?.image,

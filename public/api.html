@@ -813,7 +813,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
         <b>Ý tường mà tui làm sẽ là:</b>
         Lúc mà nó chấp nhận kết nối thì bảng này sẽ tự động tạo và nó sẽ gán mặc định giai đoạn đầu tiên của quy trình đó vào stageId, mảng checked ban đầu sẽ là rỗng. Sau đó check gì sẽ có API để cập nhật lại, nếu xong rồi thì khi nhấn next sẽ có API kiểm tra xem nó có đủ điều kiện qua không. Tại bước này cần nhập hoa hồng(số tiền mà salon đã chi ra thực tế cho hoa tiêu đó. Cái trên chỉ là phần trăm hoa hồng thôi. Nũa mình dùng thông tin này để thống kê). Nếu nó đủ điều kiện qua nghĩa là ở giai đoạn đó đã check hết thì nó sẽ tự động cập nhật lại stageId sang giai đoạn tiếp theo. Đến khi nào gọi API mà nó có status là completed thì có nghĩa là xong, nó tự cập nhật lại status là success. Lúc này tụi ông nhớ kiểm tra và đừng cho nó gọi next nữa
     </div>
-    <li>[GET] /transactions/</li>
+    <li>[GET] /transactions</li>
     Sẽ lấy ra được tất cả các giao dịch của salon mình với các hoa tiêu. Nếu là user thì lấy ra được tất cả các giao dịch của mình với các salon (Lấy ra đươc tình trạng, tên user, quy trình áp dụng, ngày tạo kết nối)
     <li>[GET] /transactions/:id</li>
     Nó sẽ lấy ra được chi tiết của giao dịch đó

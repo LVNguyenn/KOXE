@@ -11,14 +11,15 @@ const processController = {
     const user = await getUserInfo(userId);
     const salonId = user?.salonId.salon_id;
     let type: any = req.query.type;
-
     try {
       if (type === "giayto") type = 0;
-      else type = 1;
+      else if (type === "hoatieu") type = 1;
+      else type = undefined;
 
-      const processes = await processRepository.find({
-        where: { salon: { salon_id: salonId }, type: type },
-      });
+      const whereCondition: any = { salon: { salon_id: salonId } };
+      if (type !== undefined) whereCondition.type = type;
+
+      const processes = await processRepository.find({ where: whereCondition });
 
       const processesSave = {
         processes,
