@@ -132,18 +132,18 @@ const transactionController = {
           .json({ status: "failed", msg: "Transaction not found" });
       }
 
-      if (Array.isArray(checked) && checked.length > 0) {
+      if (Array.isArray(checked)) {
         transaction.checked = checked;
       }
 
       if (stageId) transaction.stage.stage_id = stageId;
 
-      await transactionRepository.save(transaction);
+      const newTransaction = await transactionRepository.save(transaction);
 
       return res.status(200).json({
         status: "success",
         msg: "Transaction updated successfully",
-        transaction,
+        transaction: newTransaction,
       });
     } catch (error) {
       console.log(error);
