@@ -7,6 +7,7 @@ import { Process } from "../entities/Process";
 import { Stage } from "../entities/Stage";
 import { getUserInfo } from "../helper/mInvoice";
 import { getNextElement, isArraySubset } from "../utils/index";
+import { formatDate } from "../utils";
 
 const transactionController = {
   getTransactionById: async (req: Request, res: Response) => {
@@ -75,7 +76,7 @@ const transactionController = {
           },
           connection: {
             connection_id: transaction.connection.connection_id,
-            created_at: transaction.connection.createdAt,
+            created_at: formatDate(transaction.connection.createdAt),
           },
         }));
       } else {
@@ -252,6 +253,27 @@ const transactionController = {
         status: "success",
         msg: "Update successfully!",
         transaction: result,
+      });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ status: "failed", msg: "Internal server error" });
+    }
+  },
+  deleteTransaction: async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const transactionRepository = getRepository(Transaction);
+    try {
+      const transaction = await transactionRepository.delete(id);
+      if (transaction.affected === 0) {
+        return res
+          .status(404)
+          .json({ status: "failed", msg: `No transaction with id: ${id}` });
+      }
+
+      res.status(200).json({
+        status: "success",
+        msg: "Delete successfully!",
       });
     } catch (error) {
       return res

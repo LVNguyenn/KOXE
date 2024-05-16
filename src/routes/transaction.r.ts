@@ -25,5 +25,10 @@ router.patch(
   middlewareController.verifyToken,
   transactionController.backStage
 );
+router.delete(
+  "/:id",
+  middlewareController.verifyToken,
+  transactionController.deleteTransaction
+);
 
 export default router;

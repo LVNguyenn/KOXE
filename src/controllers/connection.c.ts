@@ -9,6 +9,7 @@ import { Post } from "../entities/Post";
 import createNotification from "../helper/createNotification";
 import moment from "moment";
 import { Transaction } from "../entities";
+import { formatDate } from "../utils";
 
 const connectionController = {
   getAllConnections: async (req: Request, res: Response) => {
@@ -33,6 +34,7 @@ const connectionController = {
         });
         formatConnection = connections.map((connection) => ({
           ...connection,
+          createdAt: formatDate(connection.createdAt),
           post: {
             postId: connection.post.post_id,
           },
