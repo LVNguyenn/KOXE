@@ -123,6 +123,7 @@ const transactionController = {
     try {
       const transaction = await transactionRepository.findOne({
         where: { transaction_id: id },
+        relations: ["stage"],
       });
 
       if (!transaction) {
