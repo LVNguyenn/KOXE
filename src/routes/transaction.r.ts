@@ -20,11 +20,11 @@ router.patch(
   middlewareController.verifyToken,
   transactionController.nextStage
 );
-router.patch(
-  "/:id/back",
-  middlewareController.verifyToken,
-  transactionController.backStage
-);
+// router.patch(
+//   "/:id/back",
+//   middlewareController.verifyToken,
+//   transactionController.backStage
+// );
 router.delete(
   "/:id",
   middlewareController.verifyToken,
