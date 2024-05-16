@@ -65,7 +65,7 @@ const transactionController = {
       if (salonId !== "") {
         transactionList = await transactionRepository.find({
           where: { salon: { salon_id: salonId } },
-          relations: ["user", "connection", "process"],
+          relations: ["user", "connection", "process", "stage"],
         });
 
         formatTransactions = transactionList.map((transaction) => ({
@@ -82,7 +82,7 @@ const transactionController = {
       } else {
         transactionList = await transactionRepository.find({
           where: { user: { user_id: userId } },
-          relations: ["salon", "connection", "process"],
+          relations: ["salon", "connection", "process", "stage"],
         });
 
         formatTransactions = transactionList.map((transaction) => ({
@@ -135,7 +135,7 @@ const transactionController = {
         transaction.checked = checked;
       }
 
-      transaction.stage.stage_id = stageId;
+      if (stageId) transaction.stage.stage_id = stageId;
 
       await transactionRepository.save(transaction);
 
