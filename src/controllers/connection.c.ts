@@ -149,6 +149,22 @@ const connectionController = {
         relations: ["postedBy"],
       });
 
+      const checkConnection = await connectionRepository.findOne({
+        where: {
+          user: { user_id: post?.postedBy.user_id },
+          salon: { salon_id: salonId },
+          post: { post_id: postId },
+        },
+      });
+
+      if (checkConnection) {
+        return res.status(400).json({
+          status: "failed",
+          msg: "This connection already exists",
+          connection: checkConnection.connection_id,
+        });
+      }
+
       const newConnection = {
         user: { user_id: post?.postedBy.user_id },
         salon: { salon_id: salonId },
@@ -205,20 +221,29 @@ const connectionController = {
         relations: ["user", "salon", "process"],
       });
 
-      if (status === "accepted") {
-        createNotification({
-          to: result?.salon.salon_id,
-          description: `${result?.user.fullname} đã chấp nhận yêu cầu kết nối của bạn`,
-          types: "connection",
-          data: result?.connection_id,
-          avatar: result?.user.fullname,
-          isUser: true,
-        });
+      const formatResult = {
+        ...result,
+        user: {
+          user_id: result?.user.user_id,
+          name: result?.user.fullname,
+        },
+        salon: {
+          salon_id: result?.salon.salon_id,
+          name: result?.salon.name,
+        },
+      };
 
+      if (status === "accepted") {
         const process = await processRepository.findOne({
           where: { id: result?.process.id },
           relations: ["stages"],
         });
+
+        if (process?.stages.length === 0) {
+          return res
+            .status(400)
+            .json({ status: "failed", msg: "This process has no stages" });
+        }
 
         process?.stages.sort((a, b) => a.order - b.order);
 
@@ -234,6 +259,15 @@ const connectionController = {
 
         const transactionRepository = getRepository(Transaction);
         await transactionRepository.save(newTransaction);
+
+        createNotification({
+          to: result?.salon.salon_id,
+          description: `${result?.user.fullname} đã chấp nhận yêu cầu kết nối của bạn`,
+          types: "connection",
+          data: result?.connection_id,
+          avatar: result?.user.fullname,
+          isUser: true,
+        });
       } else if (status === "rejected") {
         createNotification({
           to: result?.salon.salon_id,
@@ -247,7 +281,7 @@ const connectionController = {
       return res.status(200).json({
         status: "success",
         msg: "Update successfully!",
-        connection: result,
+        connection: formatResult,
       });
     } catch (error) {
       console.log(error);

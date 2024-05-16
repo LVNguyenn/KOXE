@@ -81,7 +81,7 @@ const processController = {
   createProcess: async (req: Request, res: Response) => {
     const userId: any = req.headers["userId"] || "";
     const processRepository = getRepository(Process);
-    let { name, type, descripton } = req.body;
+    let { name, type, description } = req.body;
 
     const user = await getUserInfo(userId);
 
@@ -99,7 +99,7 @@ const processController = {
     try {
       const newProcess = {
         name,
-        descripton,
+        description,
         type,
         salon: { salon_id: salonId },
       };

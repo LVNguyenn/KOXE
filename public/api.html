@@ -791,12 +791,20 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[GET] /posts/:id</li>
     Sẽ lấy ra được nội dung chi tiết của bài đăng (có kèm người đăng)
 
+    <h2>Chặn hoa tiêu</h2>
+    <li>[POST] /block-user</li>
+    Cần truyền vào connection_id (Chỗ thông báo chắc tụi ông thêm button hay gì đó hiển thị là không nhận thông báo từ user này chẳng hạn. Xong gọi API này, data của thông báo có connectionId thì truyền vào đây)
+    <li>[GET] /salons/no-block</li>
+    Sẽ lấy ra được danh sách các salon (salon_id, name) mà hoa tiêu này được phép gửi.
+    Thì lúc mà user đó nó đăng yêu cầu bán xe mới thì cần gọi API này để load ra các salon mà nó được phép gửi (không gọi /salons nữa)
+
     <h2>Kết nối</h2>
     (Bao gồm các trường: connection_id, salonId, userId, postId, createdAt, status, processId(Id của quy trình mà salon sẽ áp dụng cho thằng này) )
     .Sau khi xem bài đăng xong thì nếu salon nào quan tâm muốn kết nối thì sẽ gọi API này
     <li>[POST] /connections</li>
     Sẽ tạo ra kết nối giữa salon và thằng đăng bài. Cần truyền vào postId và processId(này dùng để cho thằng đăng xem được các bước và phần trăm hoa hồng giúp nó có chấp nhận hay không).
-    Lúc này sẽ có thông báo đến thằng user(trong data có connection_id để link tới, type = "connection")  
+    Lúc này sẽ có thông báo đến thằng user(trong data có connection_id để link tới, type = "connection").
+    Nếu như có kết nối rồi mà tạo nữa thì nó sẽ báo lỗi, tui có trả về connection_id đã tạo trước đó
     <li>[GET] /connections</li>
     Nếu nó là user thường (người đăng) thì nó sẽ lấy ra được các kết nối giữa nó và các salon.
     Nếu nó là chủ salon thì nó sẽ lấy ra được các kết nối giữa salon của nó và thông tin những người đăng
@@ -804,8 +812,8 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Sẽ lấy ra được chi tiết kết nối bao gồm trạng thái, ngày tạo, salon nào, user nào, quy trình nào để thằng đăng nó đọc xem có chập nhận không
     <li>[PATCH] /connections/:id</li>
     Cần truyền vào status (string). Status có 3 trạng thái: ('pending', 'accepted', 'rejected'). Khi tạo ra mặc định ban đầu sẽ là pending.
-    Lúc từ chối kết nối thì sẽ có thông báo đến salon. Nếu chấp nhận cũng có thông báo và nó sẽ chạy quy trình gồm các bước mà salon đã đặt ra (có connection_id để link tới)
-    Lúc cập status thành accepted xong thì nó sẽ tự tạo ra dòng dữ liệu (transaction)
+    Lúc từ chối kết nối thì sẽ có thông báo đến salon. Nếu chấp nhận cũng có thông báo và nó sẽ chạy quy trình gồm các bước mà salon đã đặt ra (có connection_id để link tới).
+    Lúc cập status thành accepted xong thì nó sẽ tự tạo ra dòng dữ liệu (transaction) (Nếu như process đó mà không có stage nào thì nó cũng sẽ báo lỗi)
 
     <h2>Ghi nhận hoa hồng</h2>
     (Bao gồm các trường: transaction_id, connectionId, checked(mảng này cho biết là id chi tiết giai đoạn nào đã check),userId, salonId, processId(thực hiện theo quy trình nào), stageId(đang tời giai đoạn nào), commissionAmount(mảng hoa hồng của các giai đoạn), status)

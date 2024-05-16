@@ -16,11 +16,11 @@ router.get(
   middlewareController.verifyToken,
   salonController.getSalonIdForUser
 );
-// router.get(
-//   "/no-block",
-//   middlewareController.verifyToken,
-//   salonController.getAllSalonsNoBlock
-// );
+router.get(
+  "/no-block",
+  middlewareController.verifyToken,
+  salonController.getAllSalonsNoBlock
+);
 router.get(
   "/my-salon",
   middlewareController.verifyToken,
