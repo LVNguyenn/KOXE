@@ -93,7 +93,7 @@ const transactionController = {
           },
           connection: {
             connection_id: transaction.connection.connection_id,
-            created_at: transaction.connection.createdAt,
+            created_at: formatDate(transaction.connection.createdAt),
           },
         }));
       }
