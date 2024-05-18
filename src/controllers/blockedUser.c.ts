@@ -1,31 +1,34 @@
 import { Request, Response } from "express";
 import { getRepository } from "typeorm";
 import { getUserInfo } from "../helper/mInvoice";
-import { Connection, Salon } from "../entities";
+import { Post, Salon } from "../entities";
 
 const blockUserController = {
-  // LÀM THÊM GỠ BLOCK
+  // LÀM THÊM GỠ BLOCK (Xong)
   // Sửa (userId ?) (Xong)
-  // không thấy được post khi block
-  createblockUser: async (req: Request, res: Response) => {
+  // không thấy được post khi block (Xong)
+  blockUnblockUser: async (req: Request, res: Response) => {
     const salonRepository = getRepository(Salon);
-    const connectionRepository = getRepository(Connection);
+    const postRepository = getRepository(Post);
     const user_id: any = req.headers["userId"] || "";
     const user = await getUserInfo(user_id);
     const salonId = user?.salonId.salon_id;
-    const { connectionId } = req.body;
+    const { postId } = req.body;
     let userId;
+    let message;
+    let newSalon;
     try {
-      const connection = await connectionRepository.findOne({
-        where: { connection_id: connectionId },
+      const post = await postRepository.findOne({
+        where: { post_id: postId },
+        relations: ["postedBy"],
       });
 
-      if (connection) {
-        userId = connection.user.user_id;
+      if (post) {
+        userId = post.postedBy.user_id;
       } else {
         return res
           .status(400)
-          .json({ status: "failed", msg: "Connection does not exists" });
+          .json({ status: "failed", msg: "This connection does not exist" });
       }
 
       const salon = await salonRepository.findOne({
@@ -33,20 +36,31 @@ const blockUserController = {
       });
 
       if (salon) {
-        salon.blockUsers.push(userId);
-        await salonRepository.save(salon);
+        if (salon.blockUsers === null) salon.blockUsers = [];
+
+        let index = salon.blockUsers.indexOf(userId);
+        if (index > -1) {
+          salon.blockUsers.splice(index, 1);
+          newSalon = await salonRepository.save(salon);
+          message = "Unblocked user successfully!";
+        } else {
+          salon.blockUsers.push(userId);
+          newSalon = await salonRepository.save(salon);
+          message = "Blocked user successfully!";
+        }
       } else {
         return res
           .status(400)
-          .json({ status: "failed", msg: "Salon does not exists" });
+          .json({ status: "failed", msg: "This salon does not exist" });
       }
 
       return res.status(201).json({
         status: "success",
-        msg: "Create successfully!",
-        salon: salon,
+        msg: message,
+        salon: newSalon,
       });
     } catch (error) {
+      console.log(error);
       return res
         .status(500)
         .json({ status: "failed", msg: "Internal server error" });

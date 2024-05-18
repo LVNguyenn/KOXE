@@ -793,7 +793,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
 
     <h2>Chặn hoa tiêu</h2>
     <li>[POST] /block-user</li>
-    Cần truyền vào connection_id (Chỗ thông báo chắc tụi ông thêm button hay gì đó hiển thị là không nhận thông báo từ user này chẳng hạn. Xong gọi API này, data của thông báo có connectionId thì truyền vào đây)
+    Cần truyền vào post_id (Chỗ thông báo chắc tụi ông thêm button hay gì đó hiển thị là không nhận thông báo từ user này chẳng hạn. Xong gọi API này, data của thông báo có connectionId thì truyền vào đây). Nếu nó đã chặn user này rồi thì khi gọi API này 1 lần nữa thì nó sẽ là gỡ chặn (unblock)
     <li>[GET] /salons/no-block</li>
     Sẽ lấy ra được danh sách các salon (salon_id, name) mà hoa tiêu này được phép gửi.
     Thì lúc mà user đó nó đăng yêu cầu bán xe mới thì cần gọi API này để load ra các salon mà nó được phép gửi (không gọi /salons nữa)
@@ -843,9 +843,6 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Nó sẽ ghi nhận lại hoa hồng ở giai đoạn đó. Còn không truyền thì giai đoạn đó hoa hồng = 0
     <li>[DELETE] /transactions/:id</li>
     Sẽ xóa được giao dịch với hoa tiêu
-    <div>
-        <b> Chặn user thì tui sẽ bổ sung sau. </b>
-    </div>
 </body>
 
 </html>

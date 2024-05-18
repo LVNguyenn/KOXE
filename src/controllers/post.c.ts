@@ -174,6 +174,14 @@ const postController = {
           },
         };
       } else {
+        // Fetch the salon to get the blocked user IDs
+        const salon = await getRepository(Salon).findOne({
+          where: { salon_id: salonId },
+          select: ["blockUsers"],
+        });
+
+        const blockedIds = salon?.blockUsers || [];
+
         const connectedPostIds = await connectionRepository
           .createQueryBuilder("connection")
           .select("connection.postPostId")
@@ -182,31 +190,31 @@ const postController = {
 
         const connectedIds = connectedPostIds.map((item) => item.postPostId);
 
-        let posts;
+        let query = postRepository
+          .createQueryBuilder("post")
+          .leftJoinAndSelect("post.postedBy", "user")
+          .where("(post.salons LIKE :salonId OR post.salons LIKE :all)", {
+            salonId: `%${salonId}%`,
+            all: "%All%",
+          })
+          .orderBy("post.createdAt", "DESC");
+
         if (connectedIds.length > 0) {
-          posts = await postRepository
-            .createQueryBuilder("post")
-            .leftJoinAndSelect("post.postedBy", "user")
-            .where("post.salons LIKE :salonId OR post.salons LIKE :all", {
-              salonId: `%${salonId}%`,
-              all: "%All%",
-            })
-            .andWhere("post.post_id NOT IN (:...connectedIds)", {
-              connectedIds,
-            })
-            .orderBy("post.createdAt", "DESC")
-            .getMany();
-        } else {
-          posts = await postRepository
-            .createQueryBuilder("post")
-            .leftJoinAndSelect("post.postedBy", "user")
-            .where("post.salons LIKE :salonId OR post.salons LIKE :all", {
-              salonId: `%${salonId}%`,
-              all: "%All%",
-            })
-            .orderBy("post.createdAt", "DESC")
-            .getMany();
+          query = query.andWhere("post.post_id NOT IN (:...connectedIds)", {
+            connectedIds,
+          });
         }
+
+        if (blockedIds.length > 0) {
+          query = query.andWhere(
+            "post.postedByUserId NOT IN (:...blockedIds)",
+            {
+              blockedIds,
+            }
+          );
+        }
+
+        const posts = await query.getMany();
 
         formatPosts = {
           posts: posts.map((post) => ({
