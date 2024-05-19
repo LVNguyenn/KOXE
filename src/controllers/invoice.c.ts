@@ -7,6 +7,8 @@ import Year from "../utils/year";
 import legalsController from "./legals.c";
 import LegalsRepository from "../repository/legals";
 import CarRepository from "../repository/car";
+import createNotification from "../helper/createNotification";
+import UserRepository from "../repository/user";
 
 
 const invoiceController = {
@@ -52,6 +54,18 @@ const invoiceController = {
 
       // add legal for custormer
       await legalsController.addLegalForUser({ carId, salonId, phone, invoice: invoiceDb, processId })
+
+      // get userId by phone
+      const userRp = await UserRepository.getProfileByOther({phone});
+      // send notification
+      createNotification({
+        to: userRp?.data?.user_id,
+        description: `Salon ${carDb?.salon?.name} vừa thêm tiến trình giấy tờ hoàn tất mua xe cho bạn`,
+        types: "process",
+        data: "",
+        avatar: carDb?.salon?.image,
+        isUser: false
+      })
 
       return res.json({
         status: "success",

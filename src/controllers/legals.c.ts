@@ -3,6 +3,7 @@ import LegalsRepository from "../repository/legals";
 import SalonRepository from "../repository/salon";
 import CarRepository from "../repository/car";
 import UserRepository from "../repository/user";
+import createNotification from "../helper/createNotification";
 
 const legalsController = {
     createProcess: async (req: Request, res: Response) => {
@@ -185,6 +186,19 @@ const legalsController = {
         // add new details.
         const userRp = await LegalsRepository.addLegalForUser({ ...carUserRp?.data[0], details: details });
 
+        if (userRp?.data) {
+            // get userId by phone
+            const userDb = await UserRepository.getProfileByOther({ phone });
+            // send notification
+            createNotification({
+                to: userDb?.data?.user_id,
+                description: `${checkRole?.data?.salon.name} vừa cập nhật giấy tờ mới cho bạn.`,
+                types: "process",
+                avatar: checkRole?.data?.salon.image,
+                isUser: false
+            })
+        }
+
         return res.json({ ...userRp });
     },
 
@@ -219,6 +233,19 @@ const legalsController = {
                 msg: "Error update period for user"
             })
         }
+
+        // get userId by phone
+        const userRp = await UserRepository.getProfileByOther({ phone });
+        // get salon by salonId
+        const salonRp = await SalonRepository.findSalonById({salonId});
+        // send notification
+        createNotification({
+            to: userRp?.data?.user_id,
+            description: `${salonRp?.data?.name} vừa cập nhật giai đoạn mới cho bạn.`,
+            types: "process",
+            avatar: salonRp?.data?.image,
+            isUser: false
+        })
 
         return res.json({
             status: "success",
