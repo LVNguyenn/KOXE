@@ -28,7 +28,7 @@ export class Connection {
   @ManyToOne(() => Process, (process) => process.connections)
   process!: Process;
 
-  @Column({ type: "timestamptz" })
+  @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
   createdAt!: Date;
 
   @OneToMany(() => Transaction, (transaction) => transaction.connection)

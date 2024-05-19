@@ -8,6 +8,7 @@ import { Stage } from "../entities/Stage";
 import { getUserInfo } from "../helper/mInvoice";
 import { getNextElement, isArraySubset } from "../utils/index";
 import { formatDate } from "../utils";
+import createNotification from "../helper/createNotification";
 
 const transactionController = {
   getTransactionById: async (req: Request, res: Response) => {
@@ -121,9 +122,9 @@ const transactionController = {
     const { checked, stageId } = req.body;
 
     try {
-      const transaction = await transactionRepository.findOne({
+      let transaction = await transactionRepository.findOne({
         where: { transaction_id: id },
-        relations: ["stage"],
+        relations: ["stage", "user", "salon"],
       });
 
       if (!transaction) {
@@ -138,12 +139,33 @@ const transactionController = {
 
       if (stageId) transaction.stage.stage_id = stageId;
 
-      const newTransaction = await transactionRepository.save(transaction);
+      transaction = await transactionRepository.save(transaction);
+      const formatTransaction = {
+        ...transaction,
+        user: {
+          user_id: transaction.user.user_id,
+          name: transaction.user.fullname,
+        },
+        salon: {
+          salon_id: transaction.salon.salon_id,
+          name: transaction.salon.name,
+          image: transaction.salon.image,
+        },
+      };
+      // notification to user
+      createNotification({
+        to: formatTransaction.user.user_id,
+        description: `${formatTransaction.salon.name} đã cập nhật giai đoạn trong quy trình mua xe với bạn`,
+        types: "updateStage",
+        data: formatTransaction.transaction_id,
+        avatar: formatTransaction.salon.image,
+        isUser: false,
+      });
 
       return res.status(200).json({
         status: "success",
         msg: "Transaction updated successfully",
-        transaction: newTransaction,
+        transaction: formatTransaction,
       });
     } catch (error) {
       console.log(error);
@@ -157,7 +179,7 @@ const transactionController = {
     const stageRepository = getRepository(Stage);
     const processRepository = getRepository(Process);
     const { id } = req.params;
-    const { commission } = req.body;
+    const { commission, rating } = req.body;
 
     try {
       const transaction = await transactionRepository.findOne({
@@ -199,9 +221,15 @@ const transactionController = {
         );
 
         if (commission) {
-          transaction.commissionAmount.push(commission);
+          transaction.commissionList.push(commission);
         } else {
-          transaction.commissionAmount.push(0);
+          transaction.commissionList.push(0);
+        }
+
+        if (rating) {
+          transaction.ratingList.push(rating);
+        } else {
+          transaction.ratingList.push(-1);
         }
 
         if (nextElement !== null) {

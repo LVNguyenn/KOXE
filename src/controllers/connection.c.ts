@@ -172,7 +172,7 @@ const connectionController = {
         salon: { salon_id: salonId },
         post: { post_id: postId },
         process: { id: processId },
-        createdAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
+        //createdAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
       };
 
       const savedConnection = await connectionRepository.save(newConnection);
@@ -256,7 +256,8 @@ const connectionController = {
           process: { id: result?.process.id },
           stage: { stage_id: process?.stages[0].stage_id },
           checked: [],
-          commissionAmount: [],
+          commissionList: [],
+          ratingList: [],
         };
 
         const transactionRepository = getRepository(Transaction);

@@ -7,7 +7,12 @@ const router = Router();
 router.post(
   "/",
   middlewareController.verifyToken,
-  blockedUserController.blockUnblockUser
+  blockedUserController.blockUser
+);
+router.post(
+  "/un",
+  middlewareController.verifyToken,
+  blockedUserController.unblockUser
 );
 
 export default router;

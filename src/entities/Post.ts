@@ -32,7 +32,7 @@ export class Post {
   @OneToMany(() => Connection, (connection) => connection.post)
   connections!: Connection[];
 
-  @Column({ type: "timestamptz" })
+  @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
   createdAt!: Date;
 
   // Hãng xe

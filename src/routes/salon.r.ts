@@ -22,6 +22,11 @@ router.get(
   salonController.getAllSalonsNoBlock
 );
 router.get(
+  "/users/blocked",
+  middlewareController.verifyToken,
+  salonController.getAllUsersBlocked
+);
+router.get(
   "/my-salon",
   middlewareController.verifyToken,
   salonController.getSalonByUserId

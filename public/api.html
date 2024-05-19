@@ -793,7 +793,12 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
 
     <h2>Chặn hoa tiêu</h2>
     <li>[POST] /block-user</li>
-    Cần truyền vào post_id (Chỗ thông báo chắc tụi ông thêm button hay gì đó hiển thị là không nhận thông báo từ user này chẳng hạn. Xong gọi API này, data của thông báo có connectionId thì truyền vào đây). Nếu nó đã chặn user này rồi thì khi gọi API này 1 lần nữa thì nó sẽ là gỡ chặn (unblock)
+    Cần truyền vào post_id (Chỗ thông báo chắc tụi ông thêm button hay gì đó hiển thị là không nhận thông báo từ user này chẳng hạn. Xong gọi API này, data của thông báo có postId thì truyền vào đây).
+    <h3>Gỡ block</h3>
+    <li>[GET] /salons/users/blocked</li>
+    Ban đầu salon sẽ gọi API này để xem được danh sách các hoa tiêu mà mình đã chặn (có user_id và fullname)
+    <li>[POST] /block-user/un</li>
+    Sau đó gọi tiếp API này truyền vào userId để unblock
     <li>[GET] /salons/no-block</li>
     Sẽ lấy ra được danh sách các salon (salon_id, name) mà hoa tiêu này được phép gửi.
     Thì lúc mà user đó nó đăng yêu cầu bán xe mới thì cần gọi API này để load ra các salon mà nó được phép gửi (không gọi /salons nữa)
@@ -816,7 +821,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Lúc cập status thành accepted xong thì nó sẽ tự tạo ra dòng dữ liệu (transaction) (Nếu như process đó mà không có stage nào thì nó cũng sẽ báo lỗi)
 
     <h2>Ghi nhận hoa hồng</h2>
-    (Bao gồm các trường: transaction_id, connectionId, checked(mảng này cho biết là id chi tiết giai đoạn nào đã check),userId, salonId, processId(thực hiện theo quy trình nào), stageId(đang tời giai đoạn nào), commissionAmount(mảng hoa hồng của các giai đoạn), status)
+    (Bao gồm các trường: transaction_id, connectionId, checked(mảng này cho biết là id chi tiết giai đoạn nào đã check),userId, salonId, processId(thực hiện theo quy trình nào), stageId(đang tời giai đoạn nào), commissionList(mảng hoa hồng của các giai đoạn), ratingList(mảng đánh giá của các giai đoạn) status)
     <div>
         <b>Ý tường mà tui làm sẽ là:</b>
         Lúc mà nó chấp nhận kết nối thì bảng này sẽ tự động tạo và nó sẽ gán mặc định giai đoạn đầu tiên của quy trình đó vào stageId, mảng checked ban đầu sẽ là rỗng. Sau đó check gì sẽ có API để cập nhật lại, nếu xong rồi thì khi nhấn next sẽ có API kiểm tra xem nó có đủ điều kiện qua không. Tại bước này cần nhập hoa hồng(số tiền mà salon đã chi ra thực tế cho hoa tiêu đó. Cái trên chỉ là phần trăm hoa hồng thôi. Nũa mình dùng thông tin này để thống kê). Nếu nó đủ điều kiện qua nghĩa là ở giai đoạn đó đã check hết thì nó sẽ tự động cập nhật lại stageId sang giai đoạn tiếp theo. Đến khi nào gọi API mà nó có status là completed thì có nghĩa là xong, nó tự cập nhật lại status là success. Lúc này tụi ông nhớ kiểm tra và đừng cho nó gọi next nữa
@@ -833,14 +838,15 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
         "stageId": ...
     }
     </pre>
+    <b>Lúc cập nhật sẽ có thông báo cho hoa tiêu. Trong phần data của thông báo có transaction_id để hoa tiêu đó link tới xem</b>
     <li>[PATCH] /transactions/:id/next</li>
-    Có thể truyền vào commission. Ví dụ:
+    Có thể truyền vào commission (tiền hoa hồng mà salon đã chi thực sự), rating(đánh giá ở giai đoạn này). Ví dụ:
     <pre>
     {
         "commission": 123
     }
     </pre>
-    Nó sẽ ghi nhận lại hoa hồng ở giai đoạn đó. Còn không truyền thì giai đoạn đó hoa hồng = 0
+    Nó sẽ ghi nhận lại hoa hồng và đánh giá ở giai đoạn đó. Nếu không truyền thì giai đoạn đó hoa hồng = 0, rating = -1
     <li>[DELETE] /transactions/:id</li>
     Sẽ xóa được giao dịch với hoa tiêu
 </body>

@@ -67,7 +67,7 @@ const postController = {
       const newPost: any = {
         text,
         postedBy: { user_id: userId },
-        createdAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
+        //createdAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
         image,
         title,
         brand,

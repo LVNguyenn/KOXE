@@ -138,6 +138,40 @@ const salonController = {
         .json({ status: "failed", msg: "Internal server error" });
     }
   },
+  getAllUsersBlocked: async (req: Request, res: Response) => {
+    const userId: any = req.headers["userId"] || "";
+    const userRepository = getRepository(User);
+    const salonRepository = getRepository(Salon);
+    let result = [];
+    try {
+      const salon = await salonRepository.findOne({
+        where: [{ user_id: userId }],
+        select: ["blockUsers"],
+      });
+
+      if (salon?.blockUsers) {
+        for (const userId of salon.blockUsers) {
+          const user = await userRepository.findOne({
+            where: [{ user_id: userId }],
+            select: ["user_id", "fullname"],
+          });
+          if (user) result.push(user);
+        }
+      } else {
+        result = [];
+      }
+
+      return res.status(200).json({
+        status: "success",
+        blockedUsers: result,
+      });
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(500)
+        .json({ status: "failed", msg: "Internal server error" });
+    }
+  },
   getSalonById: async (req: Request, res: Response) => {
     const salonRepository = getRepository(Salon);
     const { id } = req.params;

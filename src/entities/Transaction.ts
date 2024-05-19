@@ -29,7 +29,10 @@ export class Transaction {
   checked!: string[];
 
   @Column("simple-array", { nullable: true })
-  commissionAmount!: number[];
+  commissionList!: number[];
+
+  @Column("simple-array", { nullable: true })
+  ratingList!: number[];
 
   @Column({ default: "pending" })
   status!: string; // ('pending', 'success', 'fail')
