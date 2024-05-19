@@ -15,4 +15,8 @@ router.delete("/delete-appoint-user", middleware.verifyToken, appointmentControl
 
 router.post("/get-busy-car", middleware.verifyToken, appointmentController.getTimeBusy);
 
+// routing for process
+router.post("/create-appointment-process", middleware.verifyToken, middleware.havePermission("C_APM"), appointmentController.createAppointmentBySalon);
+router.patch("/response-appointment-process", middleware.verifyToken, appointmentController.acceptingApmByUser);
+
 export default router;

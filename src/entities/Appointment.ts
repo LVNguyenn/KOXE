@@ -33,6 +33,9 @@ export class Appointment {
     @JoinColumn({ name: 'salon_id' })
     salon!: Salon;
 
+    @Column({default: "user"})
+    from!: string;
+
     @Column()
     car_id!: string;
 

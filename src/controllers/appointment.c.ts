@@ -4,6 +4,8 @@ import { Appointment, Car, Salon, User } from '../entities';
 import createNotification from '../helper/createNotification';
 import { newLogs } from '../helper/createLogs';
 import { isValidUUID } from '../utils';
+import UserRepository from '../repository/user';
+import CarRepository from '../repository/car';
 // import Cache from '../config/node-cache';
 
 const appointmentController = {
@@ -74,6 +76,8 @@ const appointmentController = {
     const userId: any = req.headers['userId'] || req.body.userId;
     const { salonId, status, id, carId }: any = req.body;
     const appointmentRepository = getRepository(Appointment)
+    let from = req.body.from;
+    from = from ? from : "user";
     // get value from cache
     // const cacheValue = (!userId && !id) ? await Cache.get(salonId + "apm") : "";
     // if (cacheValue) {
@@ -85,14 +89,14 @@ const appointmentController = {
 
     try {
       let appointDb: any = await appointmentRepository.find({
-        where: { salon_id: salonId, status: status, id: id, user_id: userId, car_id: carId },
+        where: { salon_id: salonId, status: status, id: id, user_id: userId, car_id: carId, from},
         relations: ['user', 'salon'],
-        select: ['id', 'date', 'description', 'status', 'user', 'salon', 'car_id'],
+        select: ['id', 'date', 'description', 'status', 'user', 'salon', 'car_id', 'from'],
         order: { create_at: 'DESC' }
       })
       
       for (let app in appointDb) {
-        appointDb[app].user = { fullname: appointDb[app].user.fullname, phone: appointDb[app].user.phone };
+        appointDb[app].user = { fullname: appointDb[app].user.fullname, phone: appointDb[app].user.phone};
         appointDb[app].salon = appointDb[app].salon.name;
         try {
           const carRepository = getRepository(Car);
@@ -159,7 +163,7 @@ const appointmentController = {
       }
 
       const appointDb = await appointmentRepository.findOneOrFail({
-        where: filteredObject
+        where: {...filteredObject, from: "user"}
       });
       await appointmentRepository.save({ ...appointDb, status, description });
       const responeSalon: string = (status == 1) ? `${salonDb?.name} đã chấp thuận lịch hẹn của bạn.` : `${salonDb?.name} đã từ chối lịch hẹn của bạn.`
@@ -268,7 +272,94 @@ const appointmentController = {
         msg: "Error find car."
       })
     }
+  },
+
+  // appointment for process from salon to user //
+
+  createAppointmentBySalon: async (req: Request, res: Response) => {
+    const {carId, salonId, phone, date, description } = req.body;
+    const from = "salon"; 
+
+    // check car_here
+    const carRp = await CarRepository.findCarByCarIdSalonId({carId, salonId});
+    if (!carRp?.data) {
+      return res.json({
+        status: "failed",
+        msg: "Invalid car."
+      })
+    }
+
+    try {
+      // find user by phone;
+      const userRp = await UserRepository.getProfileByOther({phone});
+      const appointmentRepository = getRepository(Appointment);
+      let appoint = new Appointment();
+      const apmDb = await appointmentRepository.save({...appoint, date, salon_id: salonId, user_id: userRp?.data?.user_id, description, car_id: carId, from});
+      // create notification to user here
+      createNotification({
+        to: userRp?.data?.user_id,
+        description: `${carRp?.data?.salon.name} vừa đặt lịch hẹn với bạn.`,
+        types: "appointment-process",
+        data: apmDb.id,
+        avatar: carRp?.data?.salon.image,
+        isUser: false
+      })
+
+      return res.json({
+        status: "success",
+        msg: "Created appointment to the user, waiting the response."
+      })
+    } catch (error) {
+      console.log(error)
+      return res.json({
+        status: "failed",
+        msg: "Error create appointment."
+      })
+    }
+  },
+
+  acceptingApmByUser: async (req: Request, res: Response) => {
+    const userId: any = req.headers['userId'];
+    const {status, id} = req.body;
+
+    if (!status || !id) {
+      return res.json({
+        status: "failed",
+        msg: "invalid input."
+      })
+    }
+
+    try {
+      const appointmentRepository = getRepository(Appointment);
+      const apmDb = await appointmentRepository.findOneOrFail({
+        where: {user_id: userId, from: "salon", id}
+      })
+
+      await appointmentRepository.save({...apmDb, status});
+      // find user by userId
+      const userDb = await UserRepository.getProfileById(userId);
+      // send notification to salon.
+      createNotification({
+        to: apmDb.salon_id,
+        description: `${userDb?.data?.fullname} vừa phản hồi lại lịch hẹn với salon của bạn.`,
+        types: "appointment-process",
+        data: apmDb.id,
+        avatar: userDb?.data?.avatar,
+        isUser: true
+      })
+
+      return res.json({
+        status: "success",
+        msg: "You responsed the appoinment of salon successfully!"
+      })
+    } catch (error) {
+      return res.json({
+        status: "failed",
+        msg: "Error with response."
+      })
+    }
   }
+
 
 };
 

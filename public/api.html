@@ -193,7 +193,10 @@
     <li>[POST] /appointment/get-appoint-user</li>
     không truyền = get all.
     truyền vô id = get theo id.
-    truyền vô status: number = get theo status
+    truyền vô status: number = get theo status,
+    <div>
+        cần lấy các lịch hẹn mà salon hẹn user để làm giấy tờ pháp lý thì truyền thêm vô: "from": "salon"
+    </div>
     <li>[PATCH] /appointment/update-one-user</li>
     truyền vô id, và thông tin cần update như description, Không thể update status và date.
     <li>[DELETE] /appointment/delete-appoint-user</li>
@@ -205,7 +208,7 @@
     <div>
         <b>status: 0 - chưa chấp nhận | </b>
         <b>status: 1 - đã được chấp nhận| </b>
-        <b>status: 2 - bị salon từ chối gặp</b>
+        <b>status: 2 - bị từ chối gặp</b>
     </div>
 
 
@@ -213,6 +216,9 @@
     <li>[POST] /appointment/get-appoint-admin</li>
     Không truyền thêm = lấy tất cả cuộc hẹn.
 	Truyền thêm id = lấy cuộc hẹn có id đó.
+    <div>
+        cần lấy các lịch hẹn mà salon hẹn user để làm giấy tờ pháp lý thì truyền thêm vô: "from": "salon"
+    </div>
     <li>[PATCH] /appointment/update-one-admin</li>
     cần truyền thêm id của cuộc hẹn. Chỉ có thể update status: 1 2. bên fe sẽ xử lý tùy theo yêu cầu mà truyền vô.
     <li>[DELETE] /appointment/delete-appoint-admin</li>
@@ -226,6 +232,34 @@
     lấy ra thời gian mà xe đã được hẹn. Dùng để ẩn đi các khung thời gian này với khách hàng, tránh khách hàng hẹn trùng giờ nhau. Bên client cần chuyển
     sang khung giờ phù hợp. 
     <div>Yêu cầu truyền vô {salonId, carId}</div> Và chỉ cần user đăng nhập là có thể lấy được.
+
+    <h3>Lịch hẹn cho qui trình: salon hẹn khách hàng</h3>
+    <li>[POST] /appointment/get-appoint-user</li>
+    Có cập nhật để lấy ra danh sách lịch hẹn mà salon hẹn user.
+    <li>[POST] /appointment/get-appoint-admin</li>
+    Có cập nhật để lấy ra danh sách lịch hẹn mà salon hẹn user.
+    <li>[POST] /appointment/create-appointment-process</li>
+    Dùng để cho salon tạo lịch hẹn với user. Cần truyền vô: 
+    <div>
+        {
+            "carId": "b3901fe8-77c3-49cc-8b15-c771b0f75af5",
+            "salonId": "e03942f6-1fc0-4864-9a70-647a070160d7",
+            "phone": "0123456789",
+            "date": "2024-05-22",
+            "description": "Hen hoan tat thu tuc"
+        }
+    </div>
+
+    <li>[PATCH] /appointment/response-appointment-process</li>
+    Khách hàng phản hồi lại lời mời hẹn của salon. Cần truyền vô: 
+    <div>
+        { 
+            "status": 1 (chấp thuận); 2 (từ chối),
+            "id": "4640267d-2037-4062-b3c9-486c3afd14bc"
+        }
+    </div>
+    Note: Lưu ý là phải đăng nhập + cập nhật đúng số điện thoại.
+    Note2: về phần thông báo lịch hẹn này thì sẽ có type là "appointment-process" và data là id của lịch hẹn.
 
     <h2>CHAT</h2>
     <b>Có 2 event: getOnlineUsers, newMessage</b>
