@@ -13,7 +13,14 @@ import UserRepository from "../repository/user";
 
 const invoiceController = {
   printInvoiceBuyCar: async (req: Request, res: Response) => {
-    const { carId, salonId, note, fullname, email, phone, expense, processId } = req.body;
+    const { carId, salonId, note, fullname, email, phone, expense, processId, employeeId } = req.body;
+
+    if (!employeeId) {
+      return res.json({
+        status: "failed",
+        msg: "Employee must be not null."
+      })
+    }
 
     try {
       const invoiceRepository = getRepository(Invoice);
@@ -45,7 +52,8 @@ const invoiceController = {
         carName: carDb.name,
         limit_kilometer,
         months,
-        policy
+        policy,
+        employee_id: employeeId
       };
       const invoiceDb = await invoiceRepository.save(saveInvoice);
 
@@ -110,7 +118,7 @@ const invoiceController = {
   },
 
   getAllInvoiceOfSalon: async (req: Request, res: Response) => {
-    const { salonId, done } = req.body;
+    const { salonId, done, employeeId } = req.body;
 
     try {
       const invoiceRepository = getRepository(Invoice);
@@ -121,10 +129,14 @@ const invoiceController = {
         .leftJoinAndSelect('invoice.legals_user', 'car_user_legals')
 
       if (done !== undefined && done !== "undefined") {
-        invoiceDb = await queryBuilder.where({ done: done }).getMany();
-      } else {
-        invoiceDb = await queryBuilder.getMany();
+        queryBuilder = await queryBuilder.where({ done: done })
       }
+
+      if (employeeId !== undefined && employeeId !== "undefined") {
+        queryBuilder = await queryBuilder.where({ employee_id: employeeId })
+      }
+
+      invoiceDb = await queryBuilder.getMany();
 
       // // get process
       // let index = 0;

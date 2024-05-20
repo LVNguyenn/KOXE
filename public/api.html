@@ -11,10 +11,12 @@
 <body>
     
     <h1>API SERVER</h1>
-    
+
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
     <h2>Các API mới thêm vô</h2>
     <li>[POST] /salons/employees</li>
+    <li>[POST] /invoice/all</li>
+    <li>[POST] /invoice/create-invoice</li>
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
     <h3>Chú ý: Với các hành động liên quan đến quản lý salon như thêm nhân viên, thêm xe,... của salon - các hành động cần quyền
@@ -554,12 +556,13 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Tìm lịch sử giao dịch mua xe cho khách hàng. Yêu cầu khách hàng cần đăng nhập. Không truyền vô gì.
     <li>[POST] /invoice/create-invoice</li>
     Dùng để tạo ra hóa đơn phụ trách việc mua xe của khách hàng. Yêu cầu chủ salon or nhân viên có quyền C_IV .Yêu cầu truyền vô:
-    {carId, salonId, note, fullname: tên khách hàng, email: email khách hàng, phone: sdt của khách hàng, expense: tổng chi phí., processId: id của qui trình cần thiết lập cho khách hàng.}
+    {carId, salonId, note, fullname: tên khách hàng, email: email khách hàng, phone: sdt của khách hàng, expense: tổng chi phí., processId: id của qui trình cần thiết lập cho khách hàng., employeeId: id nhân viên của salon.}
     <li>[POST] /invoice/lookup</li>
     Dùng để tra cứu thông tin hóa đơn. Yêu cầu là chủ salon or có quyền R_IV.Yêu cầu truyền vô: {"invoiceId", "salonId", "phone", "licensePlate", "type"}. nếu muốn tìm theo gì thì truyền vô cái đó.
     salonId là bắt buộc. licensePlate: Biển số xe. type: loại giao dịch: "buy car", "maintenance". phone: sdt khách hàng.
     <li>[POST] /invoice/all</li>
     Xem tất cả danh sách toàn bộ hóa đơn mua xe của salon đó (Nguyên tạm sửa). Yêu cầu là chủ salon, or nhân viên có quyền R_IV. Truyền vô: {"salonId"}.
+    Có thể tìm theo {"done", "employeeId"}. Không truyền thêm gì thì mặt định là không có.
     <li>[POST] /invoice/remove</li>
     Xóa invoice. Cần truyền vô: {"salonId", "invoiceId"}. Xóa hóa đơn thì sẽ xóa luôn cả tiến trình người dùng nếu có.
      Không hiểu sao delete bên postman lỗi nên dùng post để delete.
@@ -781,7 +784,6 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
         {salonId, done: không truyền lấy tất cả, = false thì lấy ra các giao dịch chưa hoàn thành (user chưa hoàn thành thủ tục ), = true thì hoàn thành rồi.}
     </div>
     Trong này nó sẽ trả về thông tin xe và qui trình của xe luôn (nếu có xe đó).
-    <li>[POST] /invoice/create-invoice</li> Có cập nhật thêm processId vào input. Có cập nhật cho phép xóa hóa đơn.
 
     <h2>Quy trình</h2>
     (Bao gồm các trường: process_id, name, type, salonId, description)
