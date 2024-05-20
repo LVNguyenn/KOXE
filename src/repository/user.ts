@@ -33,6 +33,9 @@ const UserRepository = {
     },
 
     async getProfileById (userId: string) {
+        if (!userId)
+            return FormatData("failed", "Invalid information."); 
+
         const userRepository = getRepository(User);
 
         try {

@@ -64,7 +64,7 @@ const invoiceController = {
       await legalsController.addLegalForUser({ carId, salonId, phone, invoice: invoiceDb, processId })
 
       // get userId by phone
-      const userRp = await UserRepository.getProfileByOther({phone});
+      const userRp = await UserRepository.getProfileByOther({ phone });
       // send notification
       createNotification({
         to: userRp?.data?.user_id,
@@ -127,6 +127,7 @@ const invoiceController = {
         .createQueryBuilder('invoice')
         .innerJoinAndSelect('invoice.seller', 'salon', 'salon.salon_id = :salonId', { salonId })
         .leftJoinAndSelect('invoice.legals_user', 'car_user_legals')
+        // .leftJoinAndSelect('user', 'user', 'invoice.employee_id = user.user_id')
 
       if (done !== undefined && done !== "undefined") {
         queryBuilder = await queryBuilder.where({ done: done })
@@ -137,6 +138,11 @@ const invoiceController = {
       }
 
       invoiceDb = await queryBuilder.getMany();
+
+      for (let iv of invoiceDb) {
+        let rs = await UserRepository.getProfileById(iv.employee_id);
+        iv.employee_id = rs?.data;
+      }
 
       // // get process
       // let index = 0;
@@ -286,7 +292,7 @@ const invoiceController = {
   tickDoneInvoice: async (req: Request, res: Response) => {
     try {
       const { salonId, invoiceId } = req.body;
-      console.log(salonId, invoiceId )
+      console.log(salonId, invoiceId)
       const invoiceRepository = getRepository(Invoice);
       const invoiceDb = await invoiceRepository.findOneOrFail({
         where: { invoice_id: invoiceId },
