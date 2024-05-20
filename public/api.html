@@ -11,6 +11,12 @@
 <body>
     
     <h1>API SERVER</h1>
+    
+    <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
+    <h2>Các API mới thêm vô</h2>
+    <li>[POST] /salons/employees</li>
+    <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
+
     <h3>Chú ý: Với các hành động liên quan đến quản lý salon như thêm nhân viên, thêm xe,... của salon - các hành động cần quyền
         thì mới có thể làm được với salon thì cần gửi đi salonId. Vì cần thông tin này thì mới xác định được chính xác người đó có quyền gì.
     </h3>
@@ -179,6 +185,8 @@
     <li>[POST] /salons/verifyInviteUser</li>
     Người dùng vô xác nhận lời mời vô salon. Cần truyền vô token (lưu tại data) được lưu trữ trong notification có types là invite. Muốn huỷ thì gọi
     đến api xóa thông báo đó là được.
+    <li>[POST] /salons/employees</li>
+    Dùng để lấy ra toàn bộ danh sách nhân viên trong salon. Cần truyền vô {salonId}.
 
     <h2>PURCHASE</h2>
     <li>[GET] /purchase</li>

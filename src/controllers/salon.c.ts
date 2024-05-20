@@ -9,6 +9,7 @@ import { sendMail } from "../config/nodemailer";
 import createNotification from "../helper/createNotification";
 import parsePermission from "../helper/parsePermission";
 import authController from "./auth.c";
+import UserRepository from "../repository/user";
 // import Cache from "../config/node-cache";
 
 const { v4: uuidv4 } = require("uuid");
@@ -679,7 +680,7 @@ const salonController = {
         status: "failed",
         msg: "You are in the salon here aldready.",
       });
-    } catch (error) {}
+    } catch (error) { }
 
     try {
       // create new account.
@@ -747,6 +748,14 @@ const salonController = {
       });
     }
   },
+
+  getAllEmployeesBySalon: async (req: Request, res: Response) => {
+    const { salonId } = req.body;
+
+    const userRp = await UserRepository.getAllEmployeesBySalonId({ salonId });
+
+    return res.json({...userRp});
+  }
 };
 
 export default salonController;

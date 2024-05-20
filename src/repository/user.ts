@@ -108,6 +108,25 @@ const UserRepository = {
             return FormatData("failed", "Invalid information.");
         }
     },
+
+    async getAllEmployeesBySalonId(data: any) {
+        try {
+            const userRepository = getRepository(User);
+            const userDb = await userRepository
+            .createQueryBuilder('user')
+            .innerJoin('user.salonId', 'salon',  'salon.salon_id = :salonId', { ...data })
+            .select(['user.user_id', 'user.fullname', 'user.gender', 'user.phone', 'user.address', 'user.role'])
+            .getMany()
+
+            return FormatData("success", "find successfully!", userDb);
+        } catch (error) {
+            console.log(error)
+            return FormatData("failed", "Invalid information.");
+        }
+
+
+        
+    }
 };
 
 export default UserRepository;

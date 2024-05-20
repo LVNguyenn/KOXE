@@ -56,6 +56,9 @@ export class Invoice {
   @Column({default: false})
   done!: boolean;
 
+  @Column({nullable: true})
+  employee_id!: string;
+
   @Column("simple-array", { nullable: true })
   maintenanceServices!: string[];
 

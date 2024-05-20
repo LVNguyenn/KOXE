@@ -86,4 +86,6 @@ router.post(
 );
 router.get("/verify-invite/:token", salonController.verifyInviteFromMail);
 
+router.post("/employees", salonController.getAllEmployeesBySalon);
+
 export default router;
