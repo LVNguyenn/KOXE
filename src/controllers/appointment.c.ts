@@ -91,7 +91,7 @@ const appointmentController = {
       let appointDb: any = await appointmentRepository.find({
         where: { salon_id: salonId, status: status, id: id, user_id: userId, car_id: carId, from},
         relations: ['user', 'salon'],
-        select: ['id', 'date', 'description', 'status', 'user', 'salon', 'car_id', 'from'],
+        select: ['id', 'date', 'description', 'status', 'user', 'salon', 'car_id'],
         order: { create_at: 'DESC' }
       })
       
