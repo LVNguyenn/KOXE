@@ -15,7 +15,6 @@
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
     <h2>Các API mới thêm vô</h2>
     <li>[POST] /salons/employees</li>
-    <li>[POST] /invoice/all</li>
     <li>[POST] /invoice/create-invoice</li>
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
@@ -204,9 +203,7 @@
     không truyền = get all.
     truyền vô id = get theo id.
     truyền vô status: number = get theo status,
-    <div>
-        cần lấy các lịch hẹn mà salon hẹn user để làm giấy tờ pháp lý thì truyền thêm vô: "from": "salon"
-    </div>
+
     <li>[PATCH] /appointment/update-one-user</li>
     truyền vô id, và thông tin cần update như description, Không thể update status và date.
     <li>[DELETE] /appointment/delete-appoint-user</li>
@@ -226,9 +223,6 @@
     <li>[POST] /appointment/get-appoint-admin</li>
     Không truyền thêm = lấy tất cả cuộc hẹn.
 	Truyền thêm id = lấy cuộc hẹn có id đó.
-    <div>
-        cần lấy các lịch hẹn mà salon hẹn user để làm giấy tờ pháp lý thì truyền thêm vô: "from": "salon"
-    </div>
     <li>[PATCH] /appointment/update-one-admin</li>
     cần truyền thêm id của cuộc hẹn. Chỉ có thể update status: 1 2. bên fe sẽ xử lý tùy theo yêu cầu mà truyền vô.
     <li>[DELETE] /appointment/delete-appoint-admin</li>
