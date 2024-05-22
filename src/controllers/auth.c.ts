@@ -6,9 +6,9 @@ import axios from "axios";
 import { User } from "../entities";
 const { v4: uuidv4 } = require("uuid");
 import redis from "../config/redis";
-import { generateRandomCode } from "../utils/index"
+import { generateRandomCode } from "../utils/index";
 import { sendMail } from "../config/nodemailer";
-import UserRepository from "../repository/user"
+import UserRepository from "../repository/user";
 // import Cache from "../config/node-cache"
 
 require("dotenv").config({ path: "./server/.env" });
@@ -44,7 +44,7 @@ const authController: any = {
     user.username = req.body.username;
     user.password = req.body.password;
     user.fullname = req.body.fullname;
-    user.avatar = `https://avatar.iran.liara.run/username?username=${user.username}`;
+    user.avatar = `https://avatar.iran.liara.run/username?username=${user.fullname}`;
     user.role = "user";
     user.aso = 0;
 
@@ -76,8 +76,7 @@ const authController: any = {
       user.password = await bcrypt.hash(user.password, salt);
       const userRp = await UserRepository.registerUser(user);
 
-      return res.json({...userRp})
-
+      return res.json({ ...userRp });
     } catch (error) {
       return res.json({
         status: "failed",
@@ -164,8 +163,6 @@ const authController: any = {
           // Cache.del(userDb.user_id + "user")
           // console.log("After cache: ",  Cache.keys())
 
-
-
           return res.json({
             status: "success",
             msg: "linked with google successfully!",
@@ -193,7 +190,7 @@ const authController: any = {
       if (!userExist) {
         userFe.user_id = uuidv4();
         userFe.email = userFe.google;
-        userFe.avatar = `https://avatar.iran.liara.run/username?username=${userFe.username}`;
+        userFe.avatar = `https://avatar.iran.liara.run/username?username=${userFe.fullname}`;
       }
 
       const accessToken = authController.generateAccessToken(req.user);
@@ -214,7 +211,6 @@ const authController: any = {
 
         const { password, ...others } = userFe;
         // console.log("USER: ", userFe);
-
 
         return res.json({
           refreshToken,
@@ -348,7 +344,7 @@ const authController: any = {
       if (!userExist) {
         userFe.user_id = uuidv4();
         userFe.email = userFe.facebook;
-        userFe.avatar = `https://avatar.iran.liara.run/username?username=${userFe.username}`;
+        userFe.avatar = `https://avatar.iran.liara.run/username?username=${userFe.fullname}`;
       }
 
       const accessToken = authController.generateAccessToken(req.user);
@@ -520,7 +516,7 @@ const authController: any = {
         if (!userExist) {
           userFe.user_id = uuidv4();
           userFe.email = userFe.facebook;
-          userFe.avatar = `https://avatar.iran.liara.run/username?username=${userFe.username}`;
+          userFe.avatar = `https://avatar.iran.liara.run/username?username=${userFe.fullname}`;
         }
 
         const accessToken = authController.generateAccessToken(userFe);
@@ -606,7 +602,9 @@ const authController: any = {
           msg: "Username or password is incorect.",
         });
       }
-      const { accessToken, refreshToken } = await authController.genToken(userDb);
+      const { accessToken, refreshToken } = await authController.genToken(
+        userDb
+      );
 
       refreshTokens.push(refreshToken);
 
@@ -679,8 +677,8 @@ const authController: any = {
     try {
       const userRepository = getRepository(User);
       let userDb: User = await userRepository.findOneOrFail({
-        where: { user_id: userId, password: oldPassword }
-      })
+        where: { user_id: userId, password: oldPassword },
+      });
 
       const salt = await bcrypt.genSalt(11);
       const savePassword = await bcrypt.hash(newPassword, salt);
@@ -689,14 +687,13 @@ const authController: any = {
 
       return res.json({
         status: "success",
-        msg: "change password successfully!"
-      })
-
+        msg: "change password successfully!",
+      });
     } catch (error) {
       return res.json({
         status: "failed",
-        msg: "Error input data."
-      })
+        msg: "Error input data.",
+      });
     }
   },
 
@@ -706,7 +703,7 @@ const authController: any = {
     try {
       const randomeCode = await generateRandomCode(6);
       await redis.set(email, randomeCode);
-      const content = `Your password reset confirmation code is ${randomeCode}. Please do not disclose it to anyone. Thanks.`
+      const content = `Your password reset confirmation code is ${randomeCode}. Please do not disclose it to anyone. Thanks.`;
       const rs = await sendMail(content, email);
 
       if (!rs) {
@@ -720,15 +717,13 @@ const authController: any = {
         status: "success",
         msg: "Please check mail to get code.!",
       });
-
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return res.json({
         status: "failed",
         msg: "Error renew password, please check information again.",
       });
     }
-
   },
 
   verifyForgotPassword: async (req: Request, res: Response) => {
@@ -747,19 +742,19 @@ const authController: any = {
 
         return res.json({
           status: "success",
-          code: randomeCode
-        })
+          code: randomeCode,
+        });
       }
 
       return res.json({
         status: "failed",
-        msg: "Code is invalid."
-      })
+        msg: "Code is invalid.",
+      });
     } catch (error) {
       return res.json({
         status: "failed",
-        msg: "erorr update, please try later."
-      })
+        msg: "erorr update, please try later.",
+      });
     }
   },
 
@@ -773,26 +768,29 @@ const authController: any = {
         const userRepository = getRepository(User);
         const salt = await bcrypt.genSalt(11);
         const savePassword = await bcrypt.hash(newPassword, salt);
-        await userRepository.update({ email: email }, { password: savePassword });
+        await userRepository.update(
+          { email: email },
+          { password: savePassword }
+        );
 
         // delete code.
         await redis.del(email);
 
         return res.json({
           status: "success",
-          msg: "Renew password successfylly."
-        })
+          msg: "Renew password successfylly.",
+        });
       }
 
       return res.json({
         status: "failed",
-        msg: "Code is invalid."
-      })
+        msg: "Code is invalid.",
+      });
     } catch (error) {
       return res.json({
         status: "failed",
-        msg: "erorr update, please try later."
-      })
+        msg: "erorr update, please try later.",
+      });
     }
   },
 
@@ -802,7 +800,7 @@ const authController: any = {
     refreshTokens.push(refreshToken);
 
     return { accessToken, refreshToken };
-  }
+  },
 };
 
 export default authController;

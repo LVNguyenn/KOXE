@@ -93,6 +93,7 @@ const blockUserController = {
       });
 
       if (salon) {
+        if (!salon.blockUsers) salon.blockUsers = [];
         salon.blockUsers.push(userId);
         await salonRepository.save(salon);
       } else {
@@ -107,6 +108,7 @@ const blockUserController = {
         salon: salon,
       });
     } catch (error) {
+      console.log(error);
       return res
         .status(500)
         .json({ status: "failed", msg: "Internal server error" });
