@@ -32,7 +32,7 @@ const transactionController = {
         ...transaction,
         user: {
           user_id: transaction.user.user_id,
-          fullname: transaction.user.fullname,
+          name: transaction.user.fullname,
         },
       };
 
