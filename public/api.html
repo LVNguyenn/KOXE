@@ -5,23 +5,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API SERVER</title>
-    <link rel="stylesheet" href="server/public/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    
+    <style>
+        a {
+            text-decoration: none;
+            color: #2478d3;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .fsl {
+            font-size: larger;
+        }
+    </style>
     <h1>API SERVER</h1>
-
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
     <h2>Các API mới thêm vô</h2>
     <li>[POST] /salons/employees</li>
     <li>[POST] /invoice/create-invoice</li>
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
+    <h2>MỤC LỤC</h2>
+
+    <li><a href="#auth" class="fsl">Auth</a></li>
+    <li><a href="#facebook-mobile" class="fsl">Facebook Mobile</a></li>
+    <li><a href="#profile" class="fsl">Profile</a></li>
+    <li><a href="#payment" class="fsl">Payment</a></li>
+    <li><a href="#feature" class="fsl">Feature</a></li>
+    <li><a href="#package" class="fsl">Package</a></li>
+    <li><a href="#car" class="fsl">Car</a></li>
+    <li><a href="#salon" class="fsl">Salon</a></li>
+    <li><a href="#purchase" class="fsl">Purchase(Mua gói dịch vụ)</a></li>
+    <li><a href="#appointment" class="fsl">Lịch Hẹn</a></li>
+    <li><a href="#chat" class="fsl">Chat</a></li>
+    <li><a href="#notification" class="fsl">Thông Báo</a></li>
+    <li><a href="#video" class="fsl">Video Call</a></li>
+    <li><a href="#permission" class="fsl">Phân Quyền</a></li>
+    <li><a href="#new" class="fsl">Tin Tức</a></li>
+    <li><a href="#warranty" class="fsl">Bảo Hành</a></li>
+    <li><a href="#invoice" class="fsl">Hóa Đơn Bảo Hành</a></li>
+    <li><a href="#minvoice" class="fsl">Hóa Đơn Bảo Dưỡng</a></li>
+    <li><a href="#maintenance" class="fsl">Bảo Dưỡng</a></li>
+    <li><a href="#accessory" class="fsl">Phụ Tùng</a></li>
+    <li><a href="#statistical" class="fsl">Thống Kê Doanh Thu</a></li>
+    <li><a href="#legal" class="fsl">Giấy Tờ Pháp Lý</a></li>
+    <li><a href="#process" class="fsl">Quy Trình</a></li>
+    <li><a href="#stage" class="fsl">Giai Đoạn Hoa Tiêu</a></li>
+    <li><a href="#post" class="fsl">Yêu Cầu Đăng Bán Xe</a></li>
+    <li><a href="#block" class="fsl">Chặn Hoa Tiêu</a></li>
+    <li><a href="#connection" class="fsl">Kết Nối</a></li>
+    <li><a href="#commission" class="fsl">Ghi Nhận Hoa Hồng</a></li>
+
     <h3>Chú ý: Với các hành động liên quan đến quản lý salon như thêm nhân viên, thêm xe,... của salon - các hành động cần quyền
         thì mới có thể làm được với salon thì cần gửi đi salonId. Vì cần thông tin này thì mới xác định được chính xác người đó có quyền gì.
     </h3>
-    <h2>AUTH</h2>
+    <h2 id="auth">AUTH</h2>
     <li>[POST] /auth/refresh</li>
     Cần truyền refreshToken vô bằng cookies - web or body - mobile để nhận lại token mới.
     <li>[POST] /auth/logout</li>
@@ -41,7 +82,7 @@
     <li>[GET] /auth/facebook/callback</li>
     Tương tự như trên.
     
-    <h3>FACEBOOK MOBILE</h3>
+    <h3 id="facebook-mobile">FACEBOOK MOBILE</h3>
     <li>[POST] /auth/facebook-mobile</li>
     Cần truyền vô accesstoken. Về liên kết tài khoản thì cũng gọi đến router này luôn. Và không cần truyền gì thêm chỉ truyền accesstoken
     của account mới cần liên kết với nó (account cần liên kết không phải account đang login).
@@ -60,7 +101,7 @@
     {code: mã code server gửi về cho client lúc trước, email: email của user, newPassword: mật khẩu mới}. Nếu thành công thì client cần chuyển sang trang đăng 
     nhập cho user.
 
-    <h2>PROFILE</h2>
+    <h2 id="profile">PROFILE</h2>
     <li>[GET] /users/profile</li>
     Chỉ cần login thành công và gọi tới là lấy được profile của user.
     <li>[PATCH] /users/profile</li>
@@ -68,7 +109,8 @@
     Lưu ý cần truyền vào các thuộc tính giống với thông tin trong DB của bảng User.
     Các fields bao gồm: fullname, gender, phone, address, date_of_birth, avatar. Muốn update cái nào thì truyền cái đó
     Không cần truyền vào user_id vì khi login thành công, đã có token chứa user_id bên trong header.
-    <h2>PAYMENT</h2>
+    
+    <h2 id="payment">PAYMENT</h2>
     <li>[POST] /payment/createOrder</li>
     Tạo đơn hàng. Chúng ta cần lưu lại app_tran_id để query đơn hàng khi cần.
     Nếu không truyền vào dữ liệu gì thì mặt định là zalopay app và đơn hàng sẽ mang giá trị 0đ. Nếu muốn chuyển sang
@@ -108,7 +150,7 @@
     Thất bại thì  localhost:3000/payment/vnpay?rs=failed
     Bên web chú ý tạo thêm router để nhận và hiển thị hoặc thông báo nhé.
     
-    <h2>FEATURE</h2>
+    <h2 id="feature">FEATURE</h2>
     <li>[GET] /features</li>
     Lấy được hết tất cả những tính năng
     <li>[GET] /features/:id</li>
@@ -120,7 +162,7 @@
     <li>[DELETE] /features/:id</li>
     Xóa tính năng khi biết id
 
-    <h2>PACKAGE</h2>
+    <h2 id="package">PACKAGE</h2>
     <li>[GET] /packages</li>
     Lấy được hết tất cả các gói dịch vụ kèm theo tính năng mà gói dịch vụ đó có
     <li>[GET] /packages/:id</li>
@@ -136,7 +178,7 @@
     <li>[DELETE] /packages/:id</li>
     Xóa gói dịch vụ khi biết id
 
-    <h2>CAR</h2>
+    <h2 id="car">CAR</h2>
     <li>[GET] /cars</li>
     Lấy được hết tất cả các xe kèm theo tên và địa chỉ salon mà xe đó thuộc về
     <li>[GET] /cars/:id</li>
@@ -158,7 +200,7 @@
     Xóa xe khi biết id
 
 
-    <h2>SALON</h2>
+    <h2 id="salon">SALON</h2>
     <li>[GET] /salons</li>
     Lấy được hết tất cả các thông tin của salon
     <li>[GET] /salons/my-salon</li>
@@ -189,13 +231,13 @@
     <li>[POST] /salons/employees</li>
     Dùng để lấy ra toàn bộ danh sách nhân viên trong salon. Cần truyền vô {salonId}.
 
-    <h2>PURCHASE</h2>
+    <h2 id="purchase">PURCHASE</h2>
     <li>[GET] /purchase</li>
     Cho biết user đã mua được những gói dịch vụ nào rồi và các chức năng có trong gói đó. Cái tính năng bây giờ có
     thêm cái keyMap để mình có thể dựa vào đó để render ra các tính năng tương ứng cho user sử dụng. Cái id nó generate ra
     ngẫu nhiên nên không dùng được
 
-    <h2>Lịch hẹn</h2>
+    <h2 id="appointment">Lịch hẹn</h2>
     <h3>User: Cần đăng nhập thành công.</h3>
     <li>[POST] /appointment/create-appointment</li>
     cần truyền vô các thông tin: { "salonId": "6f15ea80-b5b5-4546-8cb3-08d3f6c45445","date": "2024-03-22 14:01:06.913+07","description": "lich hen voi salon 2", "carId": "id car"}
@@ -265,7 +307,7 @@
     Note: Lưu ý là phải đăng nhập + cập nhật đúng số điện thoại.
     Note2: về phần thông báo lịch hẹn này thì sẽ có type là "appointment-process" và data là id của lịch hẹn.
 
-    <h2>CHAT</h2>
+    <h2 id="chat">CHAT</h2>
     <b>Có 2 event: getOnlineUsers, newMessage</b>
     <h4 style="font-weight: 500;">Khi bên Frontend kết nối với socket thì trước đó tụi ông cần gọi API này 
     <b>http://localhost:5000/salons/salonId</b> để biết xem thằng user đang đăng nhập đó có phải là chủ salon không. Nếu
@@ -350,7 +392,7 @@
     </pre>
 
     <h2></h2>
-    <h2>Thông báo</h2>
+    <h2 id="notification">Thông báo</h2>
     <h3>User: Cần đăng nhập thành công.</h3>
     <li>[POST] /notification/get-notification-user</li>
     không truyền = get all.
@@ -378,7 +420,8 @@
 	truyền thêm id: xóa cuộc hẹn đó.
     <b>Socket: </b> 
     Bên client cần lắng nghe (.io) sự kiện "notification" được gửi từ server.
-    <h2>VIDEO CALL</h2>
+    
+    <h2 id="video">VIDEO CALL</h2>
     <li>[GET] /videocall/get-token</li>
     Nhận về token meeting.
     <li>[POST] /videocall/create-meeting</li>
@@ -390,7 +433,7 @@
     <li>[POST] /videocall/get-token-zegocloud</li>
     Dùng để nhận token. Yêu cần phải đăng nhập.
     
-    <h2> Phân quyền</h2>
+    <h2 id="permission"> Phân quyền</h2>
     Luôn phải truyền vô salonId.
     <li>[POST] /salons/user</li>
     Yêu cầu: là chủ salon. Cần truyền vô salonId. Dùng để lấy ra danh sách tất cả các nhân viên và quyền của họ.
@@ -438,7 +481,7 @@
     Lấy ra lịch sử hoạt động của salon. Yêu cầu truyền vô salonId, và cần đăng nhập với vai trò là chủ salon. Hiện tại với server đã deploy thì nó không tự sinh
     ra được. Sẽ có hiệu chỉnh sau.
 
-    <h2>CRAWL NEWS</h2>
+    <h2 id="new">CRAWL NEWS</h2>
     Link trang mà tui crawl: <a href="https://lifestyle.znews.vn/oto-xe-may.html">Zing</a>
     (Tui cào dữ liệu ở phần tin mới)
     <div>
@@ -517,7 +560,7 @@
     
     <div>Tui chỉ cào theo format phần lớn bài báo là gồm nội dung, hình ảnh.</div>
     
-    <h2> Bảo hành </h2>
+    <h2 id="warranty"> Bảo hành </h2>
     <li>[POST] /warranty/create</li>
     Tạo một gói bảo hành mới. Yêu cầu truyền vô:
     <div>
@@ -545,7 +588,8 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[POST] /warranty/cancel</li>
     Dùng để hủy bỏ liên kết của 1 xe với 1 gói bảo hành. Yêu cầu truyền vô:
     {"salonId", "warrantyId", "carId"}
-    <h2>Hóa đơn</h2>
+    
+    <h2 id="invoice">Hóa đơn</h2>
     <div>[POST] /invoice/get-invoice-buy-car</div>
     Tìm lịch sử giao dịch mua xe cho khách hàng. Yêu cầu khách hàng cần đăng nhập. Không truyền vô gì.
     <li>[POST] /invoice/create-invoice</li>
@@ -565,7 +609,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
         Dùng để tick là hóa đơn đó đã hoàn thành tất cả qui trình cho khách hàng rồi. Cần truyền vô: {salonId, invoiceId}
     <a class="hot"> TEST1</a>
 
-    <h3>Hóa đơn bảo dưỡng</h3>
+    <h3 id="minvoice">Hóa đơn bảo dưỡng</h3>
     <li>[GET] /invoice</li>
     Nó sẽ lấy ra được thông tin tất cả các hóa đơn bảo dưỡng (xe gì, ai làm và những dịch vụ đã thực hiện, những phụ tùng đã dùng để sửa chữa) tại salon mình (Đối với chủ salon)
     <div>
@@ -610,8 +654,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[DELETE] /invoice/:id</li>
     Xóa hóa đơn bảo dưỡng
 
-
-    <h2> Bảo dưỡng </h2>
+    <h2 id="maintenance"> Bảo dưỡng </h2>
     <li>[GET] /maintenance</li>
     Sẽ lấy ra được tất cả các thông tin của dịch vụ bảo dưỡng (bao gồm id, tên, miêu tả, giá) kèm theo đó là id và tên của salon
     <li>[GET] /maintenance/:id</li>
@@ -625,7 +668,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[DELETE] /maintenance/:id</li>
     Xóa dịch vụ bảo dưỡng
 
-    <h2> Phụ tùng </h2>
+    <h2 id="accessory"> Phụ tùng </h2>
     <li>[GET] /accessory/salon/:salonId</li>
     Sẽ lấy ra được tất cả các thông tin phụ tụng vật liệu (bao gồm id, tên, nhà sản xuất, giá) của salon đó
     <li>[GET] /accessory/:id</li>
@@ -637,7 +680,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[DELETE] /accessory/:id</li>
     Xóa phụ tùng
 
-    <h2>Thống kê doanh thu</h2>
+    <h2 id="statistical">Thống kê doanh thu</h2>
     <li>[POST] /invoice/statistics</li>
     Thống kê doanh thu của salon đó. Cần có quyền R_IV or là chủ salon. Yêu cầu truyền vô: {"salonId", "fromDate": "2024-04-21" kiểu string}.
     <div>fromDate là thống kê từ ngày fromDate đến nay.</div>
@@ -677,7 +720,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     "avg": 840918.1666666666  Đây là giá trị trung bình cho mỗi tháng (tổng / 12).
 
 
-    <h2>Giấy tờ pháp lý</h2>
+    <h2 id="legal">Giấy tờ pháp lý</h2>
     Khi tạo hóa đơn thành công thì người dùng tự đồng được thêm vào tiến trình theo số điện thoại.
     <div>
         Note: Chia thành 3 loại là process(qui trình bao gồm nhiều legal documents),  legal documents và legal details. legal documents là một giai đoạn chứa các loại giấy tờ là legal details. Cần làm là cho phép
@@ -779,7 +822,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     </div>
     Trong này nó sẽ trả về thông tin xe và qui trình của xe luôn (nếu có xe đó).
 
-    <h2>Quy trình</h2>
+    <h2 id="process">Quy trình</h2>
     (Bao gồm các trường: process_id, name, type, salonId, description)
     <li>[GET] /process</li>
     Nó sẽ lấy ra được tất cả các quy trình của salon đó. Nếu có truyền vào QueryString. Ví dụ: http://localhost:5000/process?type=hoatieu thì nó sẽ lấy ra các quy trình hoa tiêu thôi(không truyền lấy cả 2)
@@ -792,7 +835,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[DELETE] /process/:id</li>
     Xóa quy trình. Khi xóa thì giai đoạn và chi tiết giai đoạn cũng sẽ tự động xóa theo
 
-    <h2>Giai đoạn hoa tiêu</h2>
+    <h2 id="stage">Giai đoạn hoa tiêu</h2>
     (Bao gồm các trường: stage_id, name, processId(thuộc về quy trình nào), salonId(salon nào tạo), commissionRate(phần trăm hoa hồng), order: thứ tự)
     Giai đoạn thì nó phải trong 1 quy trình cụ thể, không làm quản lý giai đoạn riêng lẻ 
     <li>[GET] /stages/:id</li>
@@ -816,7 +859,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[DELETE] /stages/:id</li>
     Sẽ xóa giai đoạn kèm theo chi tiết giai đoạn đó luôn
 
-    <h2>Yêu cầu đăng bán xe</h2>
+    <h2 id="post">Yêu cầu đăng bán xe</h2>
     (Bao gồm các trường: post_id, title, text(nội dung), postedBy(userId), salons(mảng id các salon có thể xem), image(tối đa 20 ảnh), brand(hãng xe), type(dòng xe), mfg(năm sản xuất), version(phiên bản), gear(hộp số), fuel(nhiên liệu), origin(xuất xứ), design(kiểu dáng), seat(số ghế ngồi), color(màu sắc), licensePlate(biển số xe), ownerNumber(số đời chủ), accessory(phụ kiện đi kèm) boolean, registrationDeadline(hạn đăng kiểm) boolean, kilometer(số km đã đi), price(giá), address(địa chỉ hoa tiêu) createdAt)
     .Này chỉ có user mới được đăng thôi nhé(nên thằng nào mà có salon thì chắc phải ẩn giao diện)
     <b>(Truyền theo form-data)</b>
@@ -829,7 +872,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[GET] /posts/:id</li>
     Sẽ lấy ra được nội dung chi tiết của bài đăng (có kèm người đăng)
 
-    <h2>Chặn hoa tiêu</h2>
+    <h2 id="block">Chặn hoa tiêu</h2>
     <li>[POST] /block-user</li>
     Cần truyền vào postId (Chỗ thông báo chắc tụi ông thêm button hay gì đó hiển thị là không nhận thông báo từ user này chẳng hạn. Xong gọi API này, data của thông báo có postId thì truyền vào đây).
     <h3>Gỡ block</h3>
@@ -841,7 +884,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Sẽ lấy ra được danh sách các salon (salon_id, name) mà hoa tiêu này được phép gửi.
     Thì lúc mà user đó nó đăng yêu cầu bán xe mới thì cần gọi API này để load ra các salon mà nó được phép gửi (không gọi /salons nữa)
 
-    <h2>Kết nối</h2>
+    <h2 id="connection">Kết nối</h2>
     (Bao gồm các trường: connection_id, salonId, userId, postId, createdAt, status, processId(Id của quy trình mà salon sẽ áp dụng cho thằng này) )
     .Sau khi xem bài đăng xong thì nếu salon nào quan tâm muốn kết nối thì sẽ gọi API này
     <li>[POST] /connections</li>
@@ -858,7 +901,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Lúc từ chối kết nối thì sẽ có thông báo đến salon. Nếu chấp nhận cũng có thông báo và nó sẽ chạy quy trình gồm các bước mà salon đã đặt ra (có connection_id để link tới).
     Lúc cập status thành accepted xong thì nó sẽ tự tạo ra dòng dữ liệu (transaction) (Nếu như process đó mà không có stage nào thì nó cũng sẽ báo lỗi)
 
-    <h2>Ghi nhận hoa hồng</h2>
+    <h2 id="commission">Ghi nhận hoa hồng</h2>
     (Bao gồm các trường: transaction_id, connectionId, checked(mảng này cho biết là id chi tiết giai đoạn nào đã check),userId, salonId, processId(thực hiện theo quy trình nào), stageId(đang tời giai đoạn nào), commissionList(mảng hoa hồng của các giai đoạn), ratingList(mảng đánh giá của các giai đoạn) status)
     <div>
         <b>Ý tường mà tui làm sẽ là:</b>
