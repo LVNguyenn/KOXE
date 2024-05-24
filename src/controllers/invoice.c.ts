@@ -9,6 +9,7 @@ import LegalsRepository from "../repository/legals";
 import CarRepository from "../repository/car";
 import createNotification from "../helper/createNotification";
 import UserRepository from "../repository/user";
+import pagination from "../helper/pagination";
 
 
 const invoiceController = {
@@ -118,7 +119,7 @@ const invoiceController = {
   },
 
   getAllInvoiceOfSalon: async (req: Request, res: Response) => {
-    const { salonId, done, employeeId } = req.body;
+    const { salonId, done, employeeId, page, per_page } = req.body;
 
     try {
       const invoiceRepository = getRepository(Invoice);
@@ -154,10 +155,12 @@ const invoiceController = {
       //   }
 
       // }
+      const rs = await pagination({data: invoiceDb, page, per_page});
 
       return res.json({
         status: "success",
-        invoices: invoiceDb
+        invoices: rs?.data,
+        total_page: rs?.total_page
       })
     } catch (error) {
       console.log(error)
