@@ -4,7 +4,9 @@ const search = async ({ data, keyword, fieldname }:
 
     try {
         return data.filter(function (obj: any) {
-            return obj[fieldname].includes(keyword);
+            let fieldValue = obj[fieldname].toLowerCase();
+            let lowerKeyword = keyword?.toLowerCase();
+            return fieldValue.includes(lowerKeyword);
         });
     } catch (error) {
         return null;
