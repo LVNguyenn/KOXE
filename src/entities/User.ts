@@ -5,17 +5,14 @@ import {
   PrimaryColumn,
   OneToMany,
   ManyToOne,
-  OneToOne,
-  ManyToMany,
+  Check,
 } from "typeorm";
-import { Length, IsNotEmpty } from "class-validator";
+import { Length } from "class-validator";
 import { Purchase } from "./Purchase";
 import { Salon } from "./Salon";
-import { Invoice } from "./Invoice";
 import { Connection } from "./Connection";
 import { Transaction } from "./Transaction";
 import { Post } from "./Post";
-import { LegalDocuments } from "./LegalDocuments";
 
 @Entity()
 @Unique(["username"])
@@ -91,6 +88,13 @@ export class User {
 
   @OneToMany(() => Transaction, (transaction) => transaction.user)
   transactions!: Transaction[];
+
+  @Column({ nullable: true, type: "float", default: 0.0 })
+  @Check(`"avgRating" >= 0`)
+  avgRating!: number;
+
+  @Column({ nullable: true, default: 0 })
+  completedTransactions!: number;
 
   init(
     user_id: string,

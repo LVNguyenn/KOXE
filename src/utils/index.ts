@@ -101,6 +101,23 @@ function isArraySubset(subset: any, array: any) {
   return subset.every((element: any) => array.includes(element));
 }
 
+function calculateAverageRating(ratingList: Array<number>) {
+  const validRatingList = ratingList.filter((rating) => rating !== -1);
+  let avgRating;
+
+  if (validRatingList.length > 0) {
+    const sum = validRatingList.reduce(
+      (acc, rating) => acc + Number(rating),
+      0
+    );
+    avgRating = sum / validRatingList.length;
+  } else {
+    avgRating = 0;
+  }
+
+  return avgRating;
+}
+
 export {
   generateRandomCode,
   isValidUUID,
@@ -113,4 +130,5 @@ export {
   FormatData,
   getNextElement,
   isArraySubset,
+  calculateAverageRating,
 };

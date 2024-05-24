@@ -6,7 +6,11 @@ import { Connection } from "../entities/Connection";
 import { Process } from "../entities/Process";
 import { Stage } from "../entities/Stage";
 import { getUserInfo } from "../helper/mInvoice";
-import { getNextElement, isArraySubset } from "../utils/index";
+import {
+  getNextElement,
+  isArraySubset,
+  calculateAverageRating,
+} from "../utils/index";
 import { formatDate } from "../utils";
 import createNotification from "../helper/createNotification";
 
@@ -155,7 +159,7 @@ const transactionController = {
       // notification to user
       createNotification({
         to: formatTransaction.user.user_id,
-        description: `${formatTransaction.salon.name} đã cập nhật giai đoạn trong quy trình mua xe với bạn`,
+        description: `${formatTransaction.salon.name} đã cập nhật chi tiết giai đoạn trong quy trình mua xe với bạn ✅`,
         types: "updateStage",
         data: formatTransaction.transaction_id,
         avatar: formatTransaction.salon.image,
@@ -178,13 +182,14 @@ const transactionController = {
     const transactionRepository = getRepository(Transaction);
     const stageRepository = getRepository(Stage);
     const processRepository = getRepository(Process);
+    const userRepository = getRepository(User);
     const { id } = req.params;
     const { commission, rating } = req.body;
 
     try {
       const transaction = await transactionRepository.findOne({
         where: { transaction_id: id },
-        relations: ["stage", "process"],
+        relations: ["stage", "process", "user", "salon"],
       });
 
       if (!transaction) {
@@ -236,6 +241,17 @@ const transactionController = {
           //transaction.checked = [];
           transaction.stage.stage_id = nextElement;
           await transactionRepository.save(transaction);
+
+          // notification to user
+          createNotification({
+            to: transaction.user.user_id,
+            description: `Quy trình bán xe của bạn với salon ${transaction.salon.name} đã được chuyển sang giai đoạn tiếp theo 🚀`,
+            types: "updateStage",
+            data: transaction.transaction_id,
+            avatar: transaction.salon.image,
+            isUser: false,
+          });
+
           return res.status(200).json({
             status: "success",
             msg: "Next stage successfully",
@@ -243,6 +259,37 @@ const transactionController = {
         } else {
           transaction.status = "success";
           await transactionRepository.save(transaction);
+
+          // notification to user
+          createNotification({
+            to: transaction.user.user_id,
+            description: `Quy trình bán xe của bạn với salon ${transaction.salon.name} đã hoàn tất 🎉✨`,
+            types: "updateStage",
+            data: transaction.transaction_id,
+            avatar: transaction.salon.image,
+            isUser: false,
+          });
+
+          const avgRating = calculateAverageRating(transaction.ratingList);
+          console.log(avgRating);
+
+          if (avgRating !== 0) {
+            const user = await userRepository.findOne({
+              where: { user_id: transaction.user.user_id },
+            });
+            if (user) {
+              let savedAvgRating;
+              if (user.avgRating === 0) {
+                savedAvgRating = avgRating;
+              } else {
+                savedAvgRating = (avgRating + user.avgRating) / 2;
+              }
+              user.avgRating = savedAvgRating;
+              user.completedTransactions += 1;
+              await userRepository.save(user);
+            }
+          }
+
           return res.status(200).json({
             status: "completed",
             msg: "The process has been completed",
