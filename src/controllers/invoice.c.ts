@@ -10,6 +10,7 @@ import CarRepository from "../repository/car";
 import createNotification from "../helper/createNotification";
 import UserRepository from "../repository/user";
 import pagination from "../helper/pagination";
+import search from "../helper/search";
 
 
 const invoiceController = {
@@ -119,7 +120,7 @@ const invoiceController = {
   },
 
   getAllInvoiceOfSalon: async (req: Request, res: Response) => {
-    const { salonId, done, employeeId, page, per_page } = req.body;
+    const { salonId, done, employeeId, page, per_page, keyword } = req.body;
 
     try {
       const invoiceRepository = getRepository(Invoice);
@@ -155,6 +156,10 @@ const invoiceController = {
       //   }
 
       // }
+      if (keyword) {
+        invoiceDb = await search({data: invoiceDb, keyword, fieldname: "fullname"})
+      }
+
       const rs = await pagination({data: invoiceDb, page, per_page});
 
       return res.json({
