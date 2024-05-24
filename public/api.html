@@ -930,6 +930,11 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Nó sẽ ghi nhận lại hoa hồng và đánh giá ở giai đoạn đó. Nếu không truyền thì giai đoạn đó hoa hồng = 0, rating = -1
     <li>[DELETE] /transactions/:id</li>
     Sẽ xóa được giao dịch với hoa tiêu
+
+    <h2>Phân trang</h2>
+    cần truyền thêm vô {page: 1, per_page: 5} ở body nếu là POST.
+    <div>Hiện đã phân trang ở: </div>
+    <li>[POST] /invoice/all</li>
 </body>
 
 </html>
