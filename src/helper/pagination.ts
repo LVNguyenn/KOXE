@@ -5,7 +5,7 @@ const pagination = async ({ data, page = 1, per_page = 4 }:
     let rs = { total_page: 1, data: null };
 
     try {
-        if (!data) return null;
+        if (!data) return rs;
         if (typeof data === "object") rs.total_page = Math.ceil(data.length / per_page);
         rs.data = data.slice((page - 1) * per_page, page * per_page);
     } catch (error) { }
