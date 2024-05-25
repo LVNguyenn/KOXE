@@ -6,6 +6,8 @@ import { newLogs } from '../helper/createLogs';
 import { isValidUUID } from '../utils';
 import UserRepository from '../repository/user';
 import CarRepository from '../repository/car';
+import search from '../helper/search';
+import pagination from '../helper/pagination';
 // import Cache from '../config/node-cache';
 
 const appointmentController = {
@@ -74,7 +76,7 @@ const appointmentController = {
 
   get: async (req: Request, res: Response) => {
     const userId: any = req.headers['userId'] || req.body.userId;
-    const { salonId, status, id, carId }: any = req.body;
+    const { salonId, status, id, carId, page, per_page, q }: any = req.body;
     const appointmentRepository = getRepository(Appointment)
     let from = req.body.from;
     from = from ? from : "user";
@@ -117,9 +119,16 @@ const appointmentController = {
       // set new value for cache
       // (!userId && !id) ? Cache.set(salonId + "apm", appointDb) : 1;
 
+      if (q) {
+        appointDb = await search({data: appointDb, q, fieldname: "user", fieldname2: "fullname"})
+      }
+
+      const rs = await pagination({data: appointDb, page, per_page});
+
       return res.status(200).json({
         status: "success",
-        appointments: appointDb
+        appointments: rs?.data,
+        total_page: rs?.total_page
       })
     } catch (error) {
       console.log(error)

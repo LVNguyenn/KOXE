@@ -943,9 +943,13 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Sẽ xóa được giao dịch với hoa tiêu
 
     <h2 id="pagination">Phân trang</h2>
-    cần truyền thêm vô {page: 1, per_page: 5, keyword: "cần tìm kiếm theo keyword nào. Với api này thì search theo fullname"} ở body nếu là POST. 
+    <div>Nếu là POST thì thêm ở body, GET thì thêm ở query. Nếu không truyền thì mặt định page =1 và per_page = 4</div>
+    cần truyền thêm vô {page: 1 (Trang thứ mấy), per_page: 5 (Mỗi trang có bao nhiêu bài), q: "cần tìm kiếm theo từ khóa nào.} 
     <div>Hiện đã phân trang ở: </div>
     <li>[POST] /invoice/all</li>
+    Với api này thì search theo fullname
+    <li>[POST] /appointment/get-appoint-admin</li>
+    Với api này thì search theo fullname của user
 </body>
 
 </html>

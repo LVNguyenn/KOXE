@@ -120,7 +120,7 @@ const invoiceController = {
   },
 
   getAllInvoiceOfSalon: async (req: Request, res: Response) => {
-    const { salonId, done, employeeId, page, per_page, keyword } = req.body;
+    const { salonId, done, employeeId, page, per_page, q } = req.body;
 
     try {
       const invoiceRepository = getRepository(Invoice);
@@ -156,8 +156,8 @@ const invoiceController = {
       //   }
 
       // }
-      if (keyword) {
-        invoiceDb = await search({data: invoiceDb, keyword, fieldname: "fullname"})
+      if (q) {
+        invoiceDb = await search({data: invoiceDb, q, fieldname: "fullname"})
       }
 
       const rs = await pagination({data: invoiceDb, page, per_page});

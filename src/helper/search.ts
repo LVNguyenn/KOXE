@@ -1,11 +1,13 @@
 
-const search = async ({ data, keyword, fieldname }:
-    { data: any, keyword?: string, fieldname: string }) => {
+const search = async ({ data, q, fieldname, fieldname2 }:
+    { data: any, q?: string, fieldname: string, fieldname2?: string }) => {
 
     try {
         return data.filter(function (obj: any) {
-            let fieldValue = obj[fieldname].toLowerCase();
-            let lowerKeyword = keyword?.toLowerCase();
+            let lowerKeyword = q?.toLowerCase();
+            let fieldValue = fieldname2 ? obj[fieldname][fieldname2] : obj[fieldname];
+            fieldValue = fieldValue.toLowerCase();
+
             return fieldValue.includes(lowerKeyword);
         });
     } catch (error) {
