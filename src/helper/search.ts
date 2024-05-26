@@ -6,7 +6,7 @@ const search = async ({ data, q, fieldname, fieldname2 }:
         return data.filter(function (obj: any) {
             let lowerKeyword = q?.toLowerCase();
             let fieldValue = fieldname2 ? obj[fieldname][fieldname2] : obj[fieldname];
-            fieldValue = fieldValue ? fieldValue.toLowerCase() : "-";
+            fieldValue = fieldValue ? fieldValue.toLowerCase() : "W";
             return fieldValue.includes(lowerKeyword);
         });
     } catch (error) {
