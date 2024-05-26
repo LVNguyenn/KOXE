@@ -10,9 +10,12 @@ import createNotification from "../helper/createNotification";
 import moment from "moment";
 import { Transaction } from "../entities";
 import { formatDate } from "../utils";
+import search from "../helper/search";
+import pagination from "../helper/pagination";
 
 const connectionController = {
   getAllConnections: async (req: Request, res: Response) => {
+    const { page, per_page, q }: any = req.query;
     const connectionRepository = getRepository(Connection);
     const userId: any = req.headers["userId"] || "";
     const user = await getRepository(User).findOne({
@@ -61,9 +64,18 @@ const connectionController = {
         }));
       }
 
+      // search and pagination
+      // if (q) {
+      //   formatConnection = await search({ data: formatConnection, q, fieldname: "name" })
+      // }
+
+      const rs = await pagination({ data: formatConnection, page, per_page });
+
+
       return res.status(200).json({
         status: "success",
-        connections: formatConnection,
+        connections: rs?.data,
+        total_page: rs?.total_page
       });
     } catch (error) {
       return res

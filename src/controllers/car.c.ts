@@ -163,6 +163,7 @@ const carController = {
   },
   getAllCarsByBrandOfSalon: async (req: Request, res: Response) => {
     const { brand, salon_id } = req.params;
+    const { page, per_page, q }: any = req.query;
     const carRepository = getRepository(Car);
     // get value from cache
     // const valueCache = Cache.get(salon_id+brand);
@@ -174,7 +175,7 @@ const carController = {
     // }
 
     try {
-      const cars = await carRepository.find({
+      let cars = await carRepository.find({
         where: {
           brand: brand,
           salon: { salon_id: salon_id },
@@ -195,8 +196,17 @@ const carController = {
       //         address: car.salon.address
       //     }
       // }));
+
+      // search and pagination
+      if (q) {
+        cars = await search({ data: cars, q, fieldname: "name" })
+      }
+
+      const rs = await pagination({ data: cars, page, per_page });
+
+
       const saveCar = {
-        cars: cars,
+        cars: rs?.data,
         nbHits: cars.length,
       };
       // set new value for cache
@@ -205,6 +215,7 @@ const carController = {
       return res.status(200).json({
         status: "success",
         data: saveCar,
+        total_page: rs?.total_page
       });
     } catch (error) {
       return res
