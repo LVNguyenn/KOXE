@@ -516,7 +516,7 @@ const salonController = {
   },
 
   getEmployees: async (req: Request, res: Response) => {
-    const { salonId, userId } = req.body;
+    const { salonId, userId, page, per_page, q } = req.body;
     const salonRepository = getRepository(Salon);
 
     try {
@@ -531,9 +531,18 @@ const salonController = {
         salonDb.employees[i].permissions = per && (await parsePermission(per));
       }
 
+      // search and pagination
+      if (q) {
+        salonDb.employees = await search({ data: salonDb.employees, q, fieldname: "fullname" })
+      }
+
+      const rs = await pagination({ data: salonDb.employees, page, per_page });
+      salonDb.employees = rs?.data;
+
       return res.json({
         status: "success",
         salonDb: salonDb,
+        total_page: rs?.total_page
       });
     } catch (error) {
       console.log(error);

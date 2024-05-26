@@ -13,6 +13,8 @@ import {
 } from "../utils/index";
 import { formatDate } from "../utils";
 import createNotification from "../helper/createNotification";
+import search from "../helper/search";
+import pagination from "../helper/pagination";
 
 const transactionController = {
   getTransactionById: async (req: Request, res: Response) => {
@@ -53,6 +55,7 @@ const transactionController = {
   getAllTransactions: async (req: Request, res: Response) => {
     const transactionRepository = getRepository(Transaction);
     const userId: any = req.headers["userId"] || "";
+    const { page, per_page, q }: any = req.query;
 
     const user = await getRepository(User).findOne({
       where: [{ user_id: userId }],
@@ -110,9 +113,18 @@ const transactionController = {
       //   });
       // }
 
+      // search and pagination
+      // if (q) {
+      //   formatTransactions = await search({ data: formatTransactions, q, fieldname: "name" })
+      // }
+
+      const rs = await pagination({ data: formatTransactions, page, per_page });
+
+
       return res.status(200).json({
         status: "success",
-        transaction: formatTransactions,
+        transaction: rs?.data,
+        total_page: rs?.total_page
       });
     } catch (error) {
       return res
