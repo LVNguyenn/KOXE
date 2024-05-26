@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { getRepository } from "typeorm";
 import { Car, Salon, Warranty } from "../entities";
+import search from "../helper/search";
+import pagination from "../helper/pagination";
 
 const warrantyController = {
     createNewWarranty: async (req: Request, res: Response) => {
@@ -42,7 +44,7 @@ const warrantyController = {
     },
 
     getWarrantyForSalon: async (req: Request, res: Response) => {
-        const { salonId, warrantyId } = req.body;
+        const { salonId, warrantyId, page, per_page, q } = req.body;
 
         try {
             const warrantyRepository = getRepository(Warranty);
@@ -55,11 +57,20 @@ const warrantyController = {
                 warrantyDb = warrantyDb
                     .where({ warranty_id: warrantyId })
 
-            const rs = await warrantyDb.getMany();
+            let rs = await warrantyDb.getMany();
+
+            // search and pagination
+            if (q) {
+                rs = await search({ data: rs, q, fieldname: "name" })
+            }
+
+            rs = await pagination({ data: rs, page, per_page });
+
 
             return res.json({
                 status: "success",
-                warranties: rs
+                warranties: rs?.data,
+                total_page: rs?.total_page
             })
         } catch (error) {
             console.log(error)
