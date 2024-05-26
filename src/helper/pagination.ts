@@ -1,5 +1,6 @@
+const DEFAULT_PER_PAGE = 1000;
 
-const pagination = async ({ data, page = 1, per_page = 4 }:
+const pagination = async ({ data, page = 1, per_page = DEFAULT_PER_PAGE }:
     { data: any, page?: number, per_page?: number }) => {
 
     let rs = { total_page: 1, data: null };
