@@ -2,9 +2,12 @@ import { Request, Response } from "express";
 import { Maintenance } from "../entities/Maintenance";
 import { getRepository } from "typeorm";
 import { getUserInfo } from "../helper/mInvoice";
+import search from "../helper/search";
+import pagination from "../helper/pagination";
 
 const maintenanceController = {
   getAllMaintenances: async (req: Request, res: Response) => {
+    const { page, per_page, q }: any = req.query;
     const mRepository = getRepository(Maintenance);
 
     try {
@@ -12,7 +15,7 @@ const maintenanceController = {
         relations: ["salon"],
       });
 
-      const maintenanceFormat = {
+      let maintenanceFormat = {
         maintenances: maintenances.map((maintenance) => ({
           maintenance_id: maintenance.maintenance_id,
           name: maintenance.name,
@@ -26,9 +29,16 @@ const maintenanceController = {
         nbHits: maintenances.length,
       };
 
+      // search and pagination
+      if (q) {
+        maintenanceFormat.maintenances = await search({ data: maintenanceFormat.maintenances, q, fieldname: "name" })
+      }
+      const rs = await pagination({ data: maintenanceFormat.maintenances, page, per_page });
+      
       return res.status(200).json({
         status: "success",
-        maintenances: maintenanceFormat,
+        maintenances: rs?.data,
+        total_page: rs?.total_page
       });
     } catch (error) {
       return res

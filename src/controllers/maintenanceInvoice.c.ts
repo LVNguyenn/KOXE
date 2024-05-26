@@ -22,10 +22,13 @@ import {
   processServices,
   processAccessory,
 } from "../helper/mInvoice";
+import search from "../helper/search";
+import pagination from "../helper/pagination";
 
 const maintainController = {
   getAllMaintenanceInvoices: async (req: Request, res: Response) => {
     const userId: any = req.headers["userId"] || "";
+    const { page, per_page, q }: any = req.query;
 
     try {
       const user = await getUserInfo(userId);
@@ -71,7 +74,7 @@ const maintainController = {
       const aInvoiceIds = mInvoices.map((invoice) => invoice.invoice_id);
       const aInvoiceDetails = await getAccessoryInvoiceDetailsList(aInvoiceIds);
 
-      const mInvoicesWithServices = formatMaintenanceInvoiceList(
+      let mInvoicesWithServices = formatMaintenanceInvoiceList(
         mInvoices,
         mServices,
         mInvoiceDetails,
@@ -79,9 +82,18 @@ const maintainController = {
         aInvoiceDetails
       );
 
+      // search and pagination
+      // if (q) {
+      //   mInvoicesWithServices = await search({ data: mInvoicesWithServices, q, fieldname: "name" })
+      // }
+
+      const rs = await pagination({ data: mInvoicesWithServices, page, per_page });
+
+
       return res.status(200).json({
         status: "success",
-        invoices: mInvoicesWithServices,
+        invoices: rs?.data,
+        total_page: rs?.total_page
       });
     } catch (error) {
       console.log(error);
@@ -139,6 +151,7 @@ const maintainController = {
     const userId: any = req.headers["userId"] || "";
     const { licensePlate } = req.params;
     const mInvoiceRepository = getRepository(Invoice);
+    const { page, per_page, q }: any = req.query;
 
     try {
       const user = await getUserInfo(userId);
@@ -195,7 +208,7 @@ const maintainController = {
       const aInvoiceIds = mInvoices.map((invoice) => invoice.invoice_id);
       const aInvoiceDetails = await getAccessoryInvoiceDetailsList(aInvoiceIds);
 
-      const mInvoicesWithServices = formatMaintenanceInvoiceList(
+      let mInvoicesWithServices = formatMaintenanceInvoiceList(
         mInvoices,
         mServices,
         mInvoiceDetails,
@@ -203,9 +216,18 @@ const maintainController = {
         aInvoiceDetails
       );
 
+      // search and pagination
+      // if (q) {
+      //   mInvoicesWithServices = await search({ data: mInvoicesWithServices, q, fieldname: "name" })
+      // }
+
+      const rs = await pagination({ data: mInvoicesWithServices, page, per_page });
+
+
       return res.status(200).json({
         status: "success",
-        invoices: mInvoicesWithServices,
+        invoices: rs?.data,
+        total_page: rs?.total_page
       });
     } catch (error) {
       console.log(error);

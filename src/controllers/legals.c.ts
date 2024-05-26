@@ -4,6 +4,8 @@ import SalonRepository from "../repository/salon";
 import CarRepository from "../repository/car";
 import UserRepository from "../repository/user";
 import createNotification from "../helper/createNotification";
+import search from "../helper/search";
+import pagination from "../helper/pagination";
 
 const legalsController = {
     createProcess: async (req: Request, res: Response) => {
@@ -75,10 +77,17 @@ const legalsController = {
     },
 
     getAllProcess: async (req: Request, res: Response) => {
-        const { salonId, processId } = req.body;
-        const legalRp = await LegalsRepository.getAllProcessBySalonId({ salonId, processId })
+        const { salonId, processId, page, per_page, q } = req.body;
+        let legalRp = await LegalsRepository.getAllProcessBySalonId({ salonId, processId })
+        // search and pagination
+        if (q) {
+            legalRp.data = await search({ data: legalRp.data, q, fieldname: "name" })
+        }
 
-        return res.json({ ...legalRp });
+        const rs = await pagination({ data: legalRp.data, page, per_page });
+        legalRp.data = rs?.data;
+
+        return res.json({ ...legalRp, total_page: rs?.total_page });
     },
 
     updateProcess: async (req: Request, res: Response) => {
@@ -237,7 +246,7 @@ const legalsController = {
         // get userId by phone
         const userRp = await UserRepository.getProfileByOther({ phone });
         // get salon by salonId
-        const salonRp = await SalonRepository.findSalonById({salonId});
+        const salonRp = await SalonRepository.findSalonById({ salonId });
         // send notification
         createNotification({
             to: userRp?.data?.user_id,

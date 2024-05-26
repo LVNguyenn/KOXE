@@ -2,7 +2,9 @@ import { Request, Response } from 'express';
 import { Package } from "../entities/Package";
 import { getRepository } from "typeorm";
 const cloudinary = require("cloudinary").v2;
-import {isValidUUID, getFileName} from "../utils/index"
+import { isValidUUID, getFileName } from "../utils/index"
+import search from '../helper/search';
+import pagination from '../helper/pagination';
 // import Cache from '../config/node-cache';
 
 interface MulterFileRequest extends Request {
@@ -11,6 +13,7 @@ interface MulterFileRequest extends Request {
 
 const packageController = {
     getAllPackages: async (req: Request, res: Response) => {
+        const { page, per_page, q }: any = req.query;
         // get value from cache
         // const valueCache = Cache.get("package");
         // if (valueCache) {
@@ -42,10 +45,18 @@ const packageController = {
             }
 
             // Cache.set("package", savedPackage);
-    
+            // search and pagination
+            if (q) {
+                savedPackage.packages = await search({ data: savedPackage.packages, q, fieldname: "name" })
+            }
+
+            const rs = await pagination({ data: savedPackage.packages, page, per_page });
+
+
             return res.status(200).json({
                 status: "success",
-                packages: savedPackage,
+                packages: rs?.data,
+                total_page: rs?.total_page
             });
         } catch (error) {
             return res.status(500).json({ status: "failed", msg: "Internal server error" });
@@ -66,9 +77,9 @@ const packageController = {
 
         try {
             const packagee = await packageRepository.createQueryBuilder("package")
-            .leftJoinAndSelect("package.features", "feature")
-            .where("package.package_id = :id", { id: id })
-            .getOne()
+                .leftJoinAndSelect("package.features", "feature")
+                .where("package.package_id = :id", { id: id })
+                .getOne()
             if (!packagee) {
                 return res.status(404).json({ status: "failed", msg: `No package with id: ${id}` });
             }
@@ -87,7 +98,7 @@ const packageController = {
                     }))
                 }
             }
-            
+
             // Cache.set(id+"package", savePackage);
 
             return res.status(200).json({
@@ -107,10 +118,10 @@ const packageController = {
             image = req.file.path;
             filename = req.file.filename;
         }
-    
+
         try {
             if (price < 0) {
-                if(filename !== ""){
+                if (filename !== "") {
                     cloudinary.uploader.destroy(filename)
                 }
                 return res.status(400).json({ status: "failed", msg: "Price must be greater than or equal to 0" });
@@ -118,8 +129,8 @@ const packageController = {
 
             const newPackage = { name, description, price, image };
             const savedPackage = await packageRepository.save(newPackage);
-            
-            if(features && isValidUUID(features[0])){
+
+            if (features && isValidUUID(features[0])) {
                 await packageRepository
                     .createQueryBuilder()
                     .relation(Package, "features")
@@ -132,9 +143,9 @@ const packageController = {
             return res.status(201).json({
                 status: "success",
                 msg: "Create successfully!"
-             });
+            });
         } catch (error) {
-            if(filename !== ""){
+            if (filename !== "") {
                 cloudinary.uploader.destroy(filename)
             }
             return res.status(500).json({ status: "failed", msg: "Internal server error" });
@@ -151,43 +162,43 @@ const packageController = {
             filename = req.file.filename;
         }
 
-        let newPackage: any = {name, description, price, features}
-        if(image !== "") newPackage.image = image;
-        const {package_id, ...other} = newPackage;
-        
+        let newPackage: any = { name, description, price, features }
+        if (image !== "") newPackage.image = image;
+        const { package_id, ...other } = newPackage;
+
         const oldPackage = await packageRepository.findOne({
             where: {
                 package_id: id,
             },
         })
-        
-        if(!oldPackage){
-            if(filename !== ""){
+
+        if (!oldPackage) {
+            if (filename !== "") {
                 cloudinary.uploader.destroy(filename)
             }
             return res.status(404).json({ status: "failed", msg: `No package with id: ${id}` });
         }
 
-        if(image !== "" && oldPackage.image){
+        if (image !== "" && oldPackage.image) {
             cloudinary.uploader.destroy(getFileName(oldPackage.image));
         }
-        
+
         try {
             if (price < 0) {
-                if(filename !== ""){
+                if (filename !== "") {
                     cloudinary.uploader.destroy(filename)
                 }
                 return res.status(400).json({ status: "failed", msg: "Price must be greater than or equal to 0" });
             }
 
-            const savePackage = {...oldPackage, ...other};
+            const savePackage = { ...oldPackage, ...other };
             await packageRepository.save(savePackage);
 
             const result = await packageRepository.findOne({
                 where: {
                     package_id: id,
                 },
-                relations: ["features"], 
+                relations: ["features"],
             })
 
             if (features && result) {
@@ -196,12 +207,12 @@ const packageController = {
                     .relation(Package, "features")
                     .of(result)
                     .remove(result.features);
-                if(isValidUUID(features[0])){
+                if (isValidUUID(features[0])) {
                     await packageRepository
-                    .createQueryBuilder()
-                    .relation(Package, "features")
-                    .of(result)
-                    .add(features);
+                        .createQueryBuilder()
+                        .relation(Package, "features")
+                        .of(result)
+                        .add(features);
                 }
             }
             // del old value package
@@ -212,7 +223,7 @@ const packageController = {
                 msg: "Update successfully!"
             });
         } catch (error) {
-            if(filename !== ""){
+            if (filename !== "") {
                 cloudinary.uploader.destroy(filename)
             }
             return res.status(500).json({ status: "failed", msg: "Internal server error" });
@@ -225,12 +236,13 @@ const packageController = {
             const oldPackage = await packageRepository.findOne({
                 where: {
                     package_id: id,
-                }})
+                }
+            })
             if (!oldPackage) {
                 return res.status(404).json({ status: "failed", msg: `No package with id: ${id}` });
             }
 
-            if(oldPackage.image){
+            if (oldPackage.image) {
                 cloudinary.uploader.destroy(getFileName(oldPackage.image));
             }
 
@@ -247,7 +259,7 @@ const packageController = {
             return res.status(500).json({ status: "failed", msg: "Internal server error" });
         }
     },
-    buyPackage:  async (req: Request, res: Response) => {
+    buyPackage: async (req: Request, res: Response) => {
 
     },
 

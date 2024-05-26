@@ -7,6 +7,8 @@ import { Salon } from "../entities/Salon";
 import { Connection } from "../entities/Connection";
 import createNotification from "../helper/createNotification";
 import { getUserInfo } from "../helper/mInvoice";
+import search from "../helper/search";
+import pagination from "../helper/pagination";
 
 const cloudinary = require("cloudinary").v2;
 
@@ -148,6 +150,7 @@ const postController = {
     }
   },
   getFeedPosts: async (req: Request, res: Response) => {
+    const { page, per_page, q }: any = req.query;
     const postRepository = getRepository(Post);
     const connectionRepository = getRepository(Connection);
     const userId: any = req.headers["userId"] || "";
@@ -156,7 +159,7 @@ const postController = {
       relations: ["salonId"],
     });
     const salonId = user?.salonId.salon_id;
-    let formatPosts;
+    let formatPosts: any;
 
     try {
       if (!salonId) {
@@ -228,9 +231,18 @@ const postController = {
         };
       }
 
+      // search and pagination
+      if (q) {
+        formatPosts.posts = await search({ data: formatPosts?.posts, q, fieldname: "name" })
+      }
+
+      const rs = await pagination({ data: formatPosts?.posts, page, per_page });
+      formatPosts.posts = rs?.data;
+
       res.status(200).json({
         status: "success",
         posts: formatPosts,
+        total_page: rs?.total_page
       });
     } catch (error) {
       console.error("Error retrieving salon posts:", error);

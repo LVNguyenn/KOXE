@@ -10,6 +10,8 @@ import createNotification from "../helper/createNotification";
 import parsePermission from "../helper/parsePermission";
 import authController from "./auth.c";
 import UserRepository from "../repository/user";
+import search from "../helper/search";
+import pagination from "../helper/pagination";
 // import Cache from "../config/node-cache";
 
 const { v4: uuidv4 } = require("uuid");
@@ -30,6 +32,7 @@ const salonController = {
     //     salons: valueCache,
     //   });
     // }
+    const { page, per_page, q }: any = req.query;
     const salonRepository = getRepository(Salon);
     try {
       const salons = await salonRepository.find({});
@@ -42,15 +45,24 @@ const salonController = {
       //         "address",
       //     ]
       // });
-      const saveSalon = {
+      let saveSalon: any = {
         salons,
         nbHits: salons.length,
       };
       // Cache.set("salon", saveSalon);
 
+      // search and pagination
+      if (q) {
+        saveSalon.salons = await search({ data: saveSalon.salons, q, fieldname: "name" })
+      }
+
+      const rs = await pagination({ data: saveSalon.salons, page, per_page });
+      saveSalon.salons = rs?.data;
+
       return res.status(200).json({
         status: "success",
         salons: saveSalon,
+        total_page: rs?.total_page
       });
     } catch (error) {
       return res
@@ -754,7 +766,7 @@ const salonController = {
 
     const userRp = await UserRepository.getAllEmployeesBySalonId({ salonId });
 
-    return res.json({...userRp});
+    return res.json({ ...userRp });
   }
 };
 

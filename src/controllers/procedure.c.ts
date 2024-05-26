@@ -3,11 +3,14 @@ import { Process } from "../entities/Process";
 import { Stage } from "../entities/Stage";
 import { getRepository } from "typeorm";
 import { getUserInfo } from "../helper/mInvoice";
+import search from "../helper/search";
+import pagination from "../helper/pagination";
 
 const processController = {
   getAllProcesses: async (req: Request, res: Response) => {
     const processRepository = getRepository(Process);
     const userId: any = req.headers["userId"] || "";
+    const { page, per_page, q }: any = req.query;
     const user = await getUserInfo(userId);
     const salonId = user?.salonId.salon_id;
     let type: any = req.query.type;
@@ -19,9 +22,17 @@ const processController = {
       const whereCondition: any = { salon: { salon_id: salonId } };
       if (type !== undefined) whereCondition.type = type;
 
-      const processes = await processRepository.find({ where: whereCondition });
+      let processes: any = await processRepository.find({ where: whereCondition });
 
-      const processesSave = {
+      // search and pagination
+      if (q) {
+        processes = await search({ data: processes, q, fieldname: "name" })
+      }
+
+      const rs = await pagination({ data: processes, page, per_page });
+      processes = rs?.data;
+
+      let processesSave = {
         processes,
         nbHits: processes.length,
       };
@@ -29,6 +40,7 @@ const processController = {
       return res.status(200).json({
         status: "success",
         processes: processesSave,
+        total_page: rs?.total_page
       });
     } catch (error) {
       return res

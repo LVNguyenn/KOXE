@@ -604,9 +604,6 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[POST] /invoice/lookup</li>
     Dùng để tra cứu thông tin hóa đơn. Yêu cầu là chủ salon or có quyền R_IV.Yêu cầu truyền vô: {"invoiceId", "salonId", "phone", "licensePlate", "type"}. nếu muốn tìm theo gì thì truyền vô cái đó.
     salonId là bắt buộc. licensePlate: Biển số xe. type: loại giao dịch: "buy car", "maintenance". phone: sdt khách hàng.
-    <li>[POST] /invoice/all</li>
-    Xem tất cả danh sách toàn bộ hóa đơn mua xe của salon đó (Nguyên tạm sửa). Yêu cầu là chủ salon, or nhân viên có quyền R_IV. Truyền vô: {"salonId"}.
-    Có thể tìm theo {"done", "employeeId"}. Không truyền thêm gì thì mặt định là không có.
     <li>[POST] /invoice/remove</li>
     Xóa invoice. Cần truyền vô: {"salonId", "invoiceId"}. Xóa hóa đơn thì sẽ xóa luôn cả tiến trình người dùng nếu có.
      Không hiểu sao delete bên postman lỗi nên dùng post để delete.
@@ -821,10 +818,8 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     </div>
 
     <li>[POST] /invoice/all</li>
-    Dùng để lấy ra toàn bộ hóa đơn của salon, trong đó sẽ có qui trình của user luôn. Cần truyền vô:
-    <div>
-        {salonId, done: không truyền lấy tất cả, = false thì lấy ra các giao dịch chưa hoàn thành (user chưa hoàn thành thủ tục ), = true thì hoàn thành rồi.}
-    </div>
+    Xem tất cả danh sách toàn bộ hóa đơn mua xe của salon đó (Nguyên tạm sửa). Yêu cầu là chủ salon, or nhân viên có quyền R_IV. Truyền vô: {"salonId"}.
+    Có thể tìm theo {"done", "employeeId"salonId, done: không truyền lấy tất cả, = false thì lấy ra các giao dịch chưa hoàn thành (user chưa hoàn thành thủ tục ), = true thì hoàn thành rồi.}. Không truyền thêm gì thì mặt định là không có.
     Trong này nó sẽ trả về thông tin xe và qui trình của xe luôn (nếu có xe đó).
 
     <h2 id="process">Quy trình</h2>
@@ -961,6 +956,20 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[GET]/connections</li>
     Không có search.
     <li>[GET] /features</li>
+    Tìm kiếm theo name.
+    <li>[GET] /invoice</li>
+    Không có search.
+    <li>[POST] /legals/process</li>
+    Tìm kiếm theo name.
+    <li>[GET] /maintenance/</li>
+    Tìm kiếm theo name.
+    <li>[GET] /packages</li>
+    Tìm kiếm theo name.
+    <li>[GET] /posts/feed</li>
+    Không có search.
+    <li>[GET] /process</li>
+    Tìm kiếm theo name.
+    <li>[GET] /salons</li>
     Tìm kiếm theo name.
 </body>
 
