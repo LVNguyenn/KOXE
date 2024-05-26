@@ -762,11 +762,18 @@ const salonController = {
   },
 
   getAllEmployeesBySalon: async (req: Request, res: Response) => {
-    const { salonId } = req.body;
+    const { salonId, page, per_page, q } = req.body;
 
-    const userRp = await UserRepository.getAllEmployeesBySalonId({ salonId });
+    let userRp = await UserRepository.getAllEmployeesBySalonId({ salonId });
 
-    return res.json({ ...userRp });
+    // search and pagination
+    if (q) {
+      userRp.data = await search({ data: userRp?.data, q, fieldname: "fullname" })
+    }
+
+    const rs = await pagination({ data: userRp?.data, page, per_page });
+
+    return res.json({ status: userRp?.status, msg: userRp?.msg, ...rs });
   }
 };
 

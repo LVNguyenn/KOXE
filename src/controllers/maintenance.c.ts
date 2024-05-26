@@ -86,9 +86,10 @@ const maintenanceController = {
   getMaintenanceBySalonId: async (req: Request, res: Response) => {
     const mRepository = getRepository(Maintenance);
     const { salonId } = req.params;
+    const { page, per_page, q }: any = req.query;
 
     try {
-      const maintenance = await mRepository.find({
+      let maintenance = await mRepository.find({
         where: { salon: { salon_id: salonId } },
       });
       if (maintenance.length === 0) {
@@ -98,9 +99,18 @@ const maintenanceController = {
         });
       }
 
+      // search and pagination
+      if (q) {
+        maintenance = await search({ data: maintenance, q, fieldname: "name" })
+      }
+
+      const rs = await pagination({ data: maintenance, page, per_page });
+
+
       return res.status(200).json({
         status: "success",
-        maintenance: maintenance,
+        maintenance: rs?.data,
+        total_page: rs?.total_page
       });
     } catch (error) {
       return res

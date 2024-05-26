@@ -83,9 +83,9 @@ const maintainController = {
       );
 
       // search and pagination
-      // if (q) {
-      //   mInvoicesWithServices = await search({ data: mInvoicesWithServices, q, fieldname: "name" })
-      // }
+      if (q) {
+        mInvoicesWithServices = await search({ data: mInvoicesWithServices, q, fieldname: "fullname" })
+      }
 
       const rs = await pagination({ data: mInvoicesWithServices, page, per_page });
 
