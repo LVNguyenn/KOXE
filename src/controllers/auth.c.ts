@@ -690,6 +690,7 @@ const authController: any = {
         })
       }
 
+      // set new password
       const salt = await bcrypt.genSalt(11);
       const savePassword = await bcrypt.hash(newPassword, salt);
 
@@ -703,7 +704,7 @@ const authController: any = {
       console.log(error)
       return res.json({
         status: "failed",
-        msg: "Error input data.",
+        msg: "Cannot change password, please check information and try again.",
       });
     }
   },
