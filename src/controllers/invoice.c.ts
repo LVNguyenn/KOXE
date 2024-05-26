@@ -253,7 +253,7 @@ const invoiceController = {
   },
 
   getInvoiceByPhone: async (req: Request, res: Response) => {
-    // const {phone} = req.body;
+    const {q, page, per_page} = req.body;
     const userId: any = req.user;
     let phone;
 
@@ -280,14 +280,21 @@ const invoiceController = {
     try {
       const invoiceRepository = getRepository(Invoice);
 
-      const invoiceDb = await invoiceRepository.find({
+      let invoiceDb = await invoiceRepository.find({
         where: { phone: phone, type: "buy car" },
         relations: ['seller', 'legals_user']
       })
 
+      if (q) {
+        invoiceDb = await search({data: invoiceDb, q, fieldname: "fullname"})
+      }
+
+      const rs = await pagination({data: invoiceDb, page, per_page});
+
       return res.json({
         status: "success",
-        invoices: invoiceDb
+        invoices: rs?.data,
+        total_page: rs?.total_page
       })
     } catch (error) {
       return res.json({
