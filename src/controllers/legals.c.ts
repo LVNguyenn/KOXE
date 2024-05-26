@@ -79,15 +79,21 @@ const legalsController = {
     getAllProcess: async (req: Request, res: Response) => {
         const { salonId, processId, page, per_page, q } = req.body;
         let legalRp = await LegalsRepository.getAllProcessBySalonId({ salonId, processId })
+        
         // search and pagination
-        if (q) {
-            legalRp.data = await search({ data: legalRp.data, q, fieldname: "name" })
+        if (!processId) {
+            if (q) {
+                legalRp.data = await search({ data: legalRp.data, q, fieldname: "name" })
+            }
+
+
+            const rs = await pagination({ data: legalRp.data, page, per_page });
+            legalRp.data = rs?.data;
+
+            return res.json({ ...legalRp, total_page: rs?.total_page });
         }
 
-        const rs = await pagination({ data: legalRp.data, page, per_page });
-        legalRp.data = rs?.data;
-
-        return res.json({ ...legalRp, total_page: rs?.total_page });
+        return res.json({ ...legalRp });
     },
 
     updateProcess: async (req: Request, res: Response) => {
