@@ -130,6 +130,7 @@ const invoiceController = {
         .innerJoinAndSelect('invoice.seller', 'salon', 'salon.salon_id = :salonId', { salonId })
         .leftJoinAndSelect('invoice.legals_user', 'car_user_legals')
         // .leftJoinAndSelect('user', 'user', 'invoice.employee_id = user.user_id')
+        .where({type: "buy car"})
 
       if (done !== undefined && done !== "undefined") {
         queryBuilder = await queryBuilder.where({ done: done })

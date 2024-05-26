@@ -27,7 +27,7 @@ router.delete("/:id", mInvoiceController.deleteMaintenanceInvoices);
 
 router.post("/create-invoice", middlewareController.verifyToken, middlewareController.havePermission("C_IV"), invoiceController.printInvoiceBuyCar);
 router.post("/lookup", middlewareController.verifyToken, middlewareController.havePermission("R_IV"), invoiceController.lookupInvoiceByInvoiceId);
-router.post("/all", middlewareController.verifyToken, middlewareController.havePermission("R_IV"), invoiceController.getAllInvoiceOfSalon);
+router.post("/get-invoice-buy-car-salon", middlewareController.verifyToken, middlewareController.havePermission("R_IV"), invoiceController.getAllInvoiceOfSalon);
 
 router.post("/statistics", middlewareController.verifyToken, middlewareController.havePermission("R_IV"), invoiceController.revenueStatistics);
 router.post("/get-top", invoiceController.getTopThingBestSeller);

@@ -31,6 +31,8 @@
     
     <li>Thêm thông báo lúc salon next qua giai đoạn tiếp theo và khi hoàn tất quy trình thì cũng sẽ có thông báo cho hoa tiêu</li>
     <li>Khi lấy bài post theo id sẽ kèm theo phần trăm đánh giá trung bình của hoa tiêu đó kèm theo số giao dịch đã hoàn thành, cung cấp thêm thông tin cho salon dễ ra quyết định kết nối</li>
+    <li>[POST] /invoice/get-invoice-buy-car-salon</li>
+    Đổi api /invoice/all lúc đầu (dễ nhầm lẫn)
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
     <h2>MỤC LỤC</h2>
@@ -607,7 +609,11 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[POST] /invoice/remove</li>
     Xóa invoice. Cần truyền vô: {"salonId", "invoiceId"}. Xóa hóa đơn thì sẽ xóa luôn cả tiến trình người dùng nếu có.
      Không hiểu sao delete bên postman lỗi nên dùng post để delete.
-
+     <li>[POST] /invoice/get-invoice-buy-car-salon</li>
+     Đổi từ /invocice/all lúc đầu.
+     Xem tất cả danh sách toàn bộ hóa đơn mua xe của salon đó. Yêu cầu là chủ salon, or nhân viên có quyền R_IV. Truyền vô: {"salonId"}.
+     Có thể tìm theo {"done", "employeeId"salonId, done: không truyền lấy tất cả, = false thì lấy ra các giao dịch chưa hoàn thành (user chưa hoàn thành thủ tục ), = true thì hoàn thành rồi.}. Không truyền thêm gì thì mặt định là không có.
+     Trong này nó sẽ trả về thông tin xe và qui trình của xe luôn (nếu có xe đó).
     <li class="hot">[PATCH] /invoice/tick-done</li>
         Dùng để tick là hóa đơn đó đã hoàn thành tất cả qui trình cho khách hàng rồi. Cần truyền vô: {salonId, invoiceId}
 
@@ -816,11 +822,6 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
             
         }
     </div>
-
-    <li>[POST] /invoice/all</li>
-    Xem tất cả danh sách toàn bộ hóa đơn mua xe của salon đó (Nguyên tạm sửa). Yêu cầu là chủ salon, or nhân viên có quyền R_IV. Truyền vô: {"salonId"}.
-    Có thể tìm theo {"done", "employeeId"salonId, done: không truyền lấy tất cả, = false thì lấy ra các giao dịch chưa hoàn thành (user chưa hoàn thành thủ tục ), = true thì hoàn thành rồi.}. Không truyền thêm gì thì mặt định là không có.
-    Trong này nó sẽ trả về thông tin xe và qui trình của xe luôn (nếu có xe đó).
 
     <h2 id="process">Quy trình</h2>
     (Bao gồm các trường: process_id, name, type, salonId, description)
