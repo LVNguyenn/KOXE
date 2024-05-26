@@ -469,7 +469,7 @@
     <div>usernamel: admin-team-salon-oto</div>
     <div>password: admin123abcDEF@@</div>
 
-    <li>[POST] /amin/</li>
+    <li>[POST] /admin/</li>
     Lấy ra danh sách tất cả các quyền. Yêu cầu phải là admin team - đăng nhập bằng tài khoản admin được cung cấp.
     <li>[POST] /admin/update-permission</li>
     Cập nhật quyền cho toàn bộ hệ thống. Yêu cầu phải là admin team - đăng nhập bằng tài khoản admin được cung cấp. có thể truyền vô như sau:
@@ -949,8 +949,13 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Với api này thì search theo fullname
     <li>[POST] /appointment/get-appoint-admin</li>
     Với api này thì search theo fullname của user
+    <li>[POST] /appointment/get-appoint-user</li>
     <li>[POST] /invoice/get-invoice-buy-car</li>
     Tìm kiếm theo fullname. Nếu muốn đổi qua phone thì nói ha.
+    <li>[GET] /accessory/salon/:salonId</li>
+    Tìm kiếm theo name.
+    <li>[GET] /cars/salon/:salonId</li>
+    Tìm kiếm theo name.
 </body>
 
 </html>

@@ -7,6 +7,8 @@ import { newLogs } from "../helper/createLogs";
 // import Cache from '../config/node-cache';
 import { Invoice, Salon } from "../entities";
 import CarRepository from "../repository/car";
+import search from "../helper/search";
+import pagination from "../helper/pagination";
 
 interface MulterFile {
   path: string;
@@ -19,6 +21,7 @@ interface MulterFileRequest extends Request {
 
 const carController = {
   getAllCars: async (req: Request, res: Response) => {
+    const { page, per_page, q }: any = req.query;
     // get value from cache
     // const valueCache = await Cache.get("cars");
     // if (valueCache) {
@@ -53,7 +56,7 @@ const carController = {
         ],
       });
 
-      const formattedCars = cars.map((car) => ({
+      let formattedCars = cars.map((car) => ({
         ...car,
         salon: {
           salon_id: car.salon.salon_id,
@@ -83,13 +86,20 @@ const carController = {
       //     car: formattedCars,
       //     nbHits: formattedCars.length,
       // });
+      // search and pagination
+      if (q) {
+        formattedCars = await search({ data: formattedCars, q, fieldname: "name" })
+      }
+
+      const rs = await pagination({ data: formattedCars, page, per_page });
 
       return res.status(200).json({
         status: "success",
         cars: {
-          car: formattedCars,
+          car: rs?.data,
           nbHits: formattedCars.length,
         },
+        total_page: rs?.total_page
       });
     } catch (error) {
       console.log(error);
