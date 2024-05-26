@@ -677,8 +677,18 @@ const authController: any = {
     try {
       const userRepository = getRepository(User);
       let userDb: User = await userRepository.findOneOrFail({
-        where: { user_id: userId, password: oldPassword },
+        where: { user_id: userId },
       });
+
+      // compare pw here.
+      const condition = await bcrypt.compare(oldPassword, userDb?.password);
+
+      if (!condition) {
+        return res.json({
+          status: "failed",
+          msg: "Old password is invalid."
+        })
+      }
 
       const salt = await bcrypt.genSalt(11);
       const savePassword = await bcrypt.hash(newPassword, salt);
@@ -690,6 +700,7 @@ const authController: any = {
         msg: "change password successfully!",
       });
     } catch (error) {
+      console.log(error)
       return res.json({
         status: "failed",
         msg: "Error input data.",
