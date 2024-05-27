@@ -48,10 +48,19 @@ function calExpiryDate(purchaseDate: string, duration: number) {
   return date.toLocaleString();
 }
 
+function convertToTimeZone(date: any, timeZoneOffset: any) {
+  const localTime = date.getTime() + timeZoneOffset * 60 * 60 * 1000;
+  return new Date(localTime);
+}
+
 function extractTime(dateString: Date) {
   const date = new Date(dateString);
-  const hours = padZero(date.getHours());
-  const minutes = padZero(date.getMinutes());
+  // const hours = padZero(date.getHours());
+  // const minutes = padZero(date.getMinutes());
+  const timeZoneOffset = 7; // Múi giờ +7
+  const localDate = convertToTimeZone(date, timeZoneOffset);
+  const hours = padZero(localDate.getHours());
+  const minutes = padZero(localDate.getMinutes());
   return `${hours}:${minutes}`;
 }
 
