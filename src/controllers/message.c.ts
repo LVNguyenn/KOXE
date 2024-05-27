@@ -234,8 +234,8 @@ const messageController = {
         conversation = await conversationRepository.save({
           participants: participants,
           messages: [],
-          //createdAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
-          //updatedAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
+          createdAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
+          updatedAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
         });
       }
 
@@ -253,8 +253,8 @@ const messageController = {
         receiverId: receiverId,
         message: message || "",
         image: image,
-        //createdAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
-        //updatedAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
+        createdAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
+        updatedAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
       });
 
       // Add message to conversation

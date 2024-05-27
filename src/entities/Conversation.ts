@@ -11,10 +11,10 @@ export class Conversation {
   @Column("simple-array", { nullable: true })
   messages!: string[];
 
-  @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+  @Column({ type: "timestamptz" })
   createdAt!: Date;
 
-  @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+  @Column({ type: "timestamptz" })
   updatedAt!: Date;
 
   @Column({ nullable: true })

@@ -17,10 +17,10 @@ export class Message {
   @Column({ type: "text", array: true, nullable: true })
   image!: string[];
 
-  @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+  @Column({ type: "timestamptz" })
   createdAt!: Date;
 
-  @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+  @Column({ type: "timestamptz" })
   updatedAt!: Date;
 
   init(
