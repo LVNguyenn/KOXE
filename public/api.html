@@ -394,7 +394,7 @@
             ...
         }
     </pre>
-    <div>Thì tại đây tụi ông cần kiểm tra. Nếu như message là chuỗi rỗng thì nó gửi ảnh, còn nếu image là mảng rỗng thì là gửi text để hiển thị</div>
+    <div>Thì tại đây tụi ông cần kiểm tra. Nếu như message là chuỗi rỗng thì nó gửi ảnh, còn nếu image là mảng rỗng thì là gửi text để hiển thị. Nếu message bắt đầu bằng http thì cho thẻ a để nó có thể link tới</div>
     <h4 style="font-weight: 500;">Trong code tui cũng đã có comment lại chỗ chỉ lấy message thôi</h4>
     <li>[POST] /messages/send/:id (id là người nhận)</li>
     Cần truyền vào nội dung của tui nhắn hoặc gửi ảnh thì truyền vào imgList (array tối đa 10 ảnh). Truyền theo form-data. VD như sau:
