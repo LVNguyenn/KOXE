@@ -88,7 +88,11 @@ const carController = {
       // });
       // search and pagination
       if (q) {
-        formattedCars = await search({ data: formattedCars, q, fieldname: "name" })
+        formattedCars = await search({
+          data: formattedCars,
+          q,
+          fieldname: "name",
+        });
       }
 
       const rs = await pagination({ data: formattedCars, page, per_page });
@@ -99,7 +103,7 @@ const carController = {
           car: rs?.data,
           nbHits: formattedCars.length,
         },
-        total_page: rs?.total_page
+        total_page: rs?.total_page,
       });
     } catch (error) {
       console.log(error);
@@ -199,11 +203,10 @@ const carController = {
 
       // search and pagination
       if (q) {
-        cars = await search({ data: cars, q, fieldname: "name" })
+        cars = await search({ data: cars, q, fieldname: "name" });
       }
 
       const rs = await pagination({ data: cars, page, per_page });
-
 
       const saveCar = {
         cars: rs?.data,
@@ -215,7 +218,7 @@ const carController = {
       return res.status(200).json({
         status: "success",
         data: saveCar,
-        total_page: rs?.total_page
+        total_page: rs?.total_page,
       });
     } catch (error) {
       return res
@@ -261,12 +264,10 @@ const carController = {
             cloudinary.uploader.destroy(url);
           });
         }
-        return res
-          .status(400)
-          .json({
-            status: "failed",
-            msg: "Price must be greater than or equal to 0",
-          });
+        return res.status(400).json({
+          status: "failed",
+          msg: "Price must be greater than or equal to 0",
+        });
       }
 
       const newCar = {
@@ -291,7 +292,7 @@ const carController = {
       };
       const savedCar = await carRepository.save(newCar);
 
-      newLogs(salonSalonId, `${req.user} created car ${savedCar.car_id}.`);
+      //newLogs(salonSalonId, `${req.user} created car ${savedCar.car_id}.`);
 
       // del old value cache
       // Cache.del(["cars", salonSalonId+brand]);
@@ -302,6 +303,7 @@ const carController = {
         car: savedCar,
       });
     } catch (error) {
+      console.log(error);
       if (filename.length !== 0) {
         filename.forEach(async (url) => {
           cloudinary.uploader.destroy(url);
@@ -398,12 +400,10 @@ const carController = {
             cloudinary.uploader.destroy(url);
           });
         }
-        return res
-          .status(400)
-          .json({
-            status: "failed",
-            msg: "Price must be greater than or equal to 0",
-          });
+        return res.status(400).json({
+          status: "failed",
+          msg: "Price must be greater than or equal to 0",
+        });
       }
 
       const saveCar = { ...oldCar, ...other };

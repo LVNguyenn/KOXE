@@ -24,6 +24,8 @@
     <h1>API SERVER</h1>
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
     <h2>Các API mới thêm vô</h2>
+    <li>Nhắn tin có hình ảnh</li>
+
     <li>[POST] /salons/employees</li>
     <li>[POST] /invoice/create-invoice</li>
     
@@ -378,26 +380,31 @@
     Sẽ lấy ra được các object message mà giữa user đang đăng nhập và user_id hoặc salon_id truyền vào đó đã chat với nhau, sẽ trả về như sau:
     <pre>
         {
-            "message_id": "667eaac1-65f0-4a85-b3ba-725bb8c3cacd",
-            "senderId": "b4f61ebe-aed1-4a49-924c-ec54dd38e27c",
-            "receiverId": "d44bedce-4033-4831-b172-ac8fccfa627b",
-            "message": "Nguyen test",
-            "createdAt": "2024-03-24 20:26:03",
-            "updatedAt": "2024-03-24 20:26:03"
+            "message_id": "b190ac38-0207-4114-89d3-af56d3f13788",
+            "senderId": "d5ca4fa6-e89e-408f-aeab-d1c855467ab5",
+            "receiverId": "d4f769bb-ecd7-4211-b93c-448cf9d1ad92",
+            "message": "",
+            "image": [
+                "https://res.cloudinary.com/dok6ou3xz/image/upload/v1716782600/salon-car/blajqhf3axf69dgro7px.jpg"
+            ],
+            "createdAt": "2024-05-27 18:03:28",
+            "updatedAt": "2024-05-27 18:03:28"
         },
         {
             ...
         }
     </pre>
+    <div>Thì tại đây tụi ông cần kiểm tra. Nếu như message là chuỗi rỗng thì nó gửi ảnh, còn nếu image là mảng rỗng thì là gửi text để hiển thị</div>
     <h4 style="font-weight: 500;">Trong code tui cũng đã có comment lại chỗ chỉ lấy message thôi</h4>
     <li>[POST] /messages/send/:id (id là người nhận)</li>
-    Cần truyền vào nội dung của tui nhắn. VD như sau:
+    Cần truyền vào nội dung của tui nhắn hoặc gửi ảnh thì truyền vào imgList (array tối đa 10 ảnh). Truyền theo form-data. VD như sau:
     <pre>
         {
             "message": "Nguyen test"
         }
     </pre>
-
+    <b>Nhớ handle đừng cho nó gửi message là chuỗi rỗng nhé</b>
+    
     <h2></h2>
     
     <h2 id="notification">Thông báo</h2>
@@ -877,6 +884,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <h2 id="block">Chặn hoa tiêu</h2>
     <li>[POST] /block-user</li>
     Cần truyền vào postId (Chỗ thông báo chắc tụi ông thêm button hay gì đó hiển thị là không nhận thông báo từ user này chẳng hạn. Xong gọi API này, data của thông báo có postId thì truyền vào đây).
+    <b>Khi chặn xong thì tụi ông nhớ gọi API để nó xóa thông báo đó luôn nha</b>
     <h3>Gỡ block</h3>
     <li>[GET] /salons/users/blocked</li>
     Ban đầu salon sẽ gọi API này để xem được danh sách các hoa tiêu mà mình đã chặn (có user_id và fullname)

@@ -120,11 +120,10 @@ const transactionController = {
 
       const rs = await pagination({ data: formatTransactions, page, per_page });
 
-
       return res.status(200).json({
         status: "success",
         transaction: rs?.data,
-        total_page: rs?.total_page
+        total_page: rs?.total_page,
       });
     } catch (error) {
       return res

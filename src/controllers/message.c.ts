@@ -8,6 +8,14 @@ import { Conversation } from "../entities/Conversation";
 import { getReceiverSocketId, io } from "../socket/socket";
 import { extractTime } from "../utils/index";
 
+interface MulterFile {
+  path: string;
+}
+
+interface MulterFileRequest extends Request {
+  files?: MulterFile[];
+}
+
 const messageController = {
   getChattingUsers: async (req: Request, res: Response) => {
     try {
@@ -84,7 +92,13 @@ const messageController = {
                 .getOne();
               detail.message = {
                 sender: detail.id === message.receiverId ? "Bạn" : "",
-                message: message.message,
+                message:
+                  message.message === ""
+                    ? detail.id === message.receiverId
+                      ? "Bạn đã gửi 1 ảnh"
+                      : `${detail.name} đã gửi 1 ảnh`
+                    : message.message,
+
                 time: extractTime(message.createdAt),
                 conversation_status: conversation?.status,
               };
@@ -178,11 +192,12 @@ const messageController = {
         .json({ status: "failed", msg: "Internal Server Error" });
     }
   },
-  sendMessage: async (req: Request, res: Response) => {
+  sendMessage: async (req: Request | MulterFileRequest, res: Response) => {
     try {
       let senderId: any = req.headers["userId"] || "";
       const receiverId: string = req.params.id;
       const { message } = req.body;
+
       const salon = await getRepository(Salon).findOne({
         where: { user_id: senderId },
       });
@@ -219,9 +234,16 @@ const messageController = {
         conversation = await conversationRepository.save({
           participants: participants,
           messages: [],
-          createdAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
-          updatedAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
+          //createdAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
+          //updatedAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
         });
+      }
+
+      // Upload image to cloudinary
+      let image = [""];
+      if ("files" in req && req.files) {
+        const arrayImages = req.files;
+        image = arrayImages.map((obj) => obj.path);
       }
 
       // Create new message
@@ -229,9 +251,10 @@ const messageController = {
       const savedMessage = await messageRepository.save({
         senderId: senderId,
         receiverId: receiverId,
-        message: message,
-        createdAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
-        updatedAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
+        message: message || "",
+        image: image,
+        //createdAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
+        //updatedAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
       });
 
       // Add message to conversation
