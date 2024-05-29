@@ -17,10 +17,10 @@ const invoiceController = {
   printInvoiceBuyCar: async (req: Request, res: Response) => {
     const { carId, salonId, note, fullname, email, phone, expense, processId, employeeId } = req.body;
 
-    if (!employeeId) {
+    if (!employeeId || !expense || !phone || !processId || !carId ) {
       return res.json({
         status: "failed",
-        msg: "Employee must be not null."
+        msg: "Input is invalid."
       })
     }
 
