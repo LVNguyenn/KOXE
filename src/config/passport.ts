@@ -54,6 +54,10 @@ passport.use(new GoogleStrategy({
             const { password, ...others } = userDb;
 
             // console.log("Others: ", others);
+            if (userDb?.blocked) {
+                return done("This account is blocked");
+            }
+            
 
             return done(null, others);
         } catch (error: any) {
@@ -90,6 +94,9 @@ passport.use(new FacebookStrategy({
                 return done(null, user);
             }
             const { password, ...others } = userDb;
+            if (userDb?.blocked) {
+                return done("This account is blocked");
+            }
 
             return done(null, others);
         } catch (error: any) {

@@ -10,4 +10,8 @@ router.post("/", middleware.verifyToken, middleware.havePermission("Z-PERMISSION
 // get logs
 router.post("/logs", middleware.verifyToken, middleware.havePermission("Z-PERMISSION-101"), adminController.getLogs);
 
+router.get("/users", middleware.verifyToken, middleware.havePermission("Z-PERMISSION-101"), adminController.getUsers);
+router.post("/create-user", middleware.verifyToken, middleware.havePermission("Z-PERMISSION-101"), adminController.createUser);
+router.delete("/user/:userId", middleware.verifyToken, middleware.havePermission("Z-PERMISSION-101"), adminController.deleteUser);
+
 export default router;

@@ -35,6 +35,10 @@
     <li>Khi lấy bài post theo id sẽ kèm theo phần trăm đánh giá trung bình của hoa tiêu đó kèm theo số giao dịch đã hoàn thành, cung cấp thêm thông tin cho salon dễ ra quyết định kết nối</li>
     <li>[POST] /invoice/get-invoice-buy-car-salon</li>
     Đổi api /invoice/all lúc đầu (dễ nhầm lẫn)
+    <h3>30/05/24</h3>
+    <li>[GET] /admin/users</li>
+    <li>[POST] /admin/create-user</li>
+    <li>[DELETE] /admin/user/:userId</li>
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
     <h2>MỤC LỤC</h2>
@@ -491,10 +495,12 @@
         muốn thay đổi name or method thì có thể hiệu chỉnh. Nếu muốn bỏ bớt 1 method R_key thì không truyền method đó mà chỉ truyền cái khác. Lưu ý không
         được thay đổi key. Key mới sẽ thành 1 tính năng mới.
     </div>
-
-    <li>[POST]: /admin/logs</li>
-    Lấy ra lịch sử hoạt động của salon. Yêu cầu truyền vô salonId, và cần đăng nhập với vai trò là chủ salon. Hiện tại với server đã deploy thì nó không tự sinh
-    ra được. Sẽ có hiệu chỉnh sau.
+    <li>[GET] /admin/users</li>
+    Lấy ra full danh sách user.
+    <li>[POST] /admin/create-user</li>
+    Tạo 1 user mới. Yêu cầu truyền vô: {fullname: option, username, password, role: option}
+    <li>[DELETE] /admin/user/:userId</li>
+    Xóa 1 user nếu user đó có thông tin trống (chưa có dữ liệu gì), sẽ chặn không cho login nếu user đó có dữ liệu rồi.
 
     <h2 id="new">CRAWL NEWS</h2>
     Link trang mà tui crawl: <a href="https://lifestyle.znews.vn/oto-xe-may.html">Zing</a>
@@ -507,7 +513,8 @@
     </div>
 
     <a href="https://crawl-data-pink.vercel.app/">https://crawl-data-pink.vercel.app/</a>
-    
+
+
     <li>[GET] /articles </li>
     <div>Nó lấy ra các bài báo gồm:</div>
     <li>id</li>
@@ -989,6 +996,8 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[GET] /transactions</li>
     Không có search.
     <li>[POST] /salons/user</li>
+    Tìm kiếm theo fullname.
+    <li>[GET] /admin/users</li>
     Tìm kiếm theo fullname.
 </body>
 

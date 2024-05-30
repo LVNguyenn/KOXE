@@ -9,7 +9,11 @@ const UserRepository = {
 
     async getAllUsers() {
         const userRepository = getRepository(User);
-        const rs = await userRepository.find({});
+        const rs = await userRepository.find({
+            select: ["user_id", "fullname", "gender", "phone", "email", "address", 
+            "date_of_birth", "avatar", "role", "role", "avgRating"],
+            where: {blocked: false}
+        });
 
         return FormatData("success", null, rs, 200);
     },
@@ -18,7 +22,7 @@ const UserRepository = {
         const userRepository = getRepository(User);
 
         try {
-            const userDb = await userRepository.find({ where: { user_id: user_id } });
+            const userDb = await userRepository.find({ where: { user_id: user_id, blocked: false } });
 
             if (!userDb) {
                 return FormatData("failed", "User not found", null, 404);
@@ -32,14 +36,14 @@ const UserRepository = {
         }
     },
 
-    async getProfileById (userId: string) {
+    async getProfileById(userId: string) {
         if (!userId)
-            return FormatData("failed", "Invalid information."); 
+            return FormatData("failed", "Invalid information.");
 
         const userRepository = getRepository(User);
 
         try {
-            const userDb = await userRepository.findOneOrFail({ where: { user_id: userId } });
+            const userDb = await userRepository.findOneOrFail({ where: { user_id: userId, blocked: false } });
             const { password, ...others } = userDb;
 
             return FormatData("success", null, others);
@@ -48,11 +52,11 @@ const UserRepository = {
         }
     },
 
-    async getProfileByUsername (username: string) {
+    async getProfileByUsername(username: string) {
         const userRepository = getRepository(User);
 
         try {
-            const userDb = await userRepository.findOneOrFail({ where: { username: username } });
+            const userDb = await userRepository.findOneOrFail({ where: { username: username, blocked: false } });
             const { password, ...others } = userDb;
 
             return FormatData("success", null, others);
@@ -61,22 +65,22 @@ const UserRepository = {
         }
     },
 
-    async updateProfile (userId: string, data: any, avatar: any) {
+    async updateProfile(userId: string, data: any, avatar: any) {
         const userRepository = getRepository(User);
-        
+
         let newProfile: any = data
-        if(avatar !== "") newProfile.avatar = avatar;
-        const {user_id, username, password, google, facebook, role, aso, ...other} = newProfile;
+        if (avatar !== "") newProfile.avatar = avatar;
+        const { user_id, username, password, google, facebook, role, aso, ...other } = newProfile;
 
         try {
-            const userDb = await userRepository.findOneOrFail({where: {user_id: userId}});
+            const userDb = await userRepository.findOneOrFail({ where: { user_id: userId, blocked: false } });
 
-            if(avatar !== "" && userDb.avatar){
-                if(!getFileName(userDb.avatar).includes('default')){
+            if (avatar !== "" && userDb.avatar) {
+                if (!getFileName(userDb.avatar).includes('default')) {
                     cloudinary.uploader.destroy(getFileName(userDb.avatar));
                 }
             }
-            const saveProfile = {...userDb, ...other};
+            const saveProfile = { ...userDb, ...other };
             await userRepository.save(saveProfile);
 
             // set new value for cache
@@ -89,7 +93,7 @@ const UserRepository = {
         }
     },
 
-    async registerUser (data: any) {
+    async registerUser(data: any) {
         try {
             const userRepository = getRepository(User);
             await userRepository.save(data);
@@ -100,11 +104,11 @@ const UserRepository = {
         }
     },
 
-    async getProfileByOther (data: any) {
+    async getProfileByOther(data: any) {
         const userRepository = getRepository(User);
 
         try {
-            const userDb = await userRepository.findOneOrFail({ where: { phone: data?.phone }});
+            const userDb = await userRepository.findOneOrFail({ where: { phone: data?.phone } });
 
             return FormatData("success", null, userDb);
         } catch (error) {
@@ -116,19 +120,38 @@ const UserRepository = {
         try {
             const userRepository = getRepository(User);
             const userDb = await userRepository
-            .createQueryBuilder('user')
-            .innerJoin('user.salonId', 'salon',  'salon.salon_id = :salonId', { ...data })
-            .select(['user.user_id', 'user.fullname', 'user.gender', 'user.phone', 'user.address', 'user.role'])
-            .getMany()
+                .createQueryBuilder('user')
+                .innerJoin('user.salonId', 'salon', 'salon.salon_id = :salonId', { ...data })
+                .select(['user.user_id', 'user.fullname', 'user.gender', 'user.phone', 'user.address', 'user.role'])
+                .getMany()
 
             return FormatData("success", "find successfully!", userDb);
         } catch (error) {
             console.log(error)
             return FormatData("failed", "Invalid information.");
         }
+    },
 
+    async delete(data: any) {
+        try {
+            const userRepository = getRepository(User);
+            const userDb = await userRepository.remove(data);
 
-        
+            return FormatData("success", "deleted successfully!", userDb); 
+        } catch (error) {
+            return FormatData("failed", "Invalid information.");
+        }
+    },
+
+    async blockUser(data: any) {
+        try {
+            const userRepository = getRepository(User);
+            const userDb = await userRepository.save({...data, blocked: true});
+            
+            return FormatData("success", "This user is blocked successfully!", userDb);
+        } catch (error) {
+            return FormatData("failed", "Blocking faiked.");
+        }
     }
 };
 

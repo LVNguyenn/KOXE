@@ -411,6 +411,13 @@ const authController: any = {
         where: { facebook: email },
       });
 
+      if (userFe?.blocked) {
+        return res.json({
+          status: "failed",
+          msg: "This account is blocked.",
+        });
+    }
+
       // console.log("respone: ", response);
 
       if (!userFe) {
@@ -581,7 +588,7 @@ const authController: any = {
       // get user from database
       const userRepository = getRepository(User);
       const userDb = await userRepository.findOne({
-        where: { username: username },
+        where: { blocked: false, username: username },
       });
 
       if (userDb == null) {

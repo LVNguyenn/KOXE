@@ -15,7 +15,7 @@ import { Transaction } from "./Transaction";
 import { Post } from "./Post";
 
 @Entity()
-@Unique(["username"])
+@Unique(["username", "email", "phone"])
 export class User {
   @PrimaryColumn()
   @Length(1, 20)
@@ -95,6 +95,9 @@ export class User {
 
   @Column({ nullable: true, default: 0 })
   completedTransactions!: number;
+
+  @Column({default: false})
+  blocked!: boolean;
 
   init(
     user_id: string,
