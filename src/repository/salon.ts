@@ -1,6 +1,7 @@
 import { IsNull, Like, Not, getRepository } from "typeorm";
 import { FormatData } from '../utils/index';
 import { Salon } from "../entities";
+import UserRepository from "./user";
 
 const SalonRepository = {
 

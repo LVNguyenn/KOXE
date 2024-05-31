@@ -45,10 +45,10 @@ const adminController = {
                 msg: "error with find permissions array."
             })
         }
-    }, 
+    },
 
     updatePermission: async (req: Request, res: Response) => {
-        const {key, name, method} = req.body;
+        const { key, name, method } = req.body;
         const adminRepository = getRepository(User);
 
         if (!key || !name || !method)
@@ -70,12 +70,12 @@ const adminController = {
 
             // delete all method in permission.
             for (let m of ["C", "R", "U", "D"])
-                adminDb.permissions = adminDb.permissions.filter((p) => p!= `${m}_${key}`);
+                adminDb.permissions = adminDb.permissions.filter((p) => p != `${m}_${key}`);
 
             // add new method belong to key permission
             for (let m of method)
                 adminDb.permissions.push(`${m}_${key}`);
-                        
+
             await adminRepository.save(adminDb);
 
             // del old value cache
@@ -86,7 +86,7 @@ const adminController = {
                 msg: "Update permission sucessfully!",
                 permissions: await parsePermission(adminDb.permissions)
             });
-            
+
         } catch (error) {
             return res.json({
                 status: "failed",
@@ -105,20 +105,20 @@ const adminController = {
     getUsers: async (req: Request, res: Response) => {
         let userRp = await UserRepository.getAllUsers();
         const { page, per_page, q }: any = req.query;
-        
-        if (q) {
-            userRp.data = await search({data: userRp?.data, q, fieldname: "fullname"});
-          }
-    
-          const rs = await pagination({data: userRp?.data, page, per_page});
-          userRp.data = rs?.data;
 
-        return res.json({...userRp, total_page: rs?.total_page});
+        if (q) {
+            userRp.data = await search({ data: userRp?.data, q, fieldname: "fullname" });
+        }
+
+        const rs = await pagination({ data: userRp?.data, page, per_page });
+        userRp.data = rs?.data;
+
+        return res.json({ ...userRp, total_page: rs?.total_page });
     },
 
     createUser: async (req: Request, res: Response) => {
-        const {fullname, role, username, password} = req.body;
-        
+        const { fullname, role, username, password } = req.body;
+
         if (!username || !password) {
             return res.json({
                 status: "failed",
@@ -139,13 +139,13 @@ const adminController = {
         user.user_id = await uuidv4();
         const salt = await bcrypt.genSalt(11);
         const hashPassword = await bcrypt.hash(password, salt);
-        const userRs = await UserRepository.registerUser({...user, username, password: hashPassword, fullname, role});
-        
-        return res.json({...userRs});
+        const userRs = await UserRepository.registerUser({ ...user, username, password: hashPassword, fullname, role });
+
+        return res.json({ ...userRs });
     },
 
     deleteUser: async (req: Request, res: Response) => {
-        const {userId} = req.params;
+        const { userId } = req.params;
 
         if (!userId) {
             return res.json({
@@ -167,27 +167,27 @@ const adminController = {
             // block this user => can not login.
             userRs = await UserRepository.blockUser(userRp?.data)
         }
-        
 
-        return res.json({...userRs});
+
+        return res.json({ ...userRs });
     },
 
     getAllSalon: async (req: Request, res: Response) => {
         let salonRp = await SalonRepository.getAllSalon({});
         const { page, per_page, q }: any = req.query;
-        
-        if (q) {
-            salonRp.data = await search({data: salonRp?.data, q, fieldname: "name"});
-          }
-    
-          const rs = await pagination({data: salonRp?.data, page, per_page});
-          salonRp.data = rs?.data;
 
-        return res.json({...salonRp, total_page: rs?.total_page});
+        if (q) {
+            salonRp.data = await search({ data: salonRp?.data, q, fieldname: "name" });
+        }
+
+        const rs = await pagination({ data: salonRp?.data, page, per_page });
+        salonRp.data = rs?.data;
+
+        return res.json({ ...salonRp, total_page: rs?.total_page });
     },
 
     deleteSalon: async (req: Request, res: Response) => {
-        const {salonId} = req.params;
+        const { salonId } = req.params;
 
         if (!salonId) {
             return res.json({
@@ -195,14 +195,25 @@ const adminController = {
                 msg: "Missing salonId"
             })
         }
-        const salonRp = await SalonRepository.findSalonById({salonId});        
+        const salonRp = await SalonRepository.findSalonById({ salonId });
+
         let salonRs = await SalonRepository.delete(salonRp?.data);
         if (!salonRs?.data) {
             // block this user => can not login.
             salonRs = await SalonRepository.removeAndBlock(salonRp?.data)
         }
 
-        return res.json({...salonRs});
+        // set permission for owner of salon is null
+        const userRp = await UserRepository.getProfileById(salonRp?.data?.user_id);
+        if (!userRp?.data) {
+            return res.json({
+                status: "success",
+                msg: "Blocked the salon successfully, please check owner of salon again."
+            })
+        }
+        await UserRepository.setPermissionNull(userRp?.data);
+
+        return res.json({ ...salonRs });
     },
 
 }

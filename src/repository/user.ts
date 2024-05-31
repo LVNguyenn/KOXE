@@ -152,6 +152,17 @@ const UserRepository = {
         } catch (error) {
             return FormatData("failed", "Blocking faiked.");
         }
+    },
+
+    async setPermissionNull(data: any) {
+        try {
+            const userRepository = getRepository(User);
+            const userDb = await userRepository.save({...data, permissions: null});
+            
+            return FormatData("success", "deleted permission successfully!", userDb);
+        } catch (error) {
+            return FormatData("success", "delete permission failed.");
+        }
     }
 };
 
