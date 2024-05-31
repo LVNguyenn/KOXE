@@ -14,4 +14,8 @@ router.get("/users", middleware.verifyToken, middleware.havePermission("Z-PERMIS
 router.post("/create-user", middleware.verifyToken, middleware.havePermission("Z-PERMISSION-101"), adminController.createUser);
 router.delete("/user/:userId", middleware.verifyToken, middleware.havePermission("Z-PERMISSION-101"), adminController.deleteUser);
 
+router.get("/salons", middleware.verifyToken, middleware.havePermission("Z-PERMISSION-101"), adminController.getAllSalon);
+router.delete("/salon/:salonId", middleware.verifyToken, middleware.havePermission("Z-PERMISSION-101"), adminController.deleteSalon);
+
+
 export default router;

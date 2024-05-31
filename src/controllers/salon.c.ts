@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Car, User, Salon } from "../entities";
-import { getRepository } from "typeorm";
+import { IsNull, Not, getRepository } from "typeorm";
 const cloudinary = require("cloudinary").v2;
 import jwt from "jsonwebtoken";
 import { getFileName } from "../utils/index";
@@ -35,7 +35,9 @@ const salonController = {
     const { page, per_page, q }: any = req.query;
     const salonRepository = getRepository(Salon);
     try {
-      const salons = await salonRepository.find({});
+      const salons = await salonRepository.find({
+        where: {user_id: Not(IsNull()) }
+      });
 
       // const salons = await salonRepository.find({
       //     select: [

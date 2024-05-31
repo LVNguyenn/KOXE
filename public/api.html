@@ -510,7 +510,10 @@
     Tạo 1 user mới. Yêu cầu truyền vô: {fullname: option, username, password, role: option}
     <li>[DELETE] /admin/user/:userId</li>
     Xóa 1 user nếu user đó có thông tin trống (chưa có dữ liệu gì), sẽ chặn không cho login nếu user đó có dữ liệu rồi.
-
+    <li>[GET] /admin/salons</li>
+    Lấy ra full danh sách salon.
+    <li>[DELETE] /admin/salon/:salonId</li>
+    Xóa 1 salon nếu user đó có thông tin trống (chưa có dữ liệu gì), sẽ chặn salond đó và giải tán nhân viên nếu salon đó có dữ liệu rồi.
     <h2 id="new">CRAWL NEWS</h2>
     Link trang mà tui crawl: <a href="https://lifestyle.znews.vn/oto-xe-may.html">Zing</a>
     (Tui cào dữ liệu ở phần tin mới)

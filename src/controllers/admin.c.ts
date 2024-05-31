@@ -7,6 +7,7 @@ import UserRepository from '../repository/user';
 import search from '../helper/search';
 import pagination from '../helper/pagination';
 import bcrypt from "bcrypt";
+import SalonRepository from '../repository/salon';
 const { v4: uuidv4 } = require("uuid");
 // import Cache from '../config/node-cache';
 
@@ -169,7 +170,41 @@ const adminController = {
         
 
         return res.json({...userRs});
-    }
+    },
+
+    getAllSalon: async (req: Request, res: Response) => {
+        let salonRp = await SalonRepository.getAllSalon({});
+        const { page, per_page, q }: any = req.query;
+        
+        if (q) {
+            salonRp.data = await search({data: salonRp?.data, q, fieldname: "name"});
+          }
+    
+          const rs = await pagination({data: salonRp?.data, page, per_page});
+          salonRp.data = rs?.data;
+
+        return res.json({...salonRp, total_page: rs?.total_page});
+    },
+
+    deleteSalon: async (req: Request, res: Response) => {
+        const {salonId} = req.params;
+
+        if (!salonId) {
+            return res.json({
+                status: "failed",
+                msg: "Missing salonId"
+            })
+        }
+        const salonRp = await SalonRepository.findSalonById({salonId});        
+        let salonRs = await SalonRepository.delete(salonRp?.data);
+        if (!salonRs?.data) {
+            // block this user => can not login.
+            salonRs = await SalonRepository.removeAndBlock(salonRp?.data)
+        }
+
+        return res.json({...salonRs});
+    },
+
 }
 
 export default adminController;
