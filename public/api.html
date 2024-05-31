@@ -38,15 +38,15 @@
     <li>[POST] /invoice/get-invoice-buy-car-salon</li>
     Đổi api /invoice/all lúc đầu (dễ nhầm lẫn)
     
-    <h3>30/05/24</h3>
+    <h3>Từ ngày 30/05/24 - Đến 3/6/24</h3>
     <li>[GET] /admin/users</li>
     <li>[POST] /admin/create-user</li>
     <li>[DELETE] /admin/user/:userId</li>
-
-    <h3>31/05/24</h3>
     <li>[GET] /invoice/get-invoice-maintenance</li>
     Đổi api /invoice lúc đầu (dễ nhầm lẫn)
     <li>Hóa đơn mua phụ tùng</li>
+    <li>[GET] /admin/salons</li>
+    <li>[DELETE] /admin/salon/:salonId</li>
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
     <h2>MỤC LỤC</h2>
@@ -514,6 +514,7 @@
     Lấy ra full danh sách salon.
     <li>[DELETE] /admin/salon/:salonId</li>
     Xóa 1 salon nếu user đó có thông tin trống (chưa có dữ liệu gì), sẽ chặn salond đó và giải tán nhân viên nếu salon đó có dữ liệu rồi.
+
     <h2 id="new">CRAWL NEWS</h2>
     Link trang mà tui crawl: <a href="https://lifestyle.znews.vn/oto-xe-may.html">Zing</a>
     (Tui cào dữ liệu ở phần tin mới)
@@ -1011,7 +1012,8 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Tìm kiếm theo fullname.
     <li>[GET] /admin/users</li>
     Tìm kiếm theo fullname.
-
+    <li>[GET] /admin/salons</li>
+    Tìm kiếm theo name.
     <h2 id="buy-accessory">Hóa đơn mua phụ tùng</h2>
     <li>[GET] /buy-accessory</li>
     Nó sẽ lấy ra được thông tin tất cả các hóa mua phụ tùng (thông tin khách hàng, các phụ tùng đã mua) tại salon mình (Đối với chủ salon)
