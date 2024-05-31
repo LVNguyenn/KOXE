@@ -24,6 +24,7 @@ import transactionRouter from "./transaction.r";
 import processRouter from "./procedure.r";
 import stageRouter from "./stage.r";
 import blockedUserRouter from "./blockedUser.r";
+import aInvoiceRouter from "./aInvoice.r";
 
 function router(app: Express) {
   app.use("/auth", authRouter);
@@ -51,6 +52,7 @@ function router(app: Express) {
   app.use("/process", processRouter);
   app.use("/stages", stageRouter);
   app.use("/block-user", blockedUserRouter);
+  app.use("/buy-accessory", aInvoiceRouter);
 }
 
 export default router;

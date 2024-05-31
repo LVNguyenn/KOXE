@@ -114,9 +114,14 @@ const transactionController = {
       // }
 
       // search and pagination
-      // if (q) {
-      //   formatTransactions = await search({ data: formatTransactions, q, fieldname: "name" })
-      // }
+      if (q) {
+        formatTransactions = await search({
+          data: formatTransactions,
+          q,
+          fieldname: "user",
+          fieldname2: "name",
+        });
+      }
 
       const rs = await pagination({ data: formatTransactions, page, per_page });
 

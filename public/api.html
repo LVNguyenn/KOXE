@@ -24,6 +24,8 @@
     <h1>API SERVER</h1>
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
     <h2>Các API mới thêm vô</h2>
+    <li>Hóa đơn mua phụ tùng</li>
+
     <li>Nhắn tin có hình ảnh</li>
 
     <li>[POST] /salons/employees</li>
@@ -35,10 +37,16 @@
     <li>Khi lấy bài post theo id sẽ kèm theo phần trăm đánh giá trung bình của hoa tiêu đó kèm theo số giao dịch đã hoàn thành, cung cấp thêm thông tin cho salon dễ ra quyết định kết nối</li>
     <li>[POST] /invoice/get-invoice-buy-car-salon</li>
     Đổi api /invoice/all lúc đầu (dễ nhầm lẫn)
+    
     <h3>30/05/24</h3>
     <li>[GET] /admin/users</li>
     <li>[POST] /admin/create-user</li>
     <li>[DELETE] /admin/user/:userId</li>
+
+    <h3>31/05/24</h3>
+    <li>[GET] /invoice/get-invoice-maintenance</li>
+    Đổi api /invoice lúc đầu (dễ nhầm lẫn)
+    <li>Hóa đơn mua phụ tùng</li>
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
     <h2>MỤC LỤC</h2>
@@ -60,7 +68,7 @@
     <li><a href="#new" class="fsl">Tin Tức</a></li>
     <li><a href="#warranty" class="fsl">Bảo Hành</a></li>
     <li><a href="#invoice" class="fsl">Hóa Đơn Bảo Hành</a></li>
-    <li><a href="#minvoice" class="fsl">Hóa Đơn Bảo Dưỡng</a></li>
+    <li><a href="#mInvoice" class="fsl">Hóa Đơn Bảo Dưỡng</a></li>
     <li><a href="#maintenance" class="fsl">Bảo Dưỡng</a></li>
     <li><a href="#accessory" class="fsl">Phụ Tùng</a></li>
     <li><a href="#statistical" class="fsl">Thống Kê Doanh Thu</a></li>
@@ -71,7 +79,8 @@
     <li><a href="#block" class="fsl">Chặn Hoa Tiêu</a></li>
     <li><a href="#connection" class="fsl">Kết Nối</a></li>
     <li><a href="#commission" class="fsl">Ghi Nhận Hoa Hồng</a></li>
-    <li><a href="#pagination" class="fsl">Phân trang</a></li>
+    <li><a href="#pagination" class="fsl">Phân Trang</a></li>
+    <li><a href="#buy-accessory" class="fsl">Hóa Đơn Mua Phụ Tùng</a></li>
 
     <h3>Chú ý: Với các hành động liên quan đến quản lý salon như thêm nhân viên, thêm xe,... của salon - các hành động cần quyền
         thì mới có thể làm được với salon thì cần gửi đi salonId. Vì cần thông tin này thì mới xác định được chính xác người đó có quyền gì.
@@ -631,8 +640,8 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li class="hot">[PATCH] /invoice/tick-done</li>
         Dùng để tick là hóa đơn đó đã hoàn thành tất cả qui trình cho khách hàng rồi. Cần truyền vô: {salonId, invoiceId}
 
-    <h3 id="minvoice">Hóa đơn bảo dưỡng</h3>
-    <li>[GET] /invoice</li>
+    <h3 id="mInvoice">Hóa đơn bảo dưỡng</h3>
+    <li>[GET] /invoice/get-invoice-maintenance</li>
     Nó sẽ lấy ra được thông tin tất cả các hóa đơn bảo dưỡng (xe gì, ai làm và những dịch vụ đã thực hiện, những phụ tùng đã dùng để sửa chữa) tại salon mình (Đối với chủ salon)
     <div>
         Còn nếu là khách hàng muốn xem lịch sử thì nó sẽ lấy được theo số điện thoại trên hóa đơn và số điện thoại của nó trong ứng dụng (Có gì tụi ông nhớ cập nhật số điện thoại của chính nó thì mới lấy được lịch sử nha)
@@ -907,7 +916,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[POST] /connections</li>
     Sẽ tạo ra kết nối giữa salon và thằng đăng bài. Cần truyền vào postId và processId(này dùng để cho thằng đăng xem được các bước và phần trăm hoa hồng giúp nó có chấp nhận hay không).
     Lúc này sẽ có thông báo đến thằng user(trong data có connection_id để link tới, type = "connection").
-    Nếu như có kết nối rồi mà tạo nữa thì nó sẽ báo lỗi, tui có trả về connection_id đã tạo trước đó
+    <b>Nếu như có kết nối rồi mà tạo nữa thì nó sẽ báo lỗi, tui có trả về connection_id đã tạo trước đó</b>
     <li>[GET] /connections</li>
     Nếu nó là user thường (người đăng) thì nó sẽ lấy ra được các kết nối giữa nó và các salon.
     Nếu nó là chủ salon thì nó sẽ lấy ra được các kết nối giữa salon của nó và thông tin những người đăng
@@ -965,7 +974,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Tìm kiếm theo fullname. Nếu muốn đổi qua phone thì nói ha.
     <li>[GET] /accessory/salon/:salonId</li>
     Tìm kiếm theo name.
-    <li>[GET] /cars/salon/:salonId</li>
+    <li>[GET] /cars</li>
     Tìm kiếm theo name.
     <li>[GET] /cars/brand/:brand/salon/:salon_id</li>
     Tìm kiếm theo name.
@@ -982,7 +991,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[GET] /packages</li>
     Tìm kiếm theo name.
     <li>[GET] /posts/feed</li>
-    Không có search.
+    Tìm kiếm theo name(tên người đăng).
     <li>[GET] /process</li>
     Tìm kiếm theo name.
     <li>[GET] /salons</li>
@@ -990,15 +999,50 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[POST] /warranty</li>
     Tìm kiếm theo name.
     <li>[GET] /maintenance/salon/:salonId</li>
-    Tìm kiếm theo name
+    Tìm kiếm theo name.
     <li>[POST] /salons/employees</li>
     Tìm kiếm theo fullname.
     <li>[GET] /transactions</li>
-    Không có search.
+    Tìm kiếm theo name(hoa tiêu).
     <li>[POST] /salons/user</li>
     Tìm kiếm theo fullname.
     <li>[GET] /admin/users</li>
     Tìm kiếm theo fullname.
+
+    <h2 id="buy-accessory">Hóa đơn mua phụ tùng</h2>
+    <li>[GET] /buy-accessory</li>
+    Nó sẽ lấy ra được thông tin tất cả các hóa mua phụ tùng (thông tin khách hàng, các phụ tùng đã mua) tại salon mình (Đối với chủ salon)
+    <div>
+        Còn nếu là khách hàng muốn xem lịch sử thì nó sẽ lấy được theo số điện thoại trên hóa đơn và số điện thoại của nó trong ứng dụng (Có gì tụi ông nhớ cập nhật số điện thoại của chính nó thì mới lấy được lịch sử nha)
+    </div>
+    <li>[GET] /buy-accessory:/id</li>
+    Lấy ra thông tin chi tiết của hóa đơn MUA PHỤ TÙNG
+    <li>[POST] /buy-accessory</li>
+    Tạo hóa đơn mua phụ tùng mới. Các trường cần truyền vào ví dụ như sau:
+    <pre>
+    {
+        "accessories": [
+            { "accessory_id": "28ce64c6-a650-4234-844f-6f5e4fcdb836" }
+        ],
+        "note": "Buy accessory",
+        "fullname": "Nguyen",
+        "email": "nguyen123@gmail.com",
+        "phone": "0966841272"
+    }
+    </pre>
+    Nếu không truyền quantity vào thì mặc định nó sẽ là 1
+    <li>[PATCH] /buy-accessory/:id</li>
+    Dùng để cập nhật hóa đơn mua phụ tùng. Có thể cập nhật { accessories, note, fullname, email, phone}. Muốn cập nhật trường nào thì truyền vào trường đó. Ví dụ:
+    <pre>
+    {
+        "accessories": [
+            { "accessory_id": "33710672-78e9-4158-84d5-569552bd64b3", "quantity": 2 },
+            { "accessory_id": "34b4bbec-aa1c-4ad0-98e6-6263d14a1ceb", "quantity": 2 }
+        ]
+    }
+    </pre>
+    <li>[DELETE] /buy-accessory/:id</li>
+    Xóa hóa đơn bảo dưỡng
 </body>
 
 </html>

@@ -6,7 +6,7 @@ import middlewareController from "../middleware/middleware";
 const router = Router();
 
 router.get(
-  "/",
+  "/get-invoice-maintenance",
   middlewareController.verifyToken,
   mInvoiceController.getAllMaintenanceInvoices
 );
@@ -25,16 +25,45 @@ router.post(
 router.patch("/:id", mInvoiceController.updateMaintenanceInvoices);
 router.delete("/:id", mInvoiceController.deleteMaintenanceInvoices);
 
-router.post("/create-invoice", middlewareController.verifyToken, middlewareController.havePermission("C_IV"), invoiceController.printInvoiceBuyCar);
-router.post("/lookup", middlewareController.verifyToken, middlewareController.havePermission("R_IV"), invoiceController.lookupInvoiceByInvoiceId);
-router.post("/get-invoice-buy-car-salon", middlewareController.verifyToken, middlewareController.havePermission("R_IV"), invoiceController.getAllInvoiceOfSalon);
+router.post(
+  "/create-invoice",
+  middlewareController.verifyToken,
+  middlewareController.havePermission("C_IV"),
+  invoiceController.printInvoiceBuyCar
+);
+router.post(
+  "/lookup",
+  middlewareController.verifyToken,
+  middlewareController.havePermission("R_IV"),
+  invoiceController.lookupInvoiceByInvoiceId
+);
+router.post(
+  "/get-invoice-buy-car-salon",
+  middlewareController.verifyToken,
+  middlewareController.havePermission("R_IV"),
+  invoiceController.getAllInvoiceOfSalon
+);
 
-router.post("/statistics", middlewareController.verifyToken, middlewareController.havePermission("R_IV"), invoiceController.revenueStatistics);
+router.post(
+  "/statistics",
+  middlewareController.verifyToken,
+  middlewareController.havePermission("R_IV"),
+  invoiceController.revenueStatistics
+);
 router.post("/get-top", invoiceController.getTopThingBestSeller);
-router.post("/get-invoice-buy-car", middlewareController.verifyToken, invoiceController.getInvoiceByPhone);
+router.post(
+  "/get-invoice-buy-car",
+  middlewareController.verifyToken,
+  invoiceController.getInvoiceByPhone
+);
 router.post("/remove", invoiceController.removeInvoice);
 
 // admin
-router.post("/statistics-admin", middlewareController.verifyToken, middlewareController.isAdminTeam, invoiceController.revenueStatisticsAdmin);
+router.post(
+  "/statistics-admin",
+  middlewareController.verifyToken,
+  middlewareController.isAdminTeam,
+  invoiceController.revenueStatisticsAdmin
+);
 
 export default router;

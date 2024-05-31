@@ -71,11 +71,10 @@ const connectionController = {
 
       const rs = await pagination({ data: formatConnection, page, per_page });
 
-
       return res.status(200).json({
         status: "success",
         connections: rs?.data,
-        total_page: rs?.total_page
+        total_page: rs?.total_page,
       });
     } catch (error) {
       return res

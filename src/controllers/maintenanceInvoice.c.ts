@@ -84,16 +84,23 @@ const maintainController = {
 
       // search and pagination
       if (q) {
-        mInvoicesWithServices = await search({ data: mInvoicesWithServices, q, fieldname: "fullname" })
+        mInvoicesWithServices = await search({
+          data: mInvoicesWithServices,
+          q,
+          fieldname: "fullname",
+        });
       }
 
-      const rs = await pagination({ data: mInvoicesWithServices, page, per_page });
-
+      const rs = await pagination({
+        data: mInvoicesWithServices,
+        page,
+        per_page,
+      });
 
       return res.status(200).json({
         status: "success",
         invoices: rs?.data,
-        total_page: rs?.total_page
+        total_page: rs?.total_page,
       });
     } catch (error) {
       console.log(error);
@@ -221,13 +228,16 @@ const maintainController = {
       //   mInvoicesWithServices = await search({ data: mInvoicesWithServices, q, fieldname: "name" })
       // }
 
-      const rs = await pagination({ data: mInvoicesWithServices, page, per_page });
-
+      const rs = await pagination({
+        data: mInvoicesWithServices,
+        page,
+        per_page,
+      });
 
       return res.status(200).json({
         status: "success",
         invoices: rs?.data,
-        total_page: rs?.total_page
+        total_page: rs?.total_page,
       });
     } catch (error) {
       console.log(error);

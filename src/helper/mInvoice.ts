@@ -389,3 +389,127 @@ export const formatMaintenanceInvoiceList = (
 
   return formattedInvoices;
 };
+
+//---------------------------------------------------------------------------------
+
+export const getAccessoryInvoiceListBySalonId = async (salonId: string) => {
+  try {
+    const aInvoicesRepository = getRepository(Invoice);
+    const aInvoices = await aInvoicesRepository.find({
+      where: { type: "buy accessory", seller: { salon_id: salonId } },
+      relations: ["seller"],
+    });
+
+    return aInvoices;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getAccessoryInvoiceListByPhone = async (phone: string) => {
+  try {
+    const aInvoicesRepository = getRepository(Invoice);
+    const aInvoices = await aInvoicesRepository.find({
+      where: { type: "buy accessory", phone: phone },
+      relations: ["seller"],
+    });
+
+    return aInvoices;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getAccessoryInvoice = async (invoiceId: string) => {
+  try {
+    const aInvoicesRepository = getRepository(Invoice);
+    const aInvoice = await aInvoicesRepository.findOne({
+      where: { invoice_id: invoiceId, type: "buy accessory" },
+      relations: ["seller"],
+    });
+    return aInvoice;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const formatAccessoryInvoice = (
+  aInvoice: Invoice,
+  aServices: Accessory[],
+  aInvoiceDetails: AInvoiceDetail[]
+) => {
+  const aDetailedServices = aServices.map((service) => {
+    const invoiceDetail = aInvoiceDetails.find(
+      (detail) => detail.accessory_id === service.accessory_id
+    );
+    if (invoiceDetail) {
+      return {
+        name: service.name,
+        price: invoiceDetail.price,
+        quantity: invoiceDetail.quantity,
+      };
+    }
+  });
+
+  const formattedInvoice = {
+    invoice_id: aInvoice.invoice_id,
+    fullname: aInvoice.fullname,
+    email: aInvoice.email,
+    phone: aInvoice.phone,
+    invoiceDate: formatDate(aInvoice.create_at),
+    total: aInvoice.expense,
+    salon: {
+      salon_id: aInvoice.seller.salon_id,
+      name: aInvoice.seller.name,
+    },
+    note: aInvoice.note,
+    accessories: aDetailedServices,
+  };
+
+  return formattedInvoice;
+};
+
+export const formatAccessoryInvoiceList = (
+  aInvoices: Invoice[],
+  aServices: Accessory[],
+  aInvoiceDetails: AInvoiceDetail[]
+) => {
+  const formattedInvoices = aInvoices.map((invoice) => {
+    let aDetailedServices: any = [];
+    if (invoice.accessories && invoice.accessories.length !== 0) {
+      aDetailedServices = invoice.accessories.map((code) => {
+        const service = aServices.find((s) => s.accessory_id === code);
+        const invoiceDetail = aInvoiceDetails.find(
+          (detail) =>
+            detail.invoice_id === invoice.invoice_id &&
+            detail.accessory_id === code
+        );
+
+        if (service && invoiceDetail) {
+          return {
+            name: service.name,
+            price: invoiceDetail.price,
+            quantity: invoiceDetail.quantity,
+          };
+        }
+      });
+    }
+
+    return {
+      invoice_id: invoice.invoice_id,
+      salon: {
+        salon_id: invoice.seller.salon_id,
+        salon_name: invoice.seller.name,
+      },
+      fullname: invoice.fullname,
+      email: invoice.email,
+      phone: invoice.phone,
+      invoiceDate: formatDate(invoice.create_at),
+      total: invoice.expense,
+      note: invoice.note,
+      accessories: aDetailedServices,
+    };
+  });
+
+  return formattedInvoices;
+};

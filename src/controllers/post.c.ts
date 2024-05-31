@@ -233,7 +233,12 @@ const postController = {
 
       // search and pagination
       if (q) {
-        formatPosts.posts = await search({ data: formatPosts?.posts, q, fieldname: "name" })
+        formatPosts.posts = await search({
+          data: formatPosts?.posts,
+          q,
+          fieldname: "postedBy",
+          fieldname2: "fullname",
+        });
       }
 
       const rs = await pagination({ data: formatPosts?.posts, page, per_page });
@@ -242,7 +247,7 @@ const postController = {
       res.status(200).json({
         status: "success",
         posts: formatPosts,
-        total_page: rs?.total_page
+        total_page: rs?.total_page,
       });
     } catch (error) {
       console.error("Error retrieving salon posts:", error);
