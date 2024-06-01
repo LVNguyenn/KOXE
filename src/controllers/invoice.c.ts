@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Car } from "../entities/Car";
 import { MoreThan, getRepository } from "typeorm";
-import { Invoice, Salon, User } from '../entities';
+import { Invoice, Purchase, Salon, User } from '../entities';
 import statistics, { averageEachMonth, getTopSeller } from '../helper/statistics';
 import Year from "../utils/year";
 import legalsController from "./legals.c";
@@ -11,6 +11,7 @@ import createNotification from "../helper/createNotification";
 import UserRepository from "../repository/user";
 import pagination from "../helper/pagination";
 import search from "../helper/search";
+import PurchaseRepository from "../repository/purchase";
 
 
 const invoiceController = {
@@ -208,6 +209,7 @@ const invoiceController = {
     let year = new Year().months;
     try {
       const purchaseDb: any = await statistics({ salonId: "", type: "package", fromDate, year });
+      const getTopPackage = await PurchaseRepository.getAllPurchase({});
 
       const avg = averageEachMonth(year)
 
@@ -215,7 +217,8 @@ const invoiceController = {
         status: "success",
         purchases: purchaseDb,
         months: year,
-        avg
+        avg,
+        topPackages: getTopPackage?.data
       })
     } catch (error) {
       return res.json({
