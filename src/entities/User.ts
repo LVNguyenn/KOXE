@@ -13,6 +13,7 @@ import { Salon } from "./Salon";
 import { Connection } from "./Connection";
 import { Transaction } from "./Transaction";
 import { Post } from "./Post";
+import { GroupSalon } from "./GroupSalon";
 
 @Entity()
 @Unique(["username", "email", "phone"])
@@ -96,8 +97,11 @@ export class User {
   @Column({ nullable: true, default: 0 })
   completedTransactions!: number;
 
-  @Column({default: false})
+  @Column({ default: false })
   blocked!: boolean;
+
+  @OneToMany(() => GroupSalon, (groupSalon) => groupSalon.user)
+  groupSalons!: GroupSalon[];
 
   init(
     user_id: string,

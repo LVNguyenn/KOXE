@@ -25,6 +25,8 @@ import processRouter from "./procedure.r";
 import stageRouter from "./stage.r";
 import blockedUserRouter from "./blockedUser.r";
 import aInvoiceRouter from "./aInvoice.r";
+import promotionRouter from "./promotion.r";
+import groupRouter from "./groupSalon.r";
 
 function router(app: Express) {
   app.use("/auth", authRouter);
@@ -53,6 +55,8 @@ function router(app: Express) {
   app.use("/stages", stageRouter);
   app.use("/block-user", blockedUserRouter);
   app.use("/buy-accessory", aInvoiceRouter);
+  app.use("/promotions", promotionRouter);
+  app.use("/group/salon", groupRouter);
 }
 
 export default router;

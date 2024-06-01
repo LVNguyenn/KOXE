@@ -24,15 +24,13 @@
     <h1>API SERVER</h1>
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
     <h2>Các API mới thêm vô</h2>
+    
+    <h3>Từ ngày 23/05/24 - Đến 30/5/24</h3>
     <li>Hóa đơn mua phụ tùng</li>
-
     <li>Nhắn tin có hình ảnh</li>
-
     <li>[POST] /salons/employees</li>
     <li>[POST] /invoice/create-invoice</li>
-    
     <li>Phân trang, search</li>
-    
     <li>Thêm thông báo lúc salon next qua giai đoạn tiếp theo và khi hoàn tất quy trình thì cũng sẽ có thông báo cho hoa tiêu</li>
     <li>Khi lấy bài post theo id sẽ kèm theo phần trăm đánh giá trung bình của hoa tiêu đó kèm theo số giao dịch đã hoàn thành, cung cấp thêm thông tin cho salon dễ ra quyết định kết nối</li>
     <li>[POST] /invoice/get-invoice-buy-car-salon</li>
@@ -48,6 +46,8 @@
     <li>[GET] /admin/salons</li>
     <li>[DELETE] /admin/salon/:salonId</li>
     <li>[POST] /invoice/statistics-admin</li>
+    <li>Đăng tin khuyến mãi</li>
+    <li>Tạo group Salon</li>
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
     <h2>MỤC LỤC</h2>
@@ -82,6 +82,8 @@
     <li><a href="#commission" class="fsl">Ghi Nhận Hoa Hồng</a></li>
     <li><a href="#pagination" class="fsl">Phân Trang</a></li>
     <li><a href="#buy-accessory" class="fsl">Hóa Đơn Mua Phụ Tùng</a></li>
+    <li><a href="#promotion" class="fsl">Đăng Tin Khuyến Mãi</a></li>
+    <li><a href="#group" class="fsl">Tạo Group Salon</a></li>
 
     <h3>Chú ý: Với các hành động liên quan đến quản lý salon như thêm nhân viên, thêm xe,... của salon - các hành động cần quyền
         thì mới có thể làm được với salon thì cần gửi đi salonId. Vì cần thông tin này thì mới xác định được chính xác người đó có quyền gì.
@@ -1054,7 +1056,37 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     }
     </pre>
     <li>[DELETE] /buy-accessory/:id</li>
-    Xóa hóa đơn bảo dưỡng
+    Xóa hóa đơn mua phụ tùng
+
+    <h2 id="promotion">Đăng tin khuyến mãi</h2>
+    (Bao gồm các trường: promotion_id, title, description, content, startDate, endDate, banner(array tối đa 5 ảnh), createdAt, updatedAt, salonId )
+    <li>[GET] /promotions</li>
+    Lấy được hết tất cả các thông tin khuyến mãi (id, title, description, thumbnail(banner[0]), createdAt, salon)
+    <li>[GET] /promotions/salon/:salonId</li>
+    Lấy được hết tất cả các thông tin khuyến mãi tại 1 salon
+    <li>[GET] /promotions/:id</li>
+    Lấy được chi tiết thông tin khuyến mãi
+    <li>[POST] /promotions</li>
+    Thêm một thông tin khuyến mãi mới. Các fields truyền vào bao gồm: title, description, content, startDate, endDate, banner(array tối đa 5 ảnh)
+    <b>Truyền theo form-data</b>
+    <li>[PATCH] /promotions/:id</li>
+    Sửa một tính năng khi biết id. Các fields có thể sửa: title, description, content, startDate, endDate, banner. Thích sửa nào thì truyền cái đó
+    <li>[DELETE] /promotions/:id</li>
+    Xóa thông tin khuyến mãi khi biết id
+
+    <h2 id="group">Tạo group salon (khi gửi yêu cầu bán xe)</h2>
+    (Bao gồm các trường: group_id, name, salons(mảng id các salon), userId(người tạo) )
+    <li>[GET] /group/salon</li>
+    Lấy được hết tất cả các group salon mà user đã tạo ra (tên nhóm, tên các salon)
+    <li>[POST] /group/salon</li>
+    Thêm nhóm salon mới. Các fields truyền vào bao gồm: name, salons. Ví dụ:
+    <pre>
+        {
+            "name": "Salon HCM",
+            "salons": ["e03942f6-1fc0-4864-9a70-647a070160d7", "c8049683-0d41-4561-8c82-d61c6e2fea8f"]
+        }
+    </pre>
+
 </body>
 
 </html>

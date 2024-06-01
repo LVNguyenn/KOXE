@@ -26,6 +26,8 @@ import {
   Car_User_Legals,
   Stage,
   CommissionDetails,
+  Promotion,
+  GroupSalon,
 } from "../entities";
 import { DataSourceOptions } from "typeorm";
 
@@ -66,6 +68,8 @@ export const connectionString: DataSourceOptions = {
     Car_User_Legals,
     Stage,
     CommissionDetails,
+    Promotion,
+    GroupSalon,
   ],
   synchronize: true,
   ssl: {

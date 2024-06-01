@@ -24,3 +24,5 @@ export * from "./Process";
 export * from "./Car_User_Legals";
 export * from "./Stage";
 export * from "./CommissionDetails";
+export * from "./Promotion";
+export * from "./GroupSalon";

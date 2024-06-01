@@ -29,13 +29,14 @@ const accessoryController = {
   getAccessoryBySalonId: async (req: Request, res: Response) => {
     const accessoryRepository = getRepository(Accessory);
     const { salonId } = req.params;
-    const {page, per_page, q}: any = req.query;
+    const { page, per_page, q }: any = req.query;
 
     try {
       let accessory = await accessoryRepository.find({
         where: { salon: { salon_id: salonId } },
       });
-      if (!accessory) {
+
+      if (accessory.length === 0) {
         return res.status(404).json({
           status: "failed",
           msg: `No accessory found for salonId: ${salonId}`,
@@ -44,16 +45,15 @@ const accessoryController = {
 
       // search and pagination
       if (q) {
-        accessory = await search({data: accessory, q, fieldname: "name"})
+        accessory = await search({ data: accessory, q, fieldname: "name" });
       }
 
-      const rs = await pagination({data: accessory, page, per_page});
-
+      const rs = await pagination({ data: accessory, page, per_page });
 
       return res.status(200).json({
         status: "success",
-        accessory:  rs?.data,
-        total_page: rs?.total_page
+        accessory: rs?.data,
+        total_page: rs?.total_page,
       });
     } catch (error) {
       return res

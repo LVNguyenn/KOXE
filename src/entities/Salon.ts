@@ -17,6 +17,7 @@ import { Connection } from "./Connection";
 import { Transaction } from "./Transaction";
 import { Process } from "./Process";
 import { Stage } from "./Stage";
+import { Promotion } from "./Promotion";
 
 @Entity()
 export class Salon {
@@ -87,6 +88,9 @@ export class Salon {
 
   @Column("simple-array", { nullable: true })
   blockUsers!: string[];
+
+  @OneToMany(() => Promotion, (promotion) => promotion.salon)
+  promotions!: Promotion[];
 
   init(
     name: string,

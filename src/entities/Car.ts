@@ -87,7 +87,7 @@ export class Car {
   @Column({ type: "text", array: true, nullable: true })
   image!: string[];
 
-  @Column({default: 1})
+  @Column({ default: 1 })
   available!: number;
 
   @ManyToOne(() => Salon, (salon) => salon.cars)
