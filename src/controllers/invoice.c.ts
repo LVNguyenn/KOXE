@@ -208,9 +208,10 @@ const invoiceController = {
     const { fromDate } = req.body;
     let year = new Year().months;
     try {
-      const purchaseDb: any = await statistics({ salonId: "", type: "package", fromDate, year });
+      let purchaseDb: any = await statistics({ salonId: "", type: "package", fromDate, year });
+      const rs = await pagination({data: purchaseDb.purchases, per_page: 10});
+      purchaseDb.purchases = rs.data || "";
       const getTopPackage = await PurchaseRepository.getAllPurchase({});
-
       const avg = averageEachMonth(year)
 
       return res.json({
