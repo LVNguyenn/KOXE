@@ -14,5 +14,15 @@ router.post(
   middlewareController.verifyToken,
   groupController.createGroupSalon
 );
+router.patch(
+  "/:id",
+  middlewareController.verifyToken,
+  groupController.updateGroupSalon
+);
+router.delete(
+  "/:id",
+  middlewareController.verifyToken,
+  groupController.deleteGroupSalon
+);
 
 export default router;
