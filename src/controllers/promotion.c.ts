@@ -103,16 +103,26 @@ const promotionController = {
     try {
       const promotion = await promotionRepository.findOne({
         where: { promotion_id: id },
+        relations: ["salon"],
       });
+
       if (!promotion) {
         return res
           .status(404)
           .json({ status: "failed", msg: `No promotion with id: ${id}` });
       }
 
+      const formatPromotion = {
+        ...promotion,
+        salon: {
+          salon_id: promotion.salon.salon_id,
+          name: promotion.salon.name,
+        },
+      };
+
       return res.status(200).json({
         status: "success",
-        promotion: promotion,
+        promotion: formatPromotion,
       });
     } catch (error) {
       return res
