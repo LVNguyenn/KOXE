@@ -167,7 +167,6 @@ const promotionController = {
         promotion: savedPromotion,
       });
     } catch (error) {
-      console.log(error);
       return res
         .status(500)
         .json({ status: "failed", msg: "Internal server error" });
