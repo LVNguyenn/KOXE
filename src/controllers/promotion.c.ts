@@ -31,6 +31,8 @@ const promotionController = {
         description: promotion.description,
         thumbnail: promotion.banner[0],
         createdAt: promotion.createdAt,
+        startDate: promotion.startDate,
+        endDate: promotion.endDate,
         salon: {
           salon_id: promotion.salon.salon_id,
           name: promotion.salon.name,
@@ -76,6 +78,8 @@ const promotionController = {
         description: promotion.description,
         thumbnail: promotion.banner[0],
         createdAt: promotion.createdAt,
+        startDate: promotion.startDate,
+        endDate: promotion.endDate,
         salon: {
           salon_id: promotion.salon.salon_id,
           name: promotion.salon.name,

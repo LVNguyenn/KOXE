@@ -5,6 +5,7 @@ import { User } from "../entities/User";
 import { Connection } from "../entities/Connection";
 import { Process } from "../entities/Process";
 import { Stage } from "../entities/Stage";
+import { Revenue } from "../entities/Revenue";
 import { getUserInfo } from "../helper/mInvoice";
 import {
   getNextElement,
@@ -54,8 +55,11 @@ const transactionController = {
   },
   getAllTransactions: async (req: Request, res: Response) => {
     const transactionRepository = getRepository(Transaction);
+    const revenueRepository = getRepository(Revenue);
     const userId: any = req.headers["userId"] || "";
     const { page, per_page, q }: any = req.query;
+    let checkSalon = false;
+    let totalRevenue = 0;
 
     const user = await getRepository(User).findOne({
       where: [{ user_id: userId }],
@@ -69,8 +73,9 @@ const transactionController = {
 
     try {
       let transactionList;
-      let formatTransactions;
+      let formatTransactions: any;
       if (salonId !== "") {
+        checkSalon = true;
         transactionList = await transactionRepository.find({
           where: { salon: { salon_id: salonId } },
           relations: ["user", "connection", "process", "stage"],
@@ -106,31 +111,85 @@ const transactionController = {
         }));
       }
 
-      // if (!transactionList) {
-      //   return res.status(404).json({
-      //     status: "failed",
-      //     msg: `No transaction with salonId: ${salonId}`,
-      //   });
-      // }
-
       // search and pagination
-      if (q) {
+      if (q && checkSalon === true) {
         formatTransactions = await search({
           data: formatTransactions,
           q,
           fieldname: "user",
           fieldname2: "name",
         });
+        const revenue = await revenueRepository.find({
+          where: {
+            salon: { salon_id: salonId },
+            user: { user_id: formatTransactions[0].user.user_id },
+          },
+          select: ["amount"],
+        });
+        totalRevenue = revenue.reduce(
+          (accumulator, currentRevenue) =>
+            Number(accumulator) + Number(currentRevenue.amount),
+          0
+        );
+      } else if (q && checkSalon === false) {
+        formatTransactions = await search({
+          data: formatTransactions,
+          q,
+          fieldname: "salon",
+          fieldname2: "name",
+        });
+        const revenue = await revenueRepository.find({
+          where: {
+            salon: { salon_id: formatTransactions[0].salon.salon_id },
+            user: { user_id: userId },
+          },
+          select: ["amount"],
+        });
+        totalRevenue = revenue.reduce(
+          (accumulator, currentRevenue) =>
+            Number(accumulator) + Number(currentRevenue.amount),
+          0
+        );
+      } else if (!q && checkSalon === true) {
+        const revenue = await revenueRepository.find({
+          where: { salon: { salon_id: salonId } },
+          select: ["amount"],
+        });
+        totalRevenue = revenue.reduce(
+          (accumulator, currentRevenue) =>
+            Number(accumulator) + Number(currentRevenue.amount),
+          0
+        );
+      } else if (!q && checkSalon === false) {
+        const revenue = await revenueRepository.find({
+          where: { user: { user_id: userId } },
+          select: ["amount"],
+        });
+        totalRevenue = revenue.reduce(
+          (accumulator, currentRevenue) =>
+            Number(accumulator) + Number(currentRevenue.amount),
+          0
+        );
       }
 
-      const rs = await pagination({ data: formatTransactions, page, per_page });
+      const rs: any = await pagination({
+        data: formatTransactions,
+        page,
+        per_page,
+      });
+
+      const result = {
+        transaction: rs.data,
+        revenue: totalRevenue,
+      };
 
       return res.status(200).json({
         status: "success",
-        transaction: rs?.data,
+        transaction: result,
         total_page: rs?.total_page,
       });
     } catch (error) {
+      console.log(error);
       return res
         .status(500)
         .json({ status: "failed", msg: "Internal server error" });
@@ -199,6 +258,7 @@ const transactionController = {
     const stageRepository = getRepository(Stage);
     const processRepository = getRepository(Process);
     const userRepository = getRepository(User);
+    const revenueRepository = getRepository(Revenue);
     const { id } = req.params;
     const { commission, rating } = req.body;
 
@@ -245,6 +305,28 @@ const transactionController = {
           transaction.commissionList.push(commission);
         } else {
           transaction.commissionList.push(0);
+        }
+
+        const revenue = await revenueRepository.findOne({
+          where: {
+            user: { user_id: transaction.user.user_id },
+            salon: { salon_id: transaction.salon.salon_id },
+          },
+        });
+        if (revenue) {
+          if (commission) {
+            revenue.amount += Number(commission);
+          }
+          await revenueRepository.save(revenue);
+        } else {
+          const amount = commission || 0;
+
+          const newRevenue = {
+            salon: { salon_id: transaction.salon.salon_id },
+            user: { user_id: transaction.user.user_id },
+            amount: amount,
+          };
+          await revenueRepository.save(newRevenue);
         }
 
         if (rating) {

@@ -26,3 +26,4 @@ export * from "./Stage";
 export * from "./CommissionDetails";
 export * from "./Promotion";
 export * from "./GroupSalon";
+export * from "./Revenue";
