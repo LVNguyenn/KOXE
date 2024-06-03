@@ -120,7 +120,14 @@ const promotionController = {
     const userId: any = req.headers["userId"] || "";
     const promotionRepository = getRepository(Promotion);
 
-    const { title, description, content, startDate, endDate } = req.body;
+    const {
+      title,
+      description,
+      contentHtml,
+      contentMarkdown,
+      startDate,
+      endDate,
+    } = req.body;
 
     const user = await getUserInfo(userId);
 
@@ -142,7 +149,8 @@ const promotionController = {
       const newPromotion = {
         title,
         description,
-        content,
+        contentHtml,
+        contentMarkdown,
         startDate,
         endDate,
         banner: banner,
@@ -167,7 +175,14 @@ const promotionController = {
   },
   updatePromotion: async (req: Request | MulterFileRequest, res: Response) => {
     const { id } = req.params;
-    const { title, description, content, startDate, endDate } = req.body;
+    const {
+      title,
+      description,
+      contentHtml,
+      contentMarkdown,
+      startDate,
+      endDate,
+    } = req.body;
     const promotionRepository = getRepository(Promotion);
 
     let image = null,
@@ -182,7 +197,8 @@ const promotionController = {
       let newPromotion: any = {
         title,
         description,
-        content,
+        contentHtml,
+        contentMarkdown,
         startDate,
         endDate,
       };

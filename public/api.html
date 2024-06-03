@@ -1059,7 +1059,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Xóa hóa đơn mua phụ tùng
 
     <h2 id="promotion">Đăng tin khuyến mãi</h2>
-    (Bao gồm các trường: promotion_id, title, description, content, startDate, endDate, banner(array tối đa 5 ảnh), createdAt, updatedAt, salonId )
+    (Bao gồm các trường: promotion_id, title, description, contentHtml, contentMarkdown, startDate, endDate, banner(array tối đa 5 ảnh), createdAt, updatedAt, salonId )
     <li>[GET] /promotions</li>
     Lấy được hết tất cả các thông tin khuyến mãi (id, title, description, thumbnail(banner[0]), createdAt, salon)
     <li>[GET] /promotions/salon/:salonId</li>
@@ -1067,10 +1067,10 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[GET] /promotions/:id</li>
     Lấy được chi tiết thông tin khuyến mãi
     <li>[POST] /promotions</li>
-    Thêm một thông tin khuyến mãi mới. Các fields truyền vào bao gồm: title, description, content, startDate, endDate, banner(array tối đa 5 ảnh)
+    Thêm một thông tin khuyến mãi mới. Các fields truyền vào bao gồm: title, description, contentHtml, contentMarkdown, startDate, endDate, banner(array tối đa 5 ảnh)
     <b>Truyền theo form-data</b>
     <li>[PATCH] /promotions/:id</li>
-    Sửa một tính năng khi biết id. Các fields có thể sửa: title, description, content, startDate, endDate, banner. Thích sửa nào thì truyền cái đó
+    Sửa một tính năng khi biết id. Các fields có thể sửa: title, description, contentHtml, contentMarkdown, startDate, endDate, banner. Thích sửa nào thì truyền cái đó
     <li>[DELETE] /promotions/:id</li>
     Xóa thông tin khuyến mãi khi biết id
 

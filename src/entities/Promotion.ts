@@ -13,7 +13,10 @@ export class Promotion {
   description!: string;
 
   @Column("text")
-  content!: string;
+  contentHtml!: string;
+
+  @Column("text")
+  contentMarkdown!: string;
 
   @ManyToOne(() => Salon, (salon) => salon.promotions)
   salon!: Salon;
