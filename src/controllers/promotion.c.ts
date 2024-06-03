@@ -5,6 +5,7 @@ import { getUserInfo } from "../helper/mInvoice";
 import moment from "moment";
 const cloudinary = require("cloudinary").v2;
 import { getFileName } from "../utils/index";
+import dayjs from "dayjs";
 
 interface MulterFile {
   path: string;
@@ -30,9 +31,9 @@ const promotionController = {
         title: promotion.title,
         description: promotion.description,
         thumbnail: promotion.banner[0],
-        createdAt: promotion.createdAt,
-        startDate: promotion.startDate,
-        endDate: promotion.endDate,
+        createdAt: dayjs(promotion.createdAt).format("DD/MM/YYYY"),
+        startDate: dayjs(promotion.startDate).format("DD/MM/YYYY"),
+        endDate: dayjs(promotion.endDate).format("DD/MM/YYYY"),
         salon: {
           salon_id: promotion.salon.salon_id,
           name: promotion.salon.name,
@@ -77,9 +78,9 @@ const promotionController = {
         title: promotion.title,
         description: promotion.description,
         thumbnail: promotion.banner[0],
-        createdAt: promotion.createdAt,
-        startDate: promotion.startDate,
-        endDate: promotion.endDate,
+        createdAt: dayjs(promotion.createdAt).format("DD/MM/YYYY"),
+        startDate: dayjs(promotion.startDate).format("DD/MM/YYYY"),
+        endDate: dayjs(promotion.endDate).format("DD/MM/YYYY"),
         salon: {
           salon_id: promotion.salon.salon_id,
           name: promotion.salon.name,
@@ -114,6 +115,10 @@ const promotionController = {
 
       const formatPromotion = {
         ...promotion,
+        createdAt: dayjs(promotion.createdAt).format("DD/MM/YYYY"),
+        updatedAt: dayjs(promotion.updatedAt).format("DD/MM/YYYY"),
+        startDate: dayjs(promotion.startDate).format("DD/MM/YYYY"),
+        endDate: dayjs(promotion.endDate).format("DD/MM/YYYY"),
         salon: {
           salon_id: promotion.salon.salon_id,
           name: promotion.salon.name,
