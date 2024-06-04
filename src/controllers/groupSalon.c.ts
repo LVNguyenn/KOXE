@@ -46,6 +46,49 @@ const groupSalonController = {
         .json({ status: "failed", msg: "Internal server error" });
     }
   },
+  getGroupSalonById: async (req: Request, res: Response) => {
+    const groupSalonRepository = getRepository(GroupSalon);
+    const salonRepository = getRepository(Salon);
+    const { id } = req.params;
+
+    try {
+      const groupSalon = await groupSalonRepository.findOne({
+        where: { group_id: id },
+      });
+      if (!groupSalon) {
+        return res
+          .status(404)
+          .json({ status: "failed", msg: `No groupSalon with id: ${id}` });
+      }
+
+      const detailedSalons = await Promise.all(
+        groupSalon.salons.map(async (salonId: string) => {
+          const detailedSalon = await salonRepository.findOne({
+            where: { salon_id: salonId },
+          });
+          return {
+            id: detailedSalon?.salon_id,
+            name: detailedSalon?.name,
+          };
+        })
+      );
+
+      const detailedGroupSalon = {
+        id: groupSalon.group_id,
+        name: groupSalon.name,
+        salons: detailedSalons,
+      };
+
+      return res.status(200).json({
+        status: "success",
+        groupSalon: detailedGroupSalon,
+      });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ status: "failed", msg: "Internal server error" });
+    }
+  },
   createGroupSalon: async (req: Request, res: Response) => {
     const userId: any = req.headers["userId"] || "";
     const groupSalonRepository = getRepository(GroupSalon);
@@ -103,6 +146,7 @@ const groupSalonController = {
     try {
       const groupSalon = await groupSalonRepository.findOne({
         where: { group_id: id },
+        relations: ["user"],
       });
 
       if (!groupSalon) {

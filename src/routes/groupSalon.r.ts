@@ -9,6 +9,11 @@ router.get(
   middlewareController.verifyToken,
   groupController.getAllGroupSalons
 );
+router.get(
+  "/:id",
+  middlewareController.verifyToken,
+  groupController.getGroupSalonById
+);
 router.post(
   "/",
   middlewareController.verifyToken,
