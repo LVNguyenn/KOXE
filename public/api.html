@@ -52,6 +52,7 @@
 
     <h3>Từ ngày 3/6/24 - Đến 10/6/24</h3>
     <li>[GET] /group/salon/:id</li>
+    <li>Tui có bổ sung thêm search cho khách hàng khi xem hóa đơn bảo dưỡng và hóa đơn phụ tùng đã mua. Salon thì search theo tên khách hàng, khách hàng thì search theo tên salon</li>
 
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
@@ -222,7 +223,7 @@
     Thêm một xe mới. Các fields truyền vào bao gồm: name (Tên xe), description (Mô tả), origin (Xuất xứ), price
     (Giá), brand (Hãng xe), model (Mẫu mã xe), type (Dòng xe), capacity (Dung tích xe), door (Số cửa), seat (Số
     ghế ngồi), kilometer (Số km đã đi), gear (Hộp số), mfg (Năm sản xuất), inColor (Màu nội thất), outColor (Màu
-    ngoại thất), salonSalonId (Id Salon mà xe này thuộc về), image (tối đa là 5 file), available: number - số lượng xe, không truyền thì mặc định là 1. Nếu price < 0 thì sẽ báo
+    ngoại thất), salonId (Id Salon mà xe này thuộc về), image (tối đa là 5 file), available: number - số lượng xe, không truyền thì mặc định là 1. Nếu price < 0 thì sẽ báo
     lỗi.
     <li>[PATCH] /cars/:id</li>
     Truyền ở dạng form-data
@@ -1030,6 +1031,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Tìm kiếm theo fullname.
     <li>[GET] /admin/salons</li>
     Tìm kiếm theo name.
+    
     <h2 id="buy-accessory">Hóa đơn mua phụ tùng</h2>
     <li>[GET] /buy-accessory</li>
     Nó sẽ lấy ra được thông tin tất cả các hóa mua phụ tùng (thông tin khách hàng, các phụ tùng đã mua) tại salon mình (Đối với chủ salon)

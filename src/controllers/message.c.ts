@@ -7,9 +7,11 @@ import { Salon } from "../entities/Salon";
 import { Conversation } from "../entities/Conversation";
 import { getReceiverSocketId, io } from "../socket/socket";
 import { extractTime } from "../utils/index";
+const cloudinary = require("cloudinary").v2;
 
 interface MulterFile {
   path: string;
+  filename: string;
 }
 
 interface MulterFileRequest extends Request {
@@ -193,11 +195,13 @@ const messageController = {
     }
   },
   sendMessage: async (req: Request | MulterFileRequest, res: Response) => {
-    try {
-      let senderId: any = req.headers["userId"] || "";
-      const receiverId: string = req.params.id;
-      const { message } = req.body;
+    let senderId: any = req.headers["userId"] || "";
+    const receiverId: string = req.params.id;
+    const { message } = req.body;
+    let image = [""],
+      filename = [""];
 
+    try {
       const salon = await getRepository(Salon).findOne({
         where: { user_id: senderId },
       });
@@ -240,10 +244,10 @@ const messageController = {
       }
 
       // Upload image to cloudinary
-      let image = [""];
       if ("files" in req && req.files) {
         const arrayImages = req.files;
         image = arrayImages.map((obj) => obj.path);
+        filename = arrayImages.map((obj) => obj.filename);
       }
 
       // Create new message
@@ -276,8 +280,12 @@ const messageController = {
         status: "success",
         message: savedMessage,
       });
-    } catch (error: any) {
-      console.log(error.message);
+    } catch (error) {
+      if (filename.length !== 0) {
+        filename.forEach(async (url) => {
+          cloudinary.uploader.destroy(url);
+        });
+      }
       return res
         .status(500)
         .json({ status: "failed", msg: "Internal Server Error" });

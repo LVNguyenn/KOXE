@@ -29,6 +29,7 @@ const maintainController = {
   getAllMaintenanceInvoices: async (req: Request, res: Response) => {
     const userId: any = req.headers["userId"] || "";
     const { page, per_page, q }: any = req.query;
+    let checkSalon = false;
 
     try {
       const user = await getUserInfo(userId);
@@ -43,6 +44,7 @@ const maintainController = {
       let mInvoices;
 
       if (user?.salonId) {
+        checkSalon = true;
         const salonId = user.salonId.salon_id;
         mInvoices = await getMaintenanceInvoiceListBySalonId(salonId);
       } else {
@@ -83,11 +85,18 @@ const maintainController = {
       );
 
       // search and pagination
-      if (q) {
+      if (q && checkSalon === true) {
         mInvoicesWithServices = await search({
           data: mInvoicesWithServices,
           q,
           fieldname: "fullname",
+        });
+      } else if (q && checkSalon === false) {
+        mInvoicesWithServices = await search({
+          data: mInvoicesWithServices,
+          q,
+          fieldname: "salon",
+          fieldname2: "salon_name",
         });
       }
 

@@ -23,6 +23,8 @@ const accessoryController = {
   getAllAccessoryInvoices: async (req: Request, res: Response) => {
     const userId: any = req.headers["userId"] || "";
     const { page, per_page, q }: any = req.query;
+    let checkSalon = false;
+
     try {
       const user = await getUserInfo(userId);
 
@@ -36,6 +38,7 @@ const accessoryController = {
       let aInvoices;
 
       if (user?.salonId) {
+        checkSalon = true;
         const salonId = user.salonId.salon_id;
         aInvoices = await getAccessoryInvoiceListBySalonId(salonId);
       } else {
@@ -61,11 +64,18 @@ const accessoryController = {
       );
 
       // search and pagination
-      if (q) {
+      if (q && checkSalon === true) {
         aInvoicesWithServices = await search({
           data: aInvoicesWithServices,
           q,
           fieldname: "fullname",
+        });
+      } else if (q && checkSalon === false) {
+        aInvoicesWithServices = await search({
+          data: aInvoicesWithServices,
+          q,
+          fieldname: "salon",
+          fieldname2: "salon_name",
         });
       }
 

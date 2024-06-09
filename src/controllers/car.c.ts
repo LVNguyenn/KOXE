@@ -244,7 +244,7 @@ const carController = {
       mfg,
       inColor,
       outColor,
-      salonSalonId,
+      salonId,
       available,
     } = req.body;
     console.log("Name car: ", name);
@@ -286,7 +286,7 @@ const carController = {
         mfg,
         inColor,
         outColor,
-        salon: { salon_id: salonSalonId },
+        salon: { salon_id: salonId },
         image,
         available,
       };
@@ -332,7 +332,7 @@ const carController = {
       mfg,
       inColor,
       outColor,
-      salonSalonId,
+      salonId,
     } = req.body;
     const carRepository = getRepository(Car);
 
@@ -360,7 +360,7 @@ const carController = {
       mfg,
       inColor,
       outColor,
-      salon: { salon_id: salonSalonId },
+      salon: { salon_id: salonId },
     };
     if (Array.isArray(image) && image.length > 0) newCar.image = image;
     const { car_id, ...other } = newCar;
@@ -409,7 +409,7 @@ const carController = {
       const saveCar = { ...oldCar, ...other };
       const car = await carRepository.save(saveCar);
 
-      newLogs(salonSalonId, `${req.user} updated car ${car?.car_id}.`);
+      // newLogs(salonId, `${req.user} updated car ${car?.car_id}.`);
       // Cache.del(["cars", id+"car", salonSalonId+brand]);
 
       return res.status(200).json({
@@ -418,6 +418,7 @@ const carController = {
         car: car,
       });
     } catch (error) {
+      console.log(error);
       if (filename && filename.length !== 0) {
         filename.forEach(async (url) => {
           cloudinary.uploader.destroy(url);

@@ -138,7 +138,8 @@ const promotionController = {
   createPromotion: async (req: Request | MulterFileRequest, res: Response) => {
     const userId: any = req.headers["userId"] || "";
     const promotionRepository = getRepository(Promotion);
-
+    let banner = [""],
+      filename = [""];
     const {
       title,
       description,
@@ -159,10 +160,10 @@ const promotionController = {
     const salonId = user.salonId.salon_id;
 
     try {
-      let banner = [""];
       if ("files" in req && req.files) {
         const arrayImages = req.files;
         banner = arrayImages.map((obj) => obj.path);
+        filename = arrayImages.map((obj) => obj.filename);
       }
 
       const newPromotion = {
@@ -186,6 +187,11 @@ const promotionController = {
         promotion: savedPromotion,
       });
     } catch (error) {
+      if (filename.length !== 0) {
+        filename.forEach(async (url) => {
+          cloudinary.uploader.destroy(url);
+        });
+      }
       return res
         .status(500)
         .json({ status: "failed", msg: "Internal server error" });
@@ -258,6 +264,11 @@ const promotionController = {
         promotion: promotion,
       });
     } catch (error) {
+      if (filename && filename.length !== 0) {
+        filename.forEach(async (url) => {
+          cloudinary.uploader.destroy(url);
+        });
+      }
       return res
         .status(500)
         .json({ status: "failed", msg: "Internal server error" });

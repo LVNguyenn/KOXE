@@ -14,15 +14,15 @@ router.get(
 router.post(
   "/",
   middlewareController.verifyToken,
-  middlewareController.havePermission("C_CAR"),
   uploadCloud.array("image", 5),
+  middlewareController.havePermission("C_CAR"),
   carController.createCar
 );
 router.patch(
   "/:id",
   middlewareController.verifyToken,
-  middlewareController.havePermission("U_CAR"),
   uploadCloud.array("image", 5),
+  middlewareController.havePermission("U_CAR"),
   carController.updateCar
 );
 router.delete(
