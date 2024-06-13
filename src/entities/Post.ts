@@ -32,7 +32,10 @@ export class Post {
   @OneToMany(() => Connection, (connection) => connection.post)
   connections!: Connection[];
 
-  @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+  @Column({
+    type: "timestamptz",
+    default: () => "timezone('Asia/Bangkok', now())",
+  })
   createdAt!: Date;
 
   // Hãng xe

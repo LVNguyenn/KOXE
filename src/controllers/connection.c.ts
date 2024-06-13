@@ -7,10 +7,8 @@ import { Process } from "../entities/Process";
 import { Stage } from "../entities/Stage";
 import { Post } from "../entities/Post";
 import createNotification from "../helper/createNotification";
-import moment from "moment";
 import { Transaction } from "../entities";
 import { formatDate } from "../utils";
-import search from "../helper/search";
 import pagination from "../helper/pagination";
 
 const connectionController = {
@@ -183,7 +181,6 @@ const connectionController = {
         salon: { salon_id: salonId },
         post: { post_id: postId },
         process: { id: processId },
-        //createdAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
       };
 
       const savedConnection = await connectionRepository.save(newConnection);

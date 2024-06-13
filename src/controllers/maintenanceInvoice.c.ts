@@ -313,7 +313,7 @@ const maintainController = {
       const newMaintain = {
         licensePlate,
         carName,
-        create_at: moment().format("YYYY-MM-DDTHH:mm:ss"),
+        //create_at: moment().format("YYYY-MM-DDTHH:mm:ss"),
         seller: { salon_id: salonId },
         maintenanceServices: mServiceIds,
         accessories: accessoryIds,

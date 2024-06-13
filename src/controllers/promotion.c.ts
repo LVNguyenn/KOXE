@@ -174,8 +174,8 @@ const promotionController = {
         startDate,
         endDate,
         banner: banner,
-        createdAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
-        updatedAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
+        //createdAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
+        //updatedAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
         salon: { salon_id: salonId },
       };
 

@@ -17,10 +17,16 @@ export class Message {
   @Column({ type: "text", array: true, nullable: true })
   image!: string[];
 
-  @Column({ type: "timestamptz" })
+  @Column({
+    type: "timestamptz",
+    default: () => "timezone('Asia/Bangkok', now())",
+  })
   createdAt!: Date;
 
-  @Column({ type: "timestamptz" })
+  @Column({
+    type: "timestamptz",
+    default: () => "timezone('Asia/Bangkok', now())",
+  })
   updatedAt!: Date;
 
   init(

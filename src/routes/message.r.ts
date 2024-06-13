@@ -11,6 +11,11 @@ router.get(
   messageController.getChattingUsers
 );
 router.get(
+  "/search",
+  middlewareController.verifyToken,
+  messageController.searchChattingUsers
+);
+router.get(
   "/:id",
   middlewareController.verifyToken,
   messageController.getMessages

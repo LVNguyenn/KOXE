@@ -28,7 +28,13 @@ export class Connection {
   @ManyToOne(() => Process, (process) => process.connections)
   process!: Process;
 
-  @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+  //@Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+  //createdAt!: Date;
+
+  @Column({
+    type: "timestamptz",
+    default: () => "timezone('Asia/Bangkok', now())",
+  })
   createdAt!: Date;
 
   @OneToMany(() => Transaction, (transaction) => transaction.connection)

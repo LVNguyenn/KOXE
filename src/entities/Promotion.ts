@@ -30,9 +30,15 @@ export class Promotion {
   @Column({ type: "text", array: true, nullable: true })
   banner!: string[];
 
-  @Column({ type: "timestamptz" })
+  @Column({
+    type: "timestamptz",
+    default: () => "timezone('Asia/Bangkok', now())",
+  })
   createdAt!: Date;
 
-  @Column({ type: "timestamptz" })
+  @Column({
+    type: "timestamptz",
+    default: () => "timezone('Asia/Bangkok', now())",
+  })
   updatedAt!: Date;
 }

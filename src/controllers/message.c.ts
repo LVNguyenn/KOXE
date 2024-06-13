@@ -6,8 +6,9 @@ import { User } from "../entities/User";
 import { Salon } from "../entities/Salon";
 import { Conversation } from "../entities/Conversation";
 import { getReceiverSocketId, io } from "../socket/socket";
-import { extractTime } from "../utils/index";
+import { getUserInfo } from "../helper/mInvoice";
 const cloudinary = require("cloudinary").v2;
+import search from "../helper/search";
 
 interface MulterFile {
   path: string;
@@ -101,7 +102,8 @@ const messageController = {
                       : `${detail.name} đã gửi 1 ảnh`
                     : message.message,
 
-                time: extractTime(message.createdAt),
+                //time: extractTime(message.createdAt),
+                time: moment(message.createdAt).format("DD-MM-YYYY HH:mm:ss"),
                 conversation_status: conversation?.status,
               };
               break;
@@ -176,8 +178,8 @@ const messageController = {
       const formattedMessages = messages.map((message) => {
         return {
           ...message,
-          createdAt: moment(message.createdAt).format("YYYY-MM-DD HH:mm:ss"),
-          updatedAt: moment(message.updatedAt).format("YYYY-MM-DD HH:mm:ss"),
+          createdAt: moment(message.createdAt).format("DD-MM-YYYY HH:mm:ss"),
+          updatedAt: moment(message.updatedAt).format("DD-MM-YYYY HH:mm:ss"),
         };
       });
 
@@ -238,8 +240,8 @@ const messageController = {
         conversation = await conversationRepository.save({
           participants: participants,
           messages: [],
-          createdAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
-          updatedAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
+          //createdAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
+          //updatedAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
         });
       }
 
@@ -257,8 +259,8 @@ const messageController = {
         receiverId: receiverId,
         message: message || "",
         image: image,
-        createdAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
-        updatedAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
+        //createdAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
+        //updatedAt: moment().format("YYYY-MM-DDTHH:mm:ss"),
       });
 
       // Add message to conversation
@@ -290,6 +292,47 @@ const messageController = {
         .status(500)
         .json({ status: "failed", msg: "Internal Server Error" });
     }
+  },
+  searchChattingUsers: async (req: Request, res: Response) => {
+    const { q }: any = req.query;
+    const userId: any = req.headers["userId"] || "";
+    const userRepository = getRepository(User);
+    let results;
+    const user = await getUserInfo(userId);
+    if (user?.salonId) {
+      const salonId = user.salonId.salon_id;
+      const messageRepository = getRepository(Message);
+      results = await messageRepository
+        .createQueryBuilder("message")
+        .select("DISTINCT(message.senderId)", "userId")
+        .where("message.receiverId = :salonId", { salonId })
+        .getRawMany();
+      results = await Promise.all(
+        results.map(async (result) => {
+          const user = await userRepository.findOne({
+            where: {
+              user_id: result.userId,
+            },
+          });
+          return {
+            user_id: user?.user_id,
+            name: user?.fullname,
+          };
+        })
+      );
+      if (q) {
+        results = await search({ data: results, q, fieldname: "name" });
+      }
+    } else {
+      const salonRepository = getRepository(Salon);
+      results = await salonRepository
+        .createQueryBuilder("salon")
+        .select(["salon.salon_id", "salon.name"])
+        .where("salon.name LIKE :q", { q: `%${q}%` })
+        .getMany();
+    }
+
+    return res.json(results);
   },
 };
 

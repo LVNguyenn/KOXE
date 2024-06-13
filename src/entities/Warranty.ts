@@ -1,46 +1,66 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, ManyToMany, JoinTable, OneToMany } from "typeorm"
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  ManyToMany,
+  JoinTable,
+  OneToMany,
+} from "typeorm";
 import { Salon } from "./Salon";
 import { Car } from "./Car";
 
 @Entity()
 export class Warranty {
-    @PrimaryGeneratedColumn('uuid')
-    warranty_id!: string;
+  @PrimaryGeneratedColumn("uuid")
+  warranty_id!: string;
 
-    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-    create_at!: Date;
+  @Column({
+    type: "timestamptz",
+    default: () => "timezone('Asia/Bangkok', now())",
+  })
+  create_at!: Date;
 
-    @Column({})
-    name!: string;
+  @Column({})
+  name!: string;
 
-    @Column({default: true})
-    reuse!: boolean;
+  @Column({ default: true })
+  reuse!: boolean;
 
-    @Column({})
-    limit_kilometer!: number;
+  @Column({})
+  limit_kilometer!: number;
 
-    @Column({})
-    months!: number;
+  @Column({})
+  months!: number;
 
-    @Column({})
-    policy!: string;
+  @Column({})
+  policy!: string;
 
-    @Column({nullable: true})
-    note!: string;
+  @Column({ nullable: true })
+  note!: string;
 
-    @ManyToOne(() => Salon, salon => salon.warranties, { cascade: true })
-    salon!: Salon;
+  @ManyToOne(() => Salon, (salon) => salon.warranties, { cascade: true })
+  salon!: Salon;
 
-    @OneToMany(() => Car, car => car.warranties, { cascade: true })
-    car!: Car[];
+  @OneToMany(() => Car, (car) => car.warranties, { cascade: true })
+  car!: Car[];
 
-    init(create_at: Date, name: string, reuse: boolean, limit_kilometer: number, months: number, policy: string, note: string) {
-        this.create_at = create_at;
-        this.name = name;
-        this.reuse = reuse;
-        this.limit_kilometer = limit_kilometer;
-        this.months = months;
-        this.policy = policy;
-        this.note = note;
-    }
+  init(
+    create_at: Date,
+    name: string,
+    reuse: boolean,
+    limit_kilometer: number,
+    months: number,
+    policy: string,
+    note: string
+  ) {
+    this.create_at = create_at;
+    this.name = name;
+    this.reuse = reuse;
+    this.limit_kilometer = limit_kilometer;
+    this.months = months;
+    this.policy = policy;
+    this.note = note;
+  }
 }

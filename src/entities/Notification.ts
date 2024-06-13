@@ -11,7 +11,10 @@ export class Notification {
   @Column()
   description!: string;
 
-  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  @Column({
+    type: "timestamptz",
+    default: () => "timezone('Asia/Bangkok', now())",
+  })
   create_at!: Date;
 
   @Column({ nullable: true })

@@ -23,7 +23,10 @@ export class Invoice {
   @Column({ nullable: true })
   note!: string;
 
-  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  @Column({
+    type: "timestamptz",
+    default: () => "timezone('Asia/Bangkok', now())",
+  })
   create_at!: Date;
 
   @ManyToOne(() => Salon, (salon) => salon.invoices)
@@ -53,10 +56,10 @@ export class Invoice {
   @Column({ nullable: true })
   policy!: string;
 
-  @Column({default: false})
+  @Column({ default: false })
   done!: boolean;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   employee_id!: string;
 
   @Column("simple-array", { nullable: true })
@@ -65,7 +68,7 @@ export class Invoice {
   @Column("simple-array", { nullable: true })
   accessories!: string[];
 
-  @OneToOne(() => Car_User_Legals, legal => legal.invoice, {
+  @OneToOne(() => Car_User_Legals, (legal) => legal.invoice, {
     cascade: ["remove"],
   })
   legals_user!: Car_User_Legals;

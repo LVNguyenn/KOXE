@@ -11,10 +11,16 @@ export class Conversation {
   @Column("simple-array", { nullable: true })
   messages!: string[];
 
-  @Column({ type: "timestamptz" })
+  @Column({
+    type: "timestamptz",
+    default: () => "timezone('Asia/Bangkok', now())",
+  })
   createdAt!: Date;
 
-  @Column({ type: "timestamptz" })
+  @Column({
+    type: "timestamptz",
+    default: () => "timezone('Asia/Bangkok', now())",
+  })
   updatedAt!: Date;
 
   @Column({ nullable: true })
