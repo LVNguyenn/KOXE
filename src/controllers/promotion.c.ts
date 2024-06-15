@@ -6,7 +6,7 @@ import moment from "moment";
 const cloudinary = require("cloudinary").v2;
 import { getFileName } from "../utils/index";
 import dayjs from "dayjs";
-
+import momenttz from "moment-timezone";
 interface MulterFile {
   path: string;
   filename: string;
@@ -225,6 +225,7 @@ const promotionController = {
         contentMarkdown,
         startDate,
         endDate,
+        updatedAt: momenttz().tz("Asia/Saigon").format(),
       };
       if (Array.isArray(image) && image.length > 0) newPromotion.banner = image;
       const { promotion_id, ...other } = newPromotion;

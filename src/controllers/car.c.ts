@@ -9,6 +9,7 @@ import { Invoice, Salon } from "../entities";
 import CarRepository from "../repository/car";
 import search from "../helper/search";
 import pagination from "../helper/pagination";
+import Sort from "../helper/sort";
 
 interface MulterFile {
   path: string;
@@ -21,7 +22,7 @@ interface MulterFileRequest extends Request {
 
 const carController = {
   getAllCars: async (req: Request, res: Response) => {
-    const { page, per_page, q }: any = req.query;
+    const { page, per_page, q, sort }: any = req.query;
     // get value from cache
     // const valueCache = await Cache.get("cars");
     // if (valueCache) {
@@ -93,6 +94,10 @@ const carController = {
           q,
           fieldname: "name",
         });
+      }
+
+      if (sort) {
+        formattedCars = Sort({ data: formattedCars, sort });
       }
 
       const rs = await pagination({ data: formattedCars, page, per_page });
@@ -167,7 +172,7 @@ const carController = {
   },
   getAllCarsByBrandOfSalon: async (req: Request, res: Response) => {
     const { brand, salon_id } = req.params;
-    const { page, per_page, q }: any = req.query;
+    const { page, per_page, q, sort }: any = req.query;
     const carRepository = getRepository(Car);
     // get value from cache
     // const valueCache = Cache.get(salon_id+brand);
@@ -204,6 +209,10 @@ const carController = {
       // search and pagination
       if (q) {
         cars = await search({ data: cars, q, fieldname: "name" });
+      }
+
+      if (sort) {
+        cars = sort({ data: cars, Sort });
       }
 
       const rs = await pagination({ data: cars, page, per_page });

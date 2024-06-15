@@ -31,7 +31,7 @@ export class Appointment {
 
   @Column({
     type: "timestamptz",
-    default: () => "timezone('Asia/Bangkok', now())",
+    default: () => "timezone('Asia/Saigon', now())",
   })
   create_at!: Date;
 

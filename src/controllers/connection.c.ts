@@ -117,6 +117,7 @@ const connectionController = {
 
       const formatConnection = {
         ...connection,
+        createdAt: formatDate(connection.createdAt),
         salon: {
           salonId: connection?.salon.salon_id,
           name: connection?.salon.name,

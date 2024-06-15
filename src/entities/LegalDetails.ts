@@ -1,23 +1,36 @@
-import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, ManyToOne, OneToMany, JoinColumn } from "typeorm"
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  PrimaryColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+} from "typeorm";
 import { LegalDocuments } from "./LegalDocuments";
 
 @Entity()
 export class LegalDetails {
-    @PrimaryGeneratedColumn('uuid')
-    id!: string
+  @PrimaryGeneratedColumn("uuid")
+  id!: string;
 
-    @JoinColumn()
-    @ManyToOne(() => LegalDocuments, (legal) => legal.details, {onDelete: 'CASCADE'})
-    document!: LegalDocuments;
+  @JoinColumn()
+  @ManyToOne(() => LegalDocuments, (legal) => legal.details, {
+    onDelete: "CASCADE",
+  })
+  document!: LegalDocuments;
 
-    @Column()
-    name!: string;
+  @Column()
+  name!: string;
 
-    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-    update_date!: Date;
+  @Column({
+    type: "timestamptz",
+    default: () => "timezone('Asia/Saigon', now())",
+  })
+  update_date!: Date;
 
-    init (name: string, update_date: Date) {
-        this.name = name;
-        this.update_date = update_date;
-    }
+  init(name: string, update_date: Date) {
+    this.name = name;
+    this.update_date = update_date;
+  }
 }

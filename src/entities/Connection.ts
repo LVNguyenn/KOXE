@@ -33,7 +33,7 @@ export class Connection {
 
   @Column({
     type: "timestamptz",
-    default: () => "timezone('Asia/Bangkok', now())",
+    default: () => "timezone('Asia/Saigon', now())",
   })
   createdAt!: Date;
 
