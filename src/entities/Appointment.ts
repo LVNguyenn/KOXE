@@ -20,6 +20,12 @@ export class Appointment {
   @Column()
   date!: Date;
 
+  @Column({ nullable: true })
+  notificationTime!: string;
+
+  @Column({ default: false })
+  notificationSent!: boolean;
+
   @Column()
   description!: string;
 

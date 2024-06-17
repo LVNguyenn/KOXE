@@ -72,6 +72,9 @@ export class User {
   @Column({ nullable: true, default: 0 })
   aso!: number;
 
+  @Column({ nullable: true })
+  androidFcmToken!: string;
+
   @Column("simple-array", { nullable: true })
   permissions!: string[];
 

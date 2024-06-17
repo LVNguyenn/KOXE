@@ -416,7 +416,7 @@ const authController: any = {
           status: "failed",
           msg: "This account is blocked.",
         });
-    }
+      }
 
       // console.log("respone: ", response);
 
@@ -570,6 +570,8 @@ const authController: any = {
   loginUser: async (req: any, res: any) => {
     const username = req.body.username;
     const passwordInput = req.body.password;
+    const androidFcmToken = req.body.androidFcmToken;
+
     if (username === undefined || passwordInput === undefined) {
       return res.json({
         status: "failed",
@@ -623,6 +625,13 @@ const authController: any = {
       });
 
       const { password, ...others } = userDb;
+      if (
+        userDb.androidFcmToken === null ||
+        userDb.androidFcmToken !== androidFcmToken
+      ) {
+        userDb.androidFcmToken = androidFcmToken;
+        await userRepository.save(userDb);
+      }
       return res.json({
         refreshToken,
         user: others,
@@ -693,8 +702,8 @@ const authController: any = {
       if (!condition) {
         return res.json({
           status: "failed",
-          msg: "Old password is invalid."
-        })
+          msg: "Old password is invalid.",
+        });
       }
 
       // set new password
@@ -708,7 +717,7 @@ const authController: any = {
         msg: "change password successfully!",
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return res.json({
         status: "failed",
         msg: "Cannot change password, please check information and try again.",

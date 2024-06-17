@@ -96,6 +96,7 @@
     <li><a href="#buy-accessory" class="fsl">Hóa Đơn Mua Phụ Tùng</a></li>
     <li><a href="#promotion" class="fsl">Đăng Tin Khuyến Mãi</a></li>
     <li><a href="#group" class="fsl">Tạo Group Salon</a></li>
+    <li><a href="#notification-offline" class="fsl">Notification Khi Offline</a></li>
 
     <h3>Chú ý: Với các hành động liên quan đến quản lý salon như thêm nhân viên, thêm xe,... của salon - các hành động cần quyền
         thì mới có thể làm được với salon thì cần gửi đi salonId. Vì cần thông tin này thì mới xác định được chính xác người đó có quyền gì.
@@ -1108,6 +1109,12 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Sửa group salon. Có thể sửa name và salons
     <li>[DELETE] /group/salon/:id</li>
     Xóa 1 group salon
+
+    <h2 id="notification-offline">Notification khi offline (Android)</h2>
+    <li>Khi login, tui đặt fcmToken là: androidFcmToken</li>
+    <li>Trong này tui có gửi file và những chỗ nó chỉ, ông thêm vào bên ông nha để FCM nó gửi đúng đến ứng dụng của mình:
+        <a href="https://drive.google.com/drive/folders/1LbPDFkmaouzoMpxB43otHQ-GgQKY8mFc?usp=sharing">Link</a>
+    </li>
 </body>
 
 </html>

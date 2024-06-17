@@ -127,6 +127,22 @@ function calculateAverageRating(ratingList: Array<number>) {
   return avgRating;
 }
 
+function subtractHoursFromStringTime(timeString: string, hours: number) {
+  let givenTime = new Date(timeString);
+  let timeBefore = new Date(givenTime.getTime() - hours * 60 * 60 * 1000);
+
+  let year = timeBefore.getFullYear();
+  let month = String(timeBefore.getMonth() + 1).padStart(2, "0");
+  let day = String(timeBefore.getDate()).padStart(2, "0");
+  let hoursStr = String(timeBefore.getHours()).padStart(2, "0");
+  let minutes = String(timeBefore.getMinutes()).padStart(2, "0");
+  let seconds = String(timeBefore.getSeconds()).padStart(2, "0");
+
+  let timeBeforeStr = `${year}-${month}-${day} ${hoursStr}:${minutes}:${seconds}`;
+
+  return timeBeforeStr;
+}
+
 export {
   generateRandomCode,
   isValidUUID,
@@ -140,4 +156,5 @@ export {
   getNextElement,
   isArraySubset,
   calculateAverageRating,
+  subtractHoursFromStringTime,
 };
