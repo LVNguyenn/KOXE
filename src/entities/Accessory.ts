@@ -26,6 +26,9 @@ export class Accessory {
   @ManyToOne(() => Salon, (salon) => salon.accessories)
   salon!: Salon;
 
+  @Column({ nullable: true })
+  icon!: string;
+
   init(name: string, manufacturer: string, price: number, salon: Salon) {
     this.name = name;
     this.manufacturer = manufacturer;

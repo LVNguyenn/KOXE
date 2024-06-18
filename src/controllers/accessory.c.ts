@@ -89,7 +89,7 @@ const accessoryController = {
   createAccessory: async (req: Request, res: Response) => {
     const userId: any = req.headers["userId"] || "";
     const accessoryRepository = getRepository(Accessory);
-    const { name, manufacturer, price } = req.body;
+    const { name, manufacturer, price, icon } = req.body;
 
     const user = await getUserInfo(userId);
 
@@ -108,6 +108,7 @@ const accessoryController = {
         manufacturer,
         price,
         salon: { salon_id: salonId },
+        icon,
       };
       const savedAccessory = await accessoryRepository.save(newAccessory);
 
@@ -124,7 +125,7 @@ const accessoryController = {
   },
   updateAccessory: async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { name, manufacturer, price } = req.body;
+    const { name, manufacturer, price, icon } = req.body;
     const accessoryRepository = getRepository(Accessory);
 
     try {
@@ -132,6 +133,7 @@ const accessoryController = {
         name,
         manufacturer,
         price,
+        icon,
       });
       if (accessory.affected === 0) {
         return res

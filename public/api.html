@@ -59,6 +59,11 @@
     <li>Bên backend đã có handle khi mà salon tạo kết nối với hoa tiêu đó rồi mà tạo thêm lần nữa thì sẽ báo lỗi và có trả về connection_id đã kết nối. Tụi ông nhớ handle bên frontend luôn nhau</li>
     <li>Phần getChattingUsers, getMessages giữa 2 người với nhau thì trường thời gian tui đã chỉnh lại theo format DD-MM-YYYY HH:mm:ss để dễ hiểu</li>
     <li>Phần nhắn tin giờ có thêm search</li>
+
+    <h3>Từ ngày 17/6/24 - Đến 24/6/24</h3>
+    <li>Hôm trước thầy có góp ý phụ tùng cần có icon nên tui thêm trường mới là icon. Tui thấy hướng này dễ làm là mình sẽ tự đi tìm các icon phụ tùng xe trước. Chẳng hạn
+        <a href="https://icons8.com/icons/set/gear">Link</a>. Tìm mấy phụ tùng của xe xong Copy Link to PNG của nó rồi mình để vào mảng. Khi thêm phụ tùng thị mình sẽ cho nó load ra để người dùng chọn xong bên tui sẽ lưu chuỗi đó vào db thôi (Bên web với mobile nên dùng chung để nó đồng nhất nhé)
+    </li>
     
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
@@ -722,13 +727,13 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
 
     <h2 id="accessory"> Phụ tùng </h2>
     <li>[GET] /accessory/salon/:salonId</li>
-    Sẽ lấy ra được tất cả các thông tin phụ tụng vật liệu (bao gồm id, tên, nhà sản xuất, giá) của salon đó
+    Sẽ lấy ra được tất cả các thông tin phụ tụng vật liệu (bao gồm id, tên, nhà sản xuất, giá, icon) của salon đó
     <li>[GET] /accessory/:id</li>
     Lấy ra thông tin chi tiết của phụ tùng
     <li>[POST] /accessory</li>
-    Dùng cho chủ salon thêm một phụ tùng mới (tạm thời là chủ làm). Các thông tin cần truyền vào bao gồm: {name, manufacturer, price}
+    Dùng cho chủ salon thêm một phụ tùng mới (tạm thời là chủ làm). Các thông tin cần truyền vào bao gồm: {name, manufacturer, price, icon}
     <li>[PATCH] /accessory/:id</li>
-    Dùng để cập nhật phụ tùng. Có thể cập nhật {name, manufacturer, price}. Muốn cập nhật trường nào thì truyền vào trường đó
+    Dùng để cập nhật phụ tùng. Có thể cập nhật {name, manufacturer, price, icon}. Muốn cập nhật trường nào thì truyền vào trường đó
     <li>[DELETE] /accessory/:id</li>
     Xóa phụ tùng
 
