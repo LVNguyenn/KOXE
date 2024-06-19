@@ -29,6 +29,7 @@ import {
   Promotion,
   GroupSalon,
   Revenue,
+  Role
 } from "../entities";
 import { DataSourceOptions } from "typeorm";
 
@@ -72,6 +73,7 @@ export const connectionString: DataSourceOptions = {
     Promotion,
     GroupSalon,
     Revenue,
+    Role,
   ],
   synchronize: true,
   ssl: {

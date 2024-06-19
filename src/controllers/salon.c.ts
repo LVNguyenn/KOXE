@@ -12,6 +12,8 @@ import authController from "./auth.c";
 import UserRepository from "../repository/user";
 import search from "../helper/search";
 import pagination from "../helper/pagination";
+import SalonRepository from "../repository/salon";
+import RoleRepository from "../repository/role";
 // import Cache from "../config/node-cache";
 
 const { v4: uuidv4 } = require("uuid");
@@ -36,7 +38,7 @@ const salonController = {
     const salonRepository = getRepository(Salon);
     try {
       const salons = await salonRepository.find({
-        where: {user_id: Not(IsNull()) }
+        where: { user_id: Not(IsNull()) }
       });
 
       // const salons = await salonRepository.find({
@@ -785,7 +787,115 @@ const salonController = {
     const rs = await pagination({ data: userRp?.data, page, per_page });
 
     return res.json({ status: userRp?.status, msg: userRp?.msg, ...rs });
-  }
+  },
+
+  getRoleForSalon: async (req: Request, res: Response) => {
+    // find salonId
+    const salonRp = await UserRepository.getSalonIdByUserId({ userId: req.user })
+    const salonId = salonRp.data;
+    let roleRp = await RoleRepository.getAllBySalon({ salonId });
+
+    // parse role
+    try {
+      for (let e of roleRp?.data) {
+        e.permissions = await parsePermission(e.permissions)
+      }
+    } catch (error) { }
+
+    return res.json({ ...roleRp });
+  },
+
+  createNewRole: async (req: Request, res: Response) => {
+    const { salonId, name, permissions } = req.body;
+
+    if (!salonId || !name || !permissions) {
+      return res.json({
+        status: "failed",
+        msg: "missing input data."
+      })
+    }
+
+    // Need to check permissions here. May be over here. Uhm... But I dont understand. FLAG ERROR!
+    // code here
+    // find salon
+    const salonRp = await SalonRepository.findSalonById({ salonId });
+    const roleDb = await RoleRepository.createNewRole({ name, salon: salonRp?.data, permissions })
+
+    return res.json({ ...roleDb });
+  },
+
+  updateRole: async (req: Request, res: Response) => {
+    const {id, name, permissions, salonId} = req.body;
+    
+    if (!id) {
+      return res.json({
+        status: "failed",
+        msg: "Missing id input."
+      })
+    }
+
+    const newData: any = {name, permissions};
+    Object.keys(newData).forEach(key => newData[key] === undefined && delete newData[key]);
+    // Need to check permissions here. May be over here. But I dont understand. FLAG ERROR!
+    // code here
+    const newRole = await RoleRepository.updatePermissionForRole({id, ...newData, salonId});
+
+    return res.json({...newRole});
+  },
+
+  deleteRole: async (req: Request, res: Response) => {
+    const {id} = req.params;
+    // find salonId
+    const salonId = await UserRepository.getSalonIdByUserId({userId: req.user})
+    const rs = await RoleRepository.delete({id, salonId: salonId?.data});
+
+    return res.json({...rs});
+  },
+
+  assignRoleToUser: async (req: Request, res: Response) => {
+    const {employeeId, roleId} = req.body;
+
+    if (!employeeId || !roleId) {
+      return res.json({
+        status: "failed",
+        msg: "Missing input."
+      })
+    }
+
+    // get salonId
+    const salonId = await UserRepository.getSalonIdByUserId({userId: req.user})
+    // get role
+    const role = await RoleRepository.getAllBySalon({id: roleId, salonId: salonId?.data});
+    // find employee
+    const oldUser = await UserRepository.getEmployeeBySalonUserId({salonId: salonId?.data, userId: employeeId})
+
+    try {
+      if (!salonId?.data || !role?.data[0] || !oldUser?.data || oldUser?.data?.permission==="OWNER") {
+        return res.json({
+          status: "failed",
+          msg: "Error data."
+        })
+      }
+      
+    } catch (error) {
+      return res.json({
+        status: "failed",
+        msg: "Error data."
+      })
+     }
+
+     if (role?.data[0]?.permissions === "OWNER") {
+      return res.json({
+        status: "failed",
+        msg: "Error role."
+      })
+     }
+
+    // assign role to user
+    const newUser = await UserRepository.setPermissionAndRole({...oldUser?.data, role: role?.data[0]?.name, permissions: role?.data[0]?.permissions})
+  
+    return res.json({...newUser});
+  },
 };
 
 export default salonController;

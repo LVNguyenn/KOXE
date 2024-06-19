@@ -64,7 +64,11 @@
     <li>Hôm trước thầy có góp ý phụ tùng cần có icon nên tui thêm trường mới là icon. Tui thấy hướng này dễ làm là mình sẽ tự đi tìm các icon phụ tùng xe trước. Chẳng hạn
         <a href="https://icons8.com/icons/set/gear">Link</a>. Tìm mấy phụ tùng của xe xong Copy Link to PNG của nó rồi mình để vào mảng. Khi thêm phụ tùng thị mình sẽ cho nó load ra để người dùng chọn xong bên tui sẽ lưu chuỗi đó vào db thôi (Bên web với mobile nên dùng chung để nó đồng nhất nhé)
     </li>
-    
+    <li>[GET] /salons/role</li>
+    <li>[POST] /salons/role</li>
+    <li>[PATCH] /salons/role</li>
+    <li>[DELETE] /salons/role/:id</li> 
+    <li>[POST] /salons/assign-role</li>
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
     <h2>MỤC LỤC</h2>
@@ -274,6 +278,19 @@
     đến api xóa thông báo đó là được.
     <li>[POST] /salons/employees</li>
     Dùng để lấy ra toàn bộ danh sách nhân viên trong salon. Cần truyền vô {salonId}.
+    <h3>Tạo role - Cần là chủ salon đăng nhập</h3>
+    <li>[GET] /salons/role</li>
+    lấy ra danh sách các role của salon.
+    <li>[POST] /salons/role</li>
+    Tạo role mới. Cần truyền vô {salonId, name: tên role, permissions: ["C_ABC", "R_ABC", ...]}
+    <li>[PATCH] /salons/role</li>
+    Cập nhật thông tin name or permissions của role đó. Cần truyền vô: {id: id của role, name, permissions, salonId}.
+    Với name và permision muốn cập nhật cái nào thì truyền vô cái đó (có thể không truyền).
+    <li>[DELETE] /salons/role/:id</li> 
+    Dùng để xóa role với id đó.
+    <li>[POST] /salons/assign-role</li>
+    gán role cho nhân viên của salon. Cần truyền vô: {employeeId: id của nhân viên, roleId: id của role}. Không cần gỡ role ra khỏi nhân viên vì 
+    nó salon có thể gán role nhân viên bình thường nếu muốn.
 
     <h2 id="purchase">PURCHASE</h2>
     <li>[GET] /purchase</li>

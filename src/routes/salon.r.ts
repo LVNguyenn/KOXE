@@ -31,7 +31,7 @@ router.get(
   middlewareController.verifyToken,
   salonController.getSalonByUserId
 );
-router.get("/:id", salonController.getSalonById);
+
 router.post(
   "/",
   middlewareController.verifyToken,
@@ -41,21 +41,8 @@ router.post(
   ]),
   salonController.createSalon
 );
-router.patch(
-  "/:id",
-  middlewareController.verifyToken,
-  uploadCloud.fields([
-    { name: "image", maxCount: 1 },
-    { name: "banner", maxCount: 5 },
-  ]),
-  salonController.updateSalon
-);
-router.delete(
-  "/:id",
-  middlewareController.verifyToken,
-  middlewareController.havePermission("D_SL"),
-  salonController.deleteSalon
-);
+
+
 
 // router.post("/user", middlewareController.isAdminOfSalon, salonController.getEmployees);
 router.post(
@@ -88,4 +75,29 @@ router.get("/verify-invite/:token", salonController.verifyInviteFromMail);
 
 router.post("/employees", salonController.getAllEmployeesBySalon);
 
+// role
+router.get("/role", middlewareController.verifyToken, middlewareController.isAdminOfSalon, salonController.getRoleForSalon);
+router.post("/role", middlewareController.verifyToken, middlewareController.isAdminOfSalon, salonController.createNewRole);
+router.patch("/role", middlewareController.verifyToken, middlewareController.isAdminOfSalon, salonController.updateRole);
+router.delete("/role/:id", middlewareController.verifyToken, middlewareController.isAdminOfSalon, salonController.deleteRole);
+router.post("/assign-role", middlewareController.verifyToken, middlewareController.isAdminOfSalon, salonController.assignRoleToUser);
+
+router.get("/:id", salonController.getSalonById);
+
+router.patch(
+  "/:id",
+  middlewareController.verifyToken,
+  uploadCloud.fields([
+    { name: "image", maxCount: 1 },
+    { name: "banner", maxCount: 5 },
+  ]),
+  salonController.updateSalon
+);
+
+router.delete(
+  "/:id",
+  middlewareController.verifyToken,
+  middlewareController.havePermission("D_SL"),
+  salonController.deleteSalon
+);
 export default router;

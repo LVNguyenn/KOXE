@@ -18,6 +18,7 @@ import { Transaction } from "./Transaction";
 import { Process } from "./Process";
 import { Stage } from "./Stage";
 import { Promotion } from "./Promotion";
+import { Role } from "./Role";
 
 @Entity()
 export class Salon {
@@ -91,6 +92,9 @@ export class Salon {
 
   @OneToMany(() => Promotion, (promotion) => promotion.salon)
   promotions!: Promotion[];
+
+  @OneToMany(() => Role, (role) => role.salon)
+  roles!: Role[];
 
   init(
     name: string,

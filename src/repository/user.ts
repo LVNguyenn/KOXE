@@ -161,7 +161,47 @@ const UserRepository = {
             
             return FormatData("success", "deleted permission successfully!", userDb);
         } catch (error) {
-            return FormatData("success", "delete permission failed.");
+            return FormatData("failed", "delete permission failed.");
+        }
+    },
+
+    async getSalonIdByUserId(data: any) {
+        try {
+            const userRepository = getRepository(User);
+            const userDb = await userRepository.findOneOrFail({
+                where: {user_id: data?.userId},
+                relations: ['salonId']
+            })
+            
+            return FormatData("success", "finded successfully!", userDb?.salonId?.salon_id);
+        } catch (error) {
+            return FormatData("failed", "find failed.", "");
+        }
+    },
+
+    async getEmployeeBySalonUserId(data: any) {
+        try {
+            const userRepository = getRepository(User);
+            const userDb = await userRepository
+                .createQueryBuilder('user')
+                .innerJoin('user.salonId', 'salon', 'salon.salon_id = :salonId', { ...data })
+                .where({ user_id: data?.userId})
+                .getOne()
+            
+            return FormatData("success", "finded successfully!", userDb);
+        } catch (error) {
+            return FormatData("failed", "find failed.", "");
+        }
+    },
+
+    async setPermissionAndRole(data: any) {
+        try {
+            const userRepository = getRepository(User);
+            const userDb = await userRepository.save({...data});
+            
+            return FormatData("success", "set permission successfully!", userDb);
+        } catch (error) {
+            return FormatData("failed", "set permission failed.");
         }
     }
 };
