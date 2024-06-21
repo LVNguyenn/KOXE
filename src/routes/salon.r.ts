@@ -76,7 +76,7 @@ router.get("/verify-invite/:token", salonController.verifyInviteFromMail);
 router.post("/employees", salonController.getAllEmployeesBySalon);
 
 // role
-router.get("/role", middlewareController.verifyToken, middlewareController.isAdminOfSalon, salonController.getRoleForSalon);
+router.get("/role", middlewareController.verifyToken, salonController.getRoleForSalon);
 router.post("/role", middlewareController.verifyToken, middlewareController.isAdminOfSalon, salonController.createNewRole);
 router.patch("/role", middlewareController.verifyToken, middlewareController.isAdminOfSalon, salonController.updateRole);
 router.delete("/role/:id", middlewareController.verifyToken, middlewareController.isAdminOfSalon, salonController.deleteRole);
