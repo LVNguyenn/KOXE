@@ -170,6 +170,39 @@ const carController = {
         .json({ status: "failed", msg: "Internal server error" });
     }
   },
+  getCarsOfSalon: async (req: Request, res: Response) => {
+    const carRepository = getRepository(Car);
+    const { salon_id } = req.params;
+    const { page, per_page, q, sort }: any = req.query;
+    try {
+      let cars = await carRepository.find({
+        where: { salon: { salon_id: salon_id } },
+      });
+
+      if (q) {
+        cars = await search({
+          data: cars,
+          q,
+          fieldname: "name",
+        });
+      }
+
+      if (sort) {
+        cars = Sort({ data: cars, sort });
+      }
+
+      const rs = await pagination({ data: cars, page, per_page });
+
+      return res.status(200).json({
+        status: "success",
+        cars: rs.data,
+      });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ status: "failed", msg: "Internal server error" });
+    }
+  },
   getAllCarsByBrandOfSalon: async (req: Request, res: Response) => {
     const { brand, salon_id } = req.params;
     const { page, per_page, q, sort }: any = req.query;

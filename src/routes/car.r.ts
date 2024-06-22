@@ -7,6 +7,7 @@ const router = Router();
 
 router.get("/", carController.getAllCars);
 router.get("/:id", carController.getCarById);
+router.get("/salon/:salon_id", carController.getCarsOfSalon);
 router.get(
   "/brand/:brand/salon/:salon_id",
   carController.getAllCarsByBrandOfSalon

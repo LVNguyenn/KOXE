@@ -69,6 +69,10 @@
     <li>[PATCH] /salons/role</li>
     <li>[DELETE] /salons/role/:id</li> 
     <li>[POST] /salons/assign-role</li>
+
+    <li>API get salon theo id tui không lấy ra các xe của salon đó nữa mà giờ sẽ có 1 API riêng để gọi. API get salon theo id chỉ lấy ra được các thông tin của salon thôi</li>
+    <li>[GET] /cars/salon/:salon_id</li>
+    <li>Có sắp xếp, hiện tại chỉ mới có cho xe, cần truyền vào VD: /cars/salon/e03942f6-1fc0-4864-9a70-647a070160d7?page=1&per_page=5&sort=price (nếu -price là sắp xếp giảm dần, muốn sắp xếp theo name cũng được)</li>
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
     <h2>MỤC LỤC</h2>
@@ -232,6 +236,8 @@
     Lấy được hết tất cả các xe kèm theo tên và địa chỉ salon mà xe đó thuộc về
     <li>[GET] /cars/:id</li>
     Lấy được xe khi biết id
+    <li>[GET] /cars/salon/:salon_id</li>
+    Lấy được hết tất cả các xe khi biết id của 1 salon (có tìm kiếm, sắp xếp, phân trang)
     <li>[GET] /cars/brand/:brand/salon/:salon_id</li>
     Lấy được hết tất cả xe của cùng hãng xem truyền vào tên hãng trong 1 salon
     <li>[POST] /cars</li>

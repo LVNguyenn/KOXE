@@ -170,7 +170,7 @@ const connectionController = {
       });
 
       if (checkConnection) {
-        return res.status(400).json({
+        return res.status(200).json({
           status: "failed",
           msg: "This connection already exists",
           connection: checkConnection.connection_id,

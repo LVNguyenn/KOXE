@@ -38,7 +38,7 @@ const salonController = {
     const salonRepository = getRepository(Salon);
     try {
       const salons = await salonRepository.find({
-        where: { user_id: Not(IsNull()) }
+        where: { user_id: Not(IsNull()) },
       });
 
       // const salons = await salonRepository.find({
@@ -57,7 +57,11 @@ const salonController = {
 
       // search and pagination
       if (q) {
-        saveSalon.salons = await search({ data: saveSalon.salons, q, fieldname: "name" })
+        saveSalon.salons = await search({
+          data: saveSalon.salons,
+          q,
+          fieldname: "name",
+        });
       }
 
       const rs = await pagination({ data: saveSalon.salons, page, per_page });
@@ -66,7 +70,7 @@ const salonController = {
       return res.status(200).json({
         status: "success",
         salons: saveSalon,
-        total_page: rs?.total_page
+        total_page: rs?.total_page,
       });
     } catch (error) {
       return res
@@ -208,7 +212,7 @@ const salonController = {
         where: {
           salon_id: id,
         },
-        relations: ["cars"],
+        //relations: ["cars"],
       });
 
       if (!salon) {
@@ -537,7 +541,11 @@ const salonController = {
 
       // search and pagination
       if (q) {
-        salonDb.employees = await search({ data: salonDb.employees, q, fieldname: "fullname" })
+        salonDb.employees = await search({
+          data: salonDb.employees,
+          q,
+          fieldname: "fullname",
+        });
       }
 
       const rs = await pagination({ data: salonDb.employees, page, per_page });
@@ -546,7 +554,7 @@ const salonController = {
       return res.json({
         status: "success",
         salonDb: salonDb,
-        total_page: rs?.total_page
+        total_page: rs?.total_page,
       });
     } catch (error) {
       console.log(error);
@@ -705,7 +713,7 @@ const salonController = {
         status: "failed",
         msg: "You are in the salon here aldready.",
       });
-    } catch (error) { }
+    } catch (error) {}
 
     try {
       // create new account.
@@ -781,7 +789,11 @@ const salonController = {
 
     // search and pagination
     if (q) {
-      userRp.data = await search({ data: userRp?.data, q, fieldname: "fullname" })
+      userRp.data = await search({
+        data: userRp?.data,
+        q,
+        fieldname: "fullname",
+      });
     }
 
     const rs = await pagination({ data: userRp?.data, page, per_page });
@@ -791,16 +803,18 @@ const salonController = {
 
   getRoleForSalon: async (req: Request, res: Response) => {
     // find salonId
-    const salonRp = await UserRepository.getSalonIdByUserId({ userId: req.user })
+    const salonRp = await UserRepository.getSalonIdByUserId({
+      userId: req.user,
+    });
     const salonId = salonRp.data;
     let roleRp = await RoleRepository.getAllBySalon({ salonId });
 
     // parse role
     try {
       for (let e of roleRp?.data) {
-        e.permissions = await parsePermission(e.permissions)
+        e.permissions = await parsePermission(e.permissions);
       }
-    } catch (error) { }
+    } catch (error) {}
 
     return res.json({ ...roleRp });
   },
@@ -811,90 +825,118 @@ const salonController = {
     if (!salonId || !name || !permissions) {
       return res.json({
         status: "failed",
-        msg: "missing input data."
-      })
+        msg: "missing input data.",
+      });
     }
 
     // Need to check permissions here. May be over here. Uhm... But I dont understand. FLAG ERROR!
     // code here
     // find salon
     const salonRp = await SalonRepository.findSalonById({ salonId });
-    const roleDb = await RoleRepository.createNewRole({ name, salon: salonRp?.data, permissions })
+    const roleDb = await RoleRepository.createNewRole({
+      name,
+      salon: salonRp?.data,
+      permissions,
+    });
 
     return res.json({ ...roleDb });
   },
 
   updateRole: async (req: Request, res: Response) => {
-    const {id, name, permissions, salonId} = req.body;
-    
+    const { id, name, permissions, salonId } = req.body;
+
     if (!id) {
       return res.json({
         status: "failed",
-        msg: "Missing id input."
-      })
+        msg: "Missing id input.",
+      });
     }
 
-    const newData: any = {name, permissions};
-    Object.keys(newData).forEach(key => newData[key] === undefined && delete newData[key]);
+    const newData: any = { name, permissions };
+    Object.keys(newData).forEach(
+      (key) => newData[key] === undefined && delete newData[key]
+    );
     // Need to check permissions here. May be over here. But I dont understand. FLAG ERROR!
     // code here
-    const newRole = await RoleRepository.updatePermissionForRole({id, ...newData, salonId});
+    const newRole = await RoleRepository.updatePermissionForRole({
+      id,
+      ...newData,
+      salonId,
+    });
 
-    return res.json({...newRole});
+    return res.json({ ...newRole });
   },
 
   deleteRole: async (req: Request, res: Response) => {
-    const {id} = req.params;
+    const { id } = req.params;
     // find salonId
-    const salonId = await UserRepository.getSalonIdByUserId({userId: req.user})
-    const rs = await RoleRepository.delete({id, salonId: salonId?.data});
+    const salonId = await UserRepository.getSalonIdByUserId({
+      userId: req.user,
+    });
+    const rs = await RoleRepository.delete({ id, salonId: salonId?.data });
 
-    return res.json({...rs});
+    return res.json({ ...rs });
   },
 
   assignRoleToUser: async (req: Request, res: Response) => {
-    const {employeeId, roleId} = req.body;
+    const { employeeId, roleId } = req.body;
 
     if (!employeeId || !roleId) {
       return res.json({
         status: "failed",
-        msg: "Missing input."
-      })
+        msg: "Missing input.",
+      });
     }
 
     // get salonId
-    const salonId = await UserRepository.getSalonIdByUserId({userId: req.user})
+    const salonId = await UserRepository.getSalonIdByUserId({
+      userId: req.user,
+    });
     // get role
-    const role = await RoleRepository.getAllBySalon({id: roleId, salonId: salonId?.data});
+    const role = await RoleRepository.getAllBySalon({
+      id: roleId,
+      salonId: salonId?.data,
+    });
     // find employee
-    const oldUser = await UserRepository.getEmployeeBySalonUserId({salonId: salonId?.data, userId: employeeId})
+    const oldUser = await UserRepository.getEmployeeBySalonUserId({
+      salonId: salonId?.data,
+      userId: employeeId,
+    });
 
     try {
-      if (!salonId?.data || !role?.data[0] || !oldUser?.data || oldUser?.data?.permission==="OWNER") {
+      if (
+        !salonId?.data ||
+        !role?.data[0] ||
+        !oldUser?.data ||
+        oldUser?.data?.permission === "OWNER"
+      ) {
         return res.json({
           status: "failed",
-          msg: "Error data."
-        })
+          msg: "Error data.",
+        });
       }
-      
     } catch (error) {
       return res.json({
         status: "failed",
-        msg: "Error data."
-      })
-     }
+        msg: "Error data.",
+      });
+    }
 
-     if (role?.data[0]?.permissions === "OWNER") {
+    if (role?.data[0]?.permissions === "OWNER") {
       return res.json({
         status: "failed",
-        msg: "Error role."
-      })
-     }
+        msg: "Error role.",
+      });
+    }
 
     // assign role to user
-    const newUser = await UserRepository.setPermissionAndRole({...oldUser?.data, role: role?.data[0]?.name, permissions: role?.data[0]?.permissions})
-  
-    return res.json({...newUser});
+    const newUser = await UserRepository.setPermissionAndRole({
+      ...oldUser?.data,
+      role: role?.data[0]?.name,
+      permissions: role?.data[0]?.permissions,
+    });
+
+    return res.json({ ...newUser });
   },
 };
 
