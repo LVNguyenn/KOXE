@@ -2,10 +2,13 @@ import { Request, Response } from "express";
 import { Purchase, Salon } from "../entities";
 import { getRepository } from "typeorm";
 import moment from "moment";
+import { PublishPaymentEvent } from "../utils";
 
 const userPurchaseController = {
+
   getAllPurchasePackages: async (req: Request, res: Response) => {
-    const userPurchaseRepository = getRepository(Purchase);
+
+    // const userPurchaseRepository = getRepository(Purchase);
     let user_id: any = req.headers["userId"] || "";
 
     const salon = await getRepository(Salon).findOne({
@@ -13,12 +16,14 @@ const userPurchaseController = {
     });
 
     try {
-      const userPurchases = await userPurchaseRepository.find({
-        where: [{ userId: user_id }, { userId: salon?.user_id }],
-        relations: ["package", "package.features"],
-      });
+      // const userPurchases = await userPurchaseRepository.find({
+      //   where: [{ userId: user_id }, { userId: salon?.user_id }],
+      //   relations: ["package", "package.features"],
+      // });
+      const userPurchases = await PublishPaymentEvent({event: 'GET_ALL_PURCHASE', data: {user_id, salon}});
+      if (!userPurchases) throw new Error();
 
-      const userPurchasedPackages = userPurchases.map((purchase) => ({
+      const userPurchasedPackages = userPurchases.map((purchase: any) => ({
         package_id: purchase.package.package_id,
         purchaseDate: moment(purchase.purchaseDate).format(
           "DD-MM-YYYY HH:mm:ss"
@@ -26,7 +31,7 @@ const userPurchaseController = {
         expirationDate: moment(purchase.expirationDate).format(
           "DD-MM-YYYY HH:mm:ss"
         ),
-        features: purchase.package.features.map((feature) => ({
+        features: purchase.package.features.map((feature: any) => ({
           //id: feature.feature_id,
           //name: feature.name,
           keyMap: feature.keyMap,

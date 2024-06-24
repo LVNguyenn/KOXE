@@ -7,8 +7,8 @@ const router = Router();
 // router.post("/createOrder", userController.createOrder);
 // router.post("/queryOrder", userController.queryOrder);
 
+// vnp
 router.post("/create_payment_url", middlewareController.verifyToken, userController.createPaymentUrl);
-// router.post("/create_payment_url", userController.createPaymentUrl);
 router.get("/vnpay_ipn", userController.vnpayIPN);
 router.get("/vnpay_return", userController.vnpayReturn);
 

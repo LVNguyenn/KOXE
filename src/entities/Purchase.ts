@@ -33,7 +33,7 @@ export class Purchase {
   init(
     userId: string,
     packageId: string,
-    purchaseDate: Date,
+    purchaseDate: Date = new Date(),
     expirationDate: Date,
     total: number
   ) {
@@ -42,5 +42,9 @@ export class Purchase {
     this.purchaseDate = purchaseDate;
     this.expirationDate = expirationDate;
     this.total = total;
+  }
+
+  constructor() {
+    this.purchaseDate = new Date();
   }
 }

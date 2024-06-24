@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import dayjs from "dayjs";
 import vi from "dayjs/locale/vi";
+import axios from "axios";
 
 dayjs.locale(vi);
 
@@ -141,6 +142,14 @@ function subtractHoursFromStringTime(timeString: string, hours: number) {
   let timeBeforeStr = `${year}-${month}-${day} ${hoursStr}:${minutes}:${seconds}`;
 
   return timeBeforeStr;
+}
+
+export const PublishPaymentEvent = async (payload: any) => {
+    const {data} = await axios.post(`${process.env.PAYMENT_SERVICE}app-events/`, {
+        payload
+    })
+
+    return data;
 }
 
 export {

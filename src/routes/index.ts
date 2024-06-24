@@ -36,7 +36,7 @@ function router(app: Express) {
   app.use("/cars", carRouter);
   app.use("/salons", salonRouter);
   app.use("/api", apidocRouter);
-  app.use("/payment", paymentRouter);
+  // app.use("/payment", paymentRouter);
   app.use("/purchase", purchaseRouter);
   app.use("/messages", messageRouter);
   app.use("/appointment", appointmentRouter);
