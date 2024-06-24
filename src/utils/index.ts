@@ -41,11 +41,11 @@ function getLocalDateTime() {
   return date.toLocaleString();
 }
 
-function calExpiryDate(purchaseDate: string, duration: number) {
-  const date = new Date(purchaseDate);
-  date.setMonth(date.getMonth() + duration);
+function calExpiryDate(purchaseDate: Date, duration: number) {
+  //const date = new Date(purchaseDate);
+  purchaseDate.setMonth(purchaseDate.getMonth() + duration);
 
-  return date.toLocaleString();
+  return purchaseDate;
 }
 
 //function convertToTimeZone(date: any, timeZoneOffset: any) {

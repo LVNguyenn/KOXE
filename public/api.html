@@ -73,6 +73,7 @@
     <li>API get salon theo id tui không lấy ra các xe của salon đó nữa mà giờ sẽ có 1 API riêng để gọi. API get salon theo id chỉ lấy ra được các thông tin của salon thôi</li>
     <li>[GET] /cars/salon/:salon_id</li>
     <li>Có sắp xếp, hiện tại chỉ mới có cho xe, cần truyền vào VD: /cars/salon/e03942f6-1fc0-4864-9a70-647a070160d7?page=1&per_page=5&sort=price (nếu -price là sắp xếp giảm dần, muốn sắp xếp theo name cũng được)</li>
+    <li>[GET] /purchase (Lấy thêm ngày mua và ngày hết hạn)</li>
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
     <h2>MỤC LỤC</h2>
@@ -300,6 +301,7 @@
 
     <h2 id="purchase">PURCHASE</h2>
     <li>[GET] /purchase</li>
+    Sẽ lấy ra được id gói, các keyMap cùng với purchaseDate và expirationDate.
     Cho biết user đã mua được những gói dịch vụ nào rồi và các chức năng có trong gói đó. Cái tính năng bây giờ có
     thêm cái keyMap để mình có thể dựa vào đó để render ra các tính năng tương ứng cho user sử dụng. Cái id nó generate ra
     ngẫu nhiên nên không dùng được

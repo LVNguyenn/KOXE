@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { Purchase, Salon } from "../entities";
 import { getRepository } from "typeorm";
+import moment from "moment";
 
 const userPurchaseController = {
   getAllPurchasePackages: async (req: Request, res: Response) => {
@@ -19,6 +20,12 @@ const userPurchaseController = {
 
       const userPurchasedPackages = userPurchases.map((purchase) => ({
         package_id: purchase.package.package_id,
+        purchaseDate: moment(purchase.purchaseDate).format(
+          "DD-MM-YYYY HH:mm:ss"
+        ),
+        expirationDate: moment(purchase.expirationDate).format(
+          "DD-MM-YYYY HH:mm:ss"
+        ),
         features: purchase.package.features.map((feature) => ({
           //id: feature.feature_id,
           //name: feature.name,
