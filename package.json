@@ -6,7 +6,8 @@
         "express-http-proxy": "^2.0.0",
         "express-session": "^1.18.0",
         "nodemon": "^3.1.4",
-        "ts-node": "^10.9.2"
+        "ts-node": "^10.9.2",
+        "typescript": "^5.5.2"
     },
     "devDependencies": {
         "@types/cors": "^2.8.17",
