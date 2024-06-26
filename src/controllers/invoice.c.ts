@@ -118,7 +118,6 @@ const invoiceController = {
 
     const connection = await getConnection();
     const queryRunner = connection.createQueryRunner();
-    await queryRunner.startTransaction();
     flagCondition +=1;
 
     try {
@@ -170,11 +169,11 @@ const invoiceController = {
       const legalUserRp = await legalsController.addLegalForUser({ carId, salonId, phone, invoice: invoiceDb, processId });
       // get userId by phone
       const userRp = await UserRepository.getProfileByOther({ phone });
-      if (!legalUserRp?.data || !legalUserRp?.data || !invoiceDb) throw new Error();
+      if (!legalUserRp?.data || !invoiceDb) throw new Error();
 
       // send notification
       createNotification({
-        to: userRp?.data?.user_id,
+        to: userRp?.data?.user_id||"",
         description: `Salon ${carDb?.salon?.name} vừa thêm tiến trình giấy tờ hoàn tất mua xe cho bạn`,
         types: "process",
         data: "",
