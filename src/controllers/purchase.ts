@@ -20,7 +20,9 @@ const userPurchaseController = {
       //   where: [{ userId: user_id }, { userId: salon?.user_id }],
       //   relations: ["package", "package.features"],
       // });
+      console.log("befor call")
       const userPurchases = await PublishPaymentEvent({event: 'GET_ALL_PURCHASE', data: {user_id, salon}});
+      console.log("after call ", userPurchases)
       if (!userPurchases) throw new Error();
 
       const userPurchasedPackages = userPurchases.map((purchase: any) => ({
