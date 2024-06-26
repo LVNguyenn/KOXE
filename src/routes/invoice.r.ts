@@ -58,6 +58,8 @@ router.post(
 );
 router.post("/remove", invoiceController.removeInvoice);
 
+router.post("/confirm-paid-user", middlewareController.verifyToken, invoiceController.confirmPaidInvoiceFromUser);
+
 // admin
 router.post(
   "/statistics-admin",

@@ -29,7 +29,6 @@
     <li>Hóa đơn mua phụ tùng</li>
     <li>Nhắn tin có hình ảnh</li>
     <li>[POST] /salons/employees</li>
-    <li>[POST] /invoice/create-invoice</li>
     <li>Phân trang, search</li>
     <li>Thêm thông báo lúc salon next qua giai đoạn tiếp theo và khi hoàn tất quy trình thì cũng sẽ có thông báo cho hoa tiêu</li>
     <li>Khi lấy bài post theo id sẽ kèm theo phần trăm đánh giá trung bình của hoa tiêu đó kèm theo số giao dịch đã hoàn thành, cung cấp thêm thông tin cho salon dễ ra quyết định kết nối</li>
@@ -74,6 +73,10 @@
     <li>[GET] /cars/salon/:salon_id</li>
     <li>Có sắp xếp, hiện tại chỉ mới có cho xe, cần truyền vào VD: /cars/salon/e03942f6-1fc0-4864-9a70-647a070160d7?page=1&per_page=5&sort=price (nếu -price là sắp xếp giảm dần, muốn sắp xếp theo name cũng được)</li>
     <li>[GET] /purchase (Lấy thêm ngày mua và ngày hết hạn)</li>
+    <h3>Từ ngày 25/6/24 - Đến 1/7/24</h3>
+    <li>[POST] /invoice/create-invoice</li>
+    <li>[POST] /invoice/confirm-paid-user</li>
+    
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
     <h2>MỤC LỤC</h2>
@@ -677,6 +680,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[POST] /invoice/create-invoice</li>
     Dùng để tạo ra hóa đơn phụ trách việc mua xe của khách hàng. Yêu cầu chủ salon or nhân viên có quyền C_IV .Yêu cầu truyền vô:
     {carId, salonId, note, fullname: tên khách hàng, email: email khách hàng, phone: sdt của khách hàng, expense: tổng chi phí., processId: id của qui trình cần thiết lập cho khách hàng., employeeId: id nhân viên của salon.}
+    Sẽ tạo ra thông báo là cần bên khách hàng thanh toán. Type của thông báo đó là "invoice-paid". data là id của cái invoice, dùng để truyền vô khi khách hàng ấn là đã hoàn tất thanh toán thì truyền vô id đó.
     <li>[POST] /invoice/lookup</li>
     Dùng để tra cứu thông tin hóa đơn. Yêu cầu là chủ salon or có quyền R_IV.Yêu cầu truyền vô: {"invoiceId", "salonId", "phone", "licensePlate", "type"}. nếu muốn tìm theo gì thì truyền vô cái đó.
     salonId là bắt buộc. licensePlate: Biển số xe. type: loại giao dịch: "buy car", "maintenance". phone: sdt khách hàng.
@@ -690,7 +694,8 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
      Trong này nó sẽ trả về thông tin xe và qui trình của xe luôn (nếu có xe đó).
     <li class="hot">[PATCH] /invoice/tick-done</li>
         Dùng để tick là hóa đơn đó đã hoàn thành tất cả qui trình cho khách hàng rồi. Cần truyền vô: {salonId, invoiceId}
-
+    <li>[POST] /invoice/confirm-paid-user</li>
+    Khách hàng ấn xác nhận là đã thanh toán hóa đơn đó rồi. Yêu cầu truyền vô: {invoiceId, notificationId: id của cái thông báo mà khách hàng nhận (vì ấn xác nhận sẽ xóa thông báo đó đi.)}
     <h3 id="mInvoice">Hóa đơn bảo dưỡng</h3>
     <li>[GET] /invoice/get-invoice-maintenance</li>
     Nó sẽ lấy ra được thông tin tất cả các hóa đơn bảo dưỡng (xe gì, ai làm và những dịch vụ đã thực hiện, những phụ tùng đã dùng để sửa chữa) tại salon mình (Đối với chủ salon)

@@ -33,7 +33,7 @@ const createNotification = async (data: Object | any): Promise<boolean> => {
 
     return true;
   } catch (error) {
-    // console.log(error)
+    console.log(error)
     return false;
   }
 };

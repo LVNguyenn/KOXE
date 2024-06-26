@@ -12,13 +12,16 @@ import UserRepository from "../repository/user";
 import pagination from "../helper/pagination";
 import search from "../helper/search";
 import PurchaseRepository from "../repository/purchase";
+import InvoiceRepository from "../repository/invoice";
+import NotificationRepository from "../repository/notification";
+import { getUserInfo } from "../helper/mInvoice";
 
 
 const invoiceController = {
   printInvoiceBuyCar2: async (req: Request, res: Response) => {
     const { carId, salonId, note, fullname, email, phone, expense, processId, employeeId } = req.body;
 
-    if (!employeeId || !expense || !phone || !processId || !carId ) {
+    if (!employeeId || !expense || !phone || !processId || !carId) {
       return res.json({
         status: "failed",
         msg: "Input is invalid."
@@ -86,7 +89,7 @@ const invoiceController = {
         avatar: carDb?.salon?.image,
         isUser: false
       })
- 
+
       return res.json({
         status: "success",
         msg: "Create invoice successfully!",
@@ -103,28 +106,30 @@ const invoiceController = {
 
   printInvoiceBuyCar: async (req: Request, res: Response) => {
     const { carId, salonId, note, fullname, email, phone, expense, processId, employeeId } = req.body;
-  
-    if (!employeeId || !expense || !phone || !processId || !carId ) {
+    let delInvoice = "";
+    let flagCondition = 0;
+
+    if (!employeeId || !expense || !phone || !processId || !carId) {
       return res.json({
         status: "failed",
         msg: "Input is invalid."
       });
     }
-  
+
     const connection = await getConnection();
     const queryRunner = connection.createQueryRunner();
-  
     await queryRunner.startTransaction();
-  
+    flagCondition +=1;
+
     try {
       const invoiceRepository = queryRunner.manager.getRepository(Invoice);
       const carRepository = queryRunner.manager.getRepository(Car);
-  
+
       const carDb: Car = await carRepository.findOneOrFail({
         where: { car_id: carId, available: MoreThan(0) },
         relations: ["salon", "warranties"],
       });
-  
+
       if (carDb.salon?.salon_id !== salonId) {
         await queryRunner.rollbackTransaction();
         return res.json({
@@ -132,11 +137,11 @@ const invoiceController = {
           msg: "Error information.",
         });
       }
-  
+
       let limit_kilometer = carDb?.warranties?.limit_kilometer;
       let months = carDb?.warranties?.months;
       let policy = carDb?.warranties?.policy;
-  
+
       let saveInvoice: any = new Invoice();
       saveInvoice.seller = carDb.salon;
       saveInvoice = {
@@ -152,18 +157,21 @@ const invoiceController = {
         policy,
         employee_id: employeeId
       };
-  
+
       const invoiceDb = await invoiceRepository.save(saveInvoice);
-  
+      await queryRunner.startTransaction();
+      delInvoice = invoiceDb;
+      console.log(invoiceDb)
+
       // set status for car is sold.
       await carRepository.save({ ...carDb, available: Number(carDb.available) - 1 });
-  
+
       // add legal for customer
-      await legalsController.addLegalForUser({ carId, salonId, phone, invoice: invoiceDb, processId });
-  
+      const legalUserRp = await legalsController.addLegalForUser({ carId, salonId, phone, invoice: invoiceDb, processId });
       // get userId by phone
       const userRp = await UserRepository.getProfileByOther({ phone });
-  
+      if (!legalUserRp?.data || !legalUserRp?.data || !invoiceDb) throw new Error();
+
       // send notification
       createNotification({
         to: userRp?.data?.user_id,
@@ -173,7 +181,7 @@ const invoiceController = {
         avatar: carDb?.salon?.image,
         isUser: false
       });
-  
+
       createNotification({
         to: userRp?.data?.user_id,
         description: `Bạn cần thanh toán hóa đơn với salon ${carDb?.salon?.name} giao dịch mua xe chi phí ${expense} vnd. Vui lòng ấn xác nhận đã thanh toán nếu bạn đã hoàn tất.`,
@@ -182,27 +190,31 @@ const invoiceController = {
         avatar: carDb?.salon?.image,
         isUser: false
       });
-  
+
       await queryRunner.commitTransaction();
-  
+
       return res.json({
         status: "success",
         msg: "Create invoice successfully!",
         invoice: { ...saveInvoice, warranty: carDb?.warranties },
       });
-  
+
     } catch (error: any) {
-      await queryRunner.rollbackTransaction();
+      if (flagCondition !=0) await queryRunner.rollbackTransaction();
+      // delete invoice 
+      await InvoiceRepository.delete(delInvoice);
+      console.log(flagCondition)
+      console.log(error)
+
       return res.json({
         status: "failed",
         msg: "An error occurred.",
-        error: error.message
       });
     } finally {
-      await queryRunner.release();
+      if (flagCondition !=0) await queryRunner.release();
     }
   },
-  
+
 
   lookupInvoiceByInvoiceId: async (req: Request, res: Response) => {
     const { salonId, invoiceId, phone: phone, licensePlate, type } = req.body;
@@ -243,7 +255,7 @@ const invoiceController = {
         .innerJoinAndSelect('invoice.seller', 'salon', 'salon.salon_id = :salonId', { salonId })
         .leftJoinAndSelect('invoice.legals_user', 'car_user_legals')
         // .leftJoinAndSelect('user', 'user', 'invoice.employee_id = user.user_id')
-        .where({type: "buy car"})
+        .where({ type: "buy car" })
 
       if (done !== undefined && done !== "undefined") {
         queryBuilder = await queryBuilder.where({ done: done })
@@ -271,10 +283,10 @@ const invoiceController = {
 
       // }
       if (q) {
-        invoiceDb = await search({data: invoiceDb, q, fieldname: "fullname"})
+        invoiceDb = await search({ data: invoiceDb, q, fieldname: "fullname" })
       }
 
-      const rs = await pagination({data: invoiceDb, page, per_page});
+      const rs = await pagination({ data: invoiceDb, page, per_page });
 
       return res.json({
         status: "success",
@@ -321,7 +333,7 @@ const invoiceController = {
     let year = new Year().months;
     try {
       let purchaseDb: any = await statistics({ salonId: "", type: "package", fromDate, year });
-      const rs = await pagination({data: purchaseDb.purchases, per_page: 10});
+      const rs = await pagination({ data: purchaseDb.purchases, per_page: 10 });
       purchaseDb.purchases = rs.data || "";
       const getTopPackage = await PurchaseRepository.getAllPurchase({});
       const avg = averageEachMonth(year)
@@ -370,7 +382,7 @@ const invoiceController = {
   },
 
   getInvoiceByPhone: async (req: Request, res: Response) => {
-    const {q, page, per_page} = req.body;
+    const { q, page, per_page } = req.body;
     const userId: any = req.user;
     let phone;
 
@@ -403,10 +415,10 @@ const invoiceController = {
       })
 
       if (q) {
-        invoiceDb = await search({data: invoiceDb, q, fieldname: "fullname"})
+        invoiceDb = await search({ data: invoiceDb, q, fieldname: "fullname" })
       }
 
-      const rs = await pagination({data: invoiceDb, page, per_page});
+      const rs = await pagination({ data: invoiceDb, page, per_page });
 
       return res.json({
         status: "success",
@@ -484,7 +496,46 @@ const invoiceController = {
         msg: "Error remove invoice."
       })
     }
-  }
+  },
+
+  confirmPaidInvoiceFromUser: async (req: Request, res: Response) => {
+    const { invoiceId, notificationId } = req.body;
+    const userId: any = req.headers["userId"] || "";
+
+    try {
+      if (!invoiceId || !notificationId || !userId) throw new Error();
+      // find notification
+      const notificationRp = await NotificationRepository.findByUserNotiId({ notificationId, userId });
+      // find invoice by userId and invoiceId
+      const invoiceRp = await InvoiceRepository.findById({ invoiceId });
+      if (!notificationRp?.data || !invoiceRp?.data) throw new Error();
+      // delete notification of user
+      await NotificationRepository.delete(notificationRp.data);
+      // send notification to salon
+      //get infor user 
+      const user = await getUserInfo(userId);
+      createNotification({
+        to: invoiceRp?.data?.salon_id,
+        description: `${user?.fullname} vừa xác nhận đã hoàn tất thanh toán. Hãy ấn xác nhận nếu bạn đã nhận được.`,
+        types: "invoice-paid",
+        data: `${invoiceId}`,
+        avatar: user?.avatar || "https://haycafe.vn/wp-content/uploads/2022/02/Avatar-trang.jpg",
+        isUser: true
+      });
+
+      return res.json({
+        status: "success",
+        msg: "Bạn đã xác nhận hoàn tất thanh toán. Vui lòng đợi đợi phản hồi từ salon."
+      })
+
+    } catch (error) {
+      return res.json({
+        status: "failed",
+        msg: "Lỗi xác nhận, vui lòng thử lại."
+      })
+    }
+
+  },
 
 }
 
