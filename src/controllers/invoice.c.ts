@@ -511,10 +511,11 @@ const invoiceController = {
       // delete notification of user
       await NotificationRepository.delete(notificationRp.data);
       // send notification to salon
+      console.log("invoiceRp: ", invoiceRp)
       //get infor user 
       const user = await getUserInfo(userId);
       createNotification({
-        to: invoiceRp?.data?.salon_id,
+        to: invoiceRp?.data?.seller.salon_id,
         description: `${user?.fullname} vừa xác nhận đã hoàn tất thanh toán. Hãy ấn xác nhận nếu bạn đã nhận được.`,
         types: "invoice-paid",
         data: `${invoiceId}`,

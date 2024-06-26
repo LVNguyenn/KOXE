@@ -9,7 +9,8 @@ const InvoiceRepository = {
         try {
             const userRepository = getRepository(Invoice);
             const invoiceDb = await userRepository.findOneOrFail({
-                where: {invoice_id: data?.invoiceId}
+                where: {invoice_id: data?.invoiceId},
+                relations: ['seller']
             })
 
             return FormatData("success", "find successfully!", invoiceDb);
