@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Car } from "../entities/Car";
-import { MoreThan, getRepository } from "typeorm";
+import { Any, MoreThan, getConnection, getRepository } from "typeorm";
 import { Invoice, Purchase, Salon, User } from '../entities';
 import statistics, { averageEachMonth, getTopSeller } from '../helper/statistics';
 import Year from "../utils/year";
@@ -15,7 +15,7 @@ import PurchaseRepository from "../repository/purchase";
 
 
 const invoiceController = {
-  printInvoiceBuyCar: async (req: Request, res: Response) => {
+  printInvoiceBuyCar2: async (req: Request, res: Response) => {
     const { carId, salonId, note, fullname, email, phone, expense, processId, employeeId } = req.body;
 
     if (!employeeId || !expense || !phone || !processId || !carId ) {
@@ -78,6 +78,15 @@ const invoiceController = {
         isUser: false
       })
 
+      createNotification({
+        to: userRp?.data?.user_id,
+        description: `Bạn cần thanh toán hóa đơn với salon ${carDb?.salon?.name} giao dịch mua xe chi phí ${expense} vnd. Vui lòng ấn xác nhận đã thanh toán nếu bạn đã hoàn tất.`,
+        types: "invoice-paid",
+        data: invoiceDb.invoice_id || "",
+        avatar: carDb?.salon?.image,
+        isUser: false
+      })
+ 
       return res.json({
         status: "success",
         msg: "Create invoice successfully!",
@@ -91,6 +100,109 @@ const invoiceController = {
       });
     }
   },
+
+  printInvoiceBuyCar: async (req: Request, res: Response) => {
+    const { carId, salonId, note, fullname, email, phone, expense, processId, employeeId } = req.body;
+  
+    if (!employeeId || !expense || !phone || !processId || !carId ) {
+      return res.json({
+        status: "failed",
+        msg: "Input is invalid."
+      });
+    }
+  
+    const connection = await getConnection();
+    const queryRunner = connection.createQueryRunner();
+  
+    await queryRunner.startTransaction();
+  
+    try {
+      const invoiceRepository = queryRunner.manager.getRepository(Invoice);
+      const carRepository = queryRunner.manager.getRepository(Car);
+  
+      const carDb: Car = await carRepository.findOneOrFail({
+        where: { car_id: carId, available: MoreThan(0) },
+        relations: ["salon", "warranties"],
+      });
+  
+      if (carDb.salon?.salon_id !== salonId) {
+        await queryRunner.rollbackTransaction();
+        return res.json({
+          status: "failed",
+          msg: "Error information.",
+        });
+      }
+  
+      let limit_kilometer = carDb?.warranties?.limit_kilometer;
+      let months = carDb?.warranties?.months;
+      let policy = carDb?.warranties?.policy;
+  
+      let saveInvoice: any = new Invoice();
+      saveInvoice.seller = carDb.salon;
+      saveInvoice = {
+        ...saveInvoice,
+        expense,
+        note,
+        fullname,
+        email,
+        phone,
+        carName: carDb.name,
+        limit_kilometer,
+        months,
+        policy,
+        employee_id: employeeId
+      };
+  
+      const invoiceDb = await invoiceRepository.save(saveInvoice);
+  
+      // set status for car is sold.
+      await carRepository.save({ ...carDb, available: Number(carDb.available) - 1 });
+  
+      // add legal for customer
+      await legalsController.addLegalForUser({ carId, salonId, phone, invoice: invoiceDb, processId });
+  
+      // get userId by phone
+      const userRp = await UserRepository.getProfileByOther({ phone });
+  
+      // send notification
+      createNotification({
+        to: userRp?.data?.user_id,
+        description: `Salon ${carDb?.salon?.name} vừa thêm tiến trình giấy tờ hoàn tất mua xe cho bạn`,
+        types: "process",
+        data: "",
+        avatar: carDb?.salon?.image,
+        isUser: false
+      });
+  
+      createNotification({
+        to: userRp?.data?.user_id,
+        description: `Bạn cần thanh toán hóa đơn với salon ${carDb?.salon?.name} giao dịch mua xe chi phí ${expense} vnd. Vui lòng ấn xác nhận đã thanh toán nếu bạn đã hoàn tất.`,
+        types: "invoice-paid",
+        data: invoiceDb.invoice_id || "",
+        avatar: carDb?.salon?.image,
+        isUser: false
+      });
+  
+      await queryRunner.commitTransaction();
+  
+      return res.json({
+        status: "success",
+        msg: "Create invoice successfully!",
+        invoice: { ...saveInvoice, warranty: carDb?.warranties },
+      });
+  
+    } catch (error: any) {
+      await queryRunner.rollbackTransaction();
+      return res.json({
+        status: "failed",
+        msg: "An error occurred.",
+        error: error.message
+      });
+    } finally {
+      await queryRunner.release();
+    }
+  },
+  
 
   lookupInvoiceByInvoiceId: async (req: Request, res: Response) => {
     const { salonId, invoiceId, phone: phone, licensePlate, type } = req.body;
