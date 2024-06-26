@@ -8,7 +8,6 @@ const userPurchaseController = {
 
   getAllPurchasePackages: async (req: Request, res: Response) => {
 
-    // const userPurchaseRepository = getRepository(Purchase);
     let user_id: any = req.headers["userId"] || "";
 
     const salon = await getRepository(Salon).findOne({
@@ -16,13 +15,14 @@ const userPurchaseController = {
     });
 
     try {
-      // const userPurchases = await userPurchaseRepository.find({
-      //   where: [{ userId: user_id }, { userId: salon?.user_id }],
-      //   relations: ["package", "package.features"],
-      // });
-      console.log("befor call")
-      const userPurchases = await PublishPaymentEvent({event: 'GET_ALL_PURCHASE', data: {user_id, salon}});
-      console.log("after call ", userPurchases)
+    const userPurchaseRepository = getRepository(Purchase);
+      const userPurchases = await userPurchaseRepository.find({
+        where: [{ userId: user_id }, { userId: salon?.user_id }],
+        relations: ["package", "package.features"],
+      });
+      // console.log("befor call")
+      // const userPurchases = await PublishPaymentEvent({event: 'GET_ALL_PURCHASE', data: {user_id, salon}});
+      // console.log("after call ", userPurchases)
       if (!userPurchases) throw new Error();
 
       const userPurchasedPackages = userPurchases.map((purchase: any) => ({
