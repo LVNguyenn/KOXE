@@ -76,7 +76,7 @@
     <h3>Từ ngày 25/6/24 - Đến 1/7/24</h3>
     <li>[POST] /invoice/create-invoice</li>
     <li>[POST] /invoice/confirm-paid-user</li>
-    
+    <li>[POST] /invoice/confirm-paid-salon</li>
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
     <h2>MỤC LỤC</h2>
@@ -696,6 +696,9 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
         Dùng để tick là hóa đơn đó đã hoàn thành tất cả qui trình cho khách hàng rồi. Cần truyền vô: {salonId, invoiceId}
     <li>[POST] /invoice/confirm-paid-user</li>
     Khách hàng ấn xác nhận là đã thanh toán hóa đơn đó rồi. Yêu cầu truyền vô: {invoiceId, notificationId: id của cái thông báo mà khách hàng nhận (vì ấn xác nhận sẽ xóa thông báo đó đi.)}
+    <li>[POST] /invoice/confirm-paid-salon</li>
+    Salon ấn xác nhận đã nhận được tiền, nếu chưa nhận thì người ta tự có cách liên lạc với khách hàng. Yêu cầu truyền vô: {"invoiceId", "notificationId": id thông báo của salon khi nhận được(dùng để xóa), salonId}
+    Xác nhận thành công thì sẽ update trường paid trong hóa đơn thành true.
     <h3 id="mInvoice">Hóa đơn bảo dưỡng</h3>
     <li>[GET] /invoice/get-invoice-maintenance</li>
     Nó sẽ lấy ra được thông tin tất cả các hóa đơn bảo dưỡng (xe gì, ai làm và những dịch vụ đã thực hiện, những phụ tùng đã dùng để sửa chữa) tại salon mình (Đối với chủ salon)

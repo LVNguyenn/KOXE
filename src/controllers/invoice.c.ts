@@ -118,7 +118,7 @@ const invoiceController = {
 
     const connection = await getConnection();
     const queryRunner = connection.createQueryRunner();
-    flagCondition +=1;
+    flagCondition += 1;
 
     try {
       const invoiceRepository = queryRunner.manager.getRepository(Invoice);
@@ -173,7 +173,7 @@ const invoiceController = {
 
       // send notification
       createNotification({
-        to: userRp?.data?.user_id||"",
+        to: userRp?.data?.user_id || "",
         description: `Salon ${carDb?.salon?.name} vừa thêm tiến trình giấy tờ hoàn tất mua xe cho bạn`,
         types: "process",
         data: "",
@@ -199,7 +199,7 @@ const invoiceController = {
       });
 
     } catch (error: any) {
-      if (flagCondition !=0) await queryRunner.rollbackTransaction();
+      if (flagCondition != 0) await queryRunner.rollbackTransaction();
       // delete invoice 
       await InvoiceRepository.delete(delInvoice);
       console.log(flagCondition)
@@ -210,7 +210,7 @@ const invoiceController = {
         msg: "An error occurred.",
       });
     } finally {
-      if (flagCondition !=0) await queryRunner.release();
+      if (flagCondition != 0) await queryRunner.release();
     }
   },
 
@@ -535,6 +535,43 @@ const invoiceController = {
       })
     }
 
+  },
+
+  confirmPaidFromSalon: async (req: Request, res: Response) => {
+    const { salonId, invoiceId, notificationId } = req.body;
+
+    try {
+      if (!invoiceId || !notificationId || !salonId) throw new Error();
+      // find invoiceId
+      const invoiceRp = await InvoiceRepository.findById({ invoiceId });
+      const notificationRp = await NotificationRepository.findByUserNotiId({ notificationId, userId: salonId });
+      if (!invoiceRp?.data || !notificationRp?.data) throw new Error();
+      // update paid
+      const rsInvoice = await InvoiceRepository.update({ ...invoiceRp?.data, paid: true });
+      if (!rsInvoice?.data) throw new Error();
+      // delete old notification
+      await NotificationRepository.delete(notificationRp?.data);
+
+      // get userId by phone
+      const userRp = await UserRepository.getProfileByOther({ phone: rsInvoice?.data?.phone });
+      createNotification({
+        to: userRp?.data?.user_id,
+        description: `Salon ${rsInvoice.data.seller.name} đã xác nhận hoàn tất thanh toán. Giao dịch thành công.`,
+        types: "invoice-paid",
+        data: "",
+        avatar: rsInvoice.data.seller?.image,
+        isUser: false
+      });
+
+      return res.json({ ...rsInvoice });
+
+    } catch (error) {
+      console.log(error)
+      return res.json({
+        status: "failed",
+        msg: "Error confirm, please try again."
+      })
+    }
   },
 
 }
