@@ -15,6 +15,10 @@ const corsOptions = {
 app.use(cors(corsOptions )); 
 app.use(express.json());
 
+// In ra giá trị của các biến môi trường để kiểm tra
+console.log('PAYMENT_SERVICE:', process.env.PAYMENT_SERVICE);
+console.log('MAIN_SERVICE:', process.env.MAIN_SERVICE);
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET_KEY as string,
