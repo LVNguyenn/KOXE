@@ -10,7 +10,7 @@ dotenv.config();
 
 module.exports = async (app: any) => {
     const corsOptions = {
-        origin: ["http://localhost:3000"],
+        origin: ["http://localhost:3000", "https://server-graduation-thesis-1.onrender.com", "https://salon-gateway.onrender.com"],
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
         credentials: true,
     };
