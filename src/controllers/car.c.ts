@@ -196,6 +196,7 @@ const carController = {
       return res.status(200).json({
         status: "success",
         cars: rs.data,
+        total_page: rs?.total_page,
       });
     } catch (error) {
       return res
