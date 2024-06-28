@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { getRepository } from "typeorm";
 import { Salon, User } from "../entities";
+import UserRepository from "../repository/user";
 
 const middlewareController = {
   // verify token
@@ -154,8 +155,11 @@ const middlewareController = {
   havePermission: (permission: any) => {
     return async (req: Request, res: Response, next: NextFunction) => {
       const roleAdmin: string[] = ["OWNER"];
-      const { salonId } = req.body;
       const userId: any = req.user;
+      // find salonId
+      const salonRp = await UserRepository.getSalonIdByUserId({ userId });
+      const salonId = req.body.salonId || salonRp?.data;
+
 
       //console.log("salonId: ", salonId);
 

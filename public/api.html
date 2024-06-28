@@ -74,9 +74,12 @@
     <li>Có sắp xếp, hiện tại chỉ mới có cho xe, cần truyền vào VD: /cars/salon/e03942f6-1fc0-4864-9a70-647a070160d7?page=1&per_page=5&sort=price (nếu -price là sắp xếp giảm dần, muốn sắp xếp theo name cũng được)</li>
     <li>[GET] /purchase (Lấy thêm ngày mua và ngày hết hạn)</li>
     <h3>Từ ngày 25/6/24 - Đến 1/7/24</h3>
-    <li>[POST] /invoice/create-invoice</li>
-    <li>[POST] /invoice/confirm-paid-user</li>
-    <li>[POST] /invoice/confirm-paid-salon</li>
+    <li>[GET] /salon-payment</li>
+    <li>[POST] /salon-payment/create</li>
+    <li>[POST] /salon-payment/confirm-user</li>
+    <li>[POST] /salon-payment/confirm-salon</li>
+    <li>[DELETE] /salon-payment/:id</li>
+    
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
     <h2>MỤC LỤC</h2>
@@ -114,6 +117,7 @@
     <li><a href="#promotion" class="fsl">Đăng Tin Khuyến Mãi</a></li>
     <li><a href="#group" class="fsl">Tạo Group Salon</a></li>
     <li><a href="#notification-offline" class="fsl">Notification Khi Offline</a></li>
+    <li><a href="#salon-payment" class="fsl">Salon tạo phiếu thanh toán</a></li>
 
     <h3>Chú ý: Với các hành động liên quan đến quản lý salon như thêm nhân viên, thêm xe,... của salon - các hành động cần quyền
         thì mới có thể làm được với salon thì cần gửi đi salonId. Vì cần thông tin này thì mới xác định được chính xác người đó có quyền gì.
@@ -694,11 +698,6 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
      Trong này nó sẽ trả về thông tin xe và qui trình của xe luôn (nếu có xe đó).
     <li class="hot">[PATCH] /invoice/tick-done</li>
         Dùng để tick là hóa đơn đó đã hoàn thành tất cả qui trình cho khách hàng rồi. Cần truyền vô: {salonId, invoiceId}
-    <li>[POST] /invoice/confirm-paid-user</li>
-    Khách hàng ấn xác nhận là đã thanh toán hóa đơn đó rồi. Yêu cầu truyền vô: {invoiceId, notificationId: id của cái thông báo mà khách hàng nhận (vì ấn xác nhận sẽ xóa thông báo đó đi.)}
-    <li>[POST] /invoice/confirm-paid-salon</li>
-    Salon ấn xác nhận đã nhận được tiền, nếu chưa nhận thì người ta tự có cách liên lạc với khách hàng. Yêu cầu truyền vô: {"invoiceId", "notificationId": id thông báo của salon khi nhận được(dùng để xóa), salonId}
-    Xác nhận thành công thì sẽ update trường paid trong hóa đơn thành true.
     <h3 id="mInvoice">Hóa đơn bảo dưỡng</h3>
     <li>[GET] /invoice/get-invoice-maintenance</li>
     Nó sẽ lấy ra được thông tin tất cả các hóa đơn bảo dưỡng (xe gì, ai làm và những dịch vụ đã thực hiện, những phụ tùng đã dùng để sửa chữa) tại salon mình (Đối với chủ salon)
@@ -1077,6 +1076,8 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Tìm kiếm theo fullname.
     <li>[GET] /admin/salons</li>
     Tìm kiếm theo name.
+    <li>[GET] //salon-payment/</li>
+    Nếu là người dùng thì tìm kiếm theo tên salon. Là salon tìm kiếm theo sdt người dùng.
     
     <h2 id="buy-accessory">Hóa đơn mua phụ tùng</h2>
     <li>[GET] /buy-accessory</li>
@@ -1153,6 +1154,21 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>Trong này tui có gửi file và những chỗ nó chỉ, ông thêm vào bên ông nha để FCM nó gửi đúng đến ứng dụng của mình:
         <a href="https://drive.google.com/drive/folders/1LbPDFkmaouzoMpxB43otHQ-GgQKY8mFc?usp=sharing">Link</a>
     </li>
+
+    <h2 id="salon-payment">Salon tạo thanh toán gửi cho khách hàng</h2>
+    <li>[GET] /salon-payment</li>
+    Lấy ra danh sách các phiếu thanh toán của khách hàng or salon. Nếu truyền vô ?id thì sẽ lấy phiếu thanh toán với id đó.
+    Lưu ý kết quả trả về creator: là người nhân viên tạo ra phiếu thanh toán đó, dùng để hiển thị thôi.
+    <li>[POST] /salon-payment/create</li>
+    Yêu cầu là chủ salon or nhân viên có quyền C_PMSL. Dùng để tạo ra phiếu thanh toán và gửi cho khách hàng. Yêu cầu truyền vô: {cusPhone: số điện thoại khách hàng, cusFullname: tên khách hàng, reason: lý do nội dung tạo hóa đơn, amount: số tiền, salonId}.
+    <div>Sau khi tạo thành công thì bên khách hàng sẽ nhận được thông báo cần thanh toán, type là salon-payment, data là id của phiếu hóa đơn.</div>
+    <li>[POST] /salon-payment/confirm-user</li>
+    Khách hàng ấn xác nhận đã thanh toán, và sẽ gửi thông báo về cho salon. Yêu cầu truyền vô {id: id của phiếu thanh toán (data trong thông báo.)}
+    <li>[POST] /salon-payment/confirm-salon</li>
+    Yêu cầu nhân viên có quyền U_PMSL or chủ salon. Salon xác nhận là đã nhận khoản thanh toán từ user. Sau khi xác nhận sẽ gửi thông báo về cho khách hàng, type là salon-payment, data là id của phiếu thanh toán.
+    <div>Yêu cầu truyền vô: {salonId, id: id của phiếu thanh toán.}</div>
+    <li>[DELETE] /salon-payment/:id</li>
+    Yêu cầu có quyền D_PMSL or chủ salon. Dùng để xóa phiếu thanh toán với id đó. Truyền id qua params.
 </body>
 
 </html>

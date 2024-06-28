@@ -182,15 +182,6 @@ const invoiceController = {
         isUser: false
       });
 
-      createNotification({
-        to: userRp?.data?.user_id,
-        description: `Bạn cần thanh toán hóa đơn với salon ${carDb?.salon?.name} giao dịch mua xe chi phí ${expense} vnd. Vui lòng ấn xác nhận đã thanh toán nếu bạn đã hoàn tất.`,
-        types: "invoice-paid",
-        data: invoiceDb.invoice_id || "",
-        avatar: carDb?.salon?.image,
-        isUser: false
-      });
-
       await queryRunner.commitTransaction();
 
       return res.json({
@@ -492,83 +483,6 @@ const invoiceController = {
       return res.json({
         status: "failed",
         msg: "Error remove invoice."
-      })
-    }
-  },
-
-  confirmPaidInvoiceFromUser: async (req: Request, res: Response) => {
-    const { invoiceId, notificationId } = req.body;
-    const userId: any = req.headers["userId"] || "";
-
-    try {
-      if (!invoiceId || !notificationId || !userId) throw new Error();
-      // find notification
-      const notificationRp = await NotificationRepository.findByUserNotiId({ notificationId, userId });
-      // find invoice by userId and invoiceId
-      const invoiceRp = await InvoiceRepository.findById({ invoiceId });
-      if (!notificationRp?.data || !invoiceRp?.data) throw new Error();
-      // delete notification of user
-      await NotificationRepository.delete(notificationRp.data);
-      // send notification to salon
-      console.log("invoiceRp: ", invoiceRp)
-      //get infor user 
-      const user = await getUserInfo(userId);
-      createNotification({
-        to: invoiceRp?.data?.seller.salon_id,
-        description: `${user?.fullname} vừa xác nhận đã hoàn tất thanh toán. Hãy ấn xác nhận nếu bạn đã nhận được.`,
-        types: "invoice-paid",
-        data: `${invoiceId}`,
-        avatar: user?.avatar || "https://haycafe.vn/wp-content/uploads/2022/02/Avatar-trang.jpg",
-        isUser: true
-      });
-
-      return res.json({
-        status: "success",
-        msg: "Bạn đã xác nhận hoàn tất thanh toán. Vui lòng đợi đợi phản hồi từ salon."
-      })
-
-    } catch (error) {
-      return res.json({
-        status: "failed",
-        msg: "Lỗi xác nhận, vui lòng thử lại."
-      })
-    }
-
-  },
-
-  confirmPaidFromSalon: async (req: Request, res: Response) => {
-    const { salonId, invoiceId, notificationId } = req.body;
-
-    try {
-      if (!invoiceId || !notificationId || !salonId) throw new Error();
-      // find invoiceId
-      const invoiceRp = await InvoiceRepository.findById({ invoiceId });
-      const notificationRp = await NotificationRepository.findByUserNotiId({ notificationId, userId: salonId });
-      if (!invoiceRp?.data || !notificationRp?.data) throw new Error();
-      // update paid
-      const rsInvoice = await InvoiceRepository.update({ ...invoiceRp?.data, paid: true });
-      if (!rsInvoice?.data) throw new Error();
-      // delete old notification
-      await NotificationRepository.delete(notificationRp?.data);
-
-      // get userId by phone
-      const userRp = await UserRepository.getProfileByOther({ phone: rsInvoice?.data?.phone });
-      createNotification({
-        to: userRp?.data?.user_id,
-        description: `Salon ${rsInvoice.data.seller.name} đã xác nhận hoàn tất thanh toán. Giao dịch thành công.`,
-        types: "invoice-paid",
-        data: "",
-        avatar: rsInvoice.data.seller?.image,
-        isUser: false
-      });
-
-      return res.json({ ...rsInvoice });
-
-    } catch (error) {
-      console.log(error)
-      return res.json({
-        status: "failed",
-        msg: "Error confirm, please try again."
       })
     }
   },
