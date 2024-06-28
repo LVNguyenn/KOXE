@@ -108,6 +108,7 @@ const invoiceController = {
     const { carId, salonId, note, fullname, email, phone, expense, processId, employeeId } = req.body;
     let delInvoice = "";
     let flagCondition = 0;
+    let msg = "";
 
     if (!employeeId || !expense || !phone || !processId || !carId) {
       return res.json({
@@ -118,7 +119,6 @@ const invoiceController = {
 
     const connection = await getConnection();
     const queryRunner = connection.createQueryRunner();
-    flagCondition += 1;
 
     try {
       const invoiceRepository = queryRunner.manager.getRepository(Invoice);
@@ -130,11 +130,8 @@ const invoiceController = {
       });
 
       if (carDb.salon?.salon_id !== salonId) {
-        await queryRunner.rollbackTransaction();
-        return res.json({
-          status: "failed",
-          msg: "Error information.",
-        });
+        msg = "Error car.";
+        throw new Error(msg);
       }
 
       let limit_kilometer = carDb?.warranties?.limit_kilometer;
@@ -159,6 +156,7 @@ const invoiceController = {
 
       const invoiceDb = await invoiceRepository.save(saveInvoice);
       await queryRunner.startTransaction();
+      flagCondition += 1;
       delInvoice = invoiceDb;
       console.log(invoiceDb)
 
@@ -167,10 +165,13 @@ const invoiceController = {
 
       // add legal for customer
       const legalUserRp = await legalsController.addLegalForUser({ carId, salonId, phone, invoice: invoiceDb, processId });
+
       // get userId by phone
       const userRp = await UserRepository.getProfileByOther({ phone });
-      if (!legalUserRp?.data || !invoiceDb) throw new Error();
-
+      if (!legalUserRp?.data || !invoiceDb) {
+        msg = legalUserRp?.msg || "Can not create invoice.";
+        throw new Error(msg);
+      }
       // send notification
       createNotification({
         to: userRp?.data?.user_id || "",
@@ -202,12 +203,10 @@ const invoiceController = {
       if (flagCondition != 0) await queryRunner.rollbackTransaction();
       // delete invoice 
       await InvoiceRepository.delete(delInvoice);
-      console.log(flagCondition)
-      console.log(error)
 
       return res.json({
         status: "failed",
-        msg: "An error occurred.",
+        msg: msg || "Error with create invoice."
       });
     } finally {
       if (flagCondition != 0) await queryRunner.release();

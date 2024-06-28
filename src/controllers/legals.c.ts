@@ -171,6 +171,10 @@ const legalsController = {
             }
         }
 
+        if (!(processDb?.data.documents.length)) {
+            return {status: "failed", msg: "Need to add period for the process.", data: null};
+        }
+
         const userRp = await LegalsRepository.addLegalForUser({ phone, car_id: carId, current_period: processDb?.data?.documents[0].period, invoice, processId });
 
         return userRp;
