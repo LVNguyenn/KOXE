@@ -22,7 +22,8 @@ const SalonPaymentRepository = {
         try {
             const payRepository = getRepository(SalonPayment);
             let rs;
-            let queyString = await payRepository
+            console.log("data: ", data)
+            let queyString = payRepository
             .createQueryBuilder("SalonPayment")
             .innerJoinAndSelect('SalonPayment.salon', 'salon', data?.salonId? 'salon.salon_id =:salonId' : '', {...data})
 

@@ -41,12 +41,27 @@ const apidocController = {
     },
 
     get: async (req: Request, res: Response) => {
-        const { phone, id, page, per_page, q, creator }: any = req.query;
-        const userId = req.user;
+        const { id, page, per_page, q, creator }: any = req.query;
+        const userId: any = req.user;
+        let phone = req.query.phone;
 
         try {
             // get salonId
-            const salonRp = await UserRepository.getSalonIdByUserId({ userId })
+            const salonRp = await UserRepository.getSalonIdByUserId({ userId });
+
+            if (!salonRp.data) {
+                const userRp = await UserRepository.getProfileById(userId);
+
+                if (!userRp?.data?.phone) {
+                    return res.json({
+                        status: "failed",
+                        msg: "Please update your phone."
+                    })
+                }
+
+                phone = userRp?.data?.phone;
+            }
+
             let rs = await SalonPaymentRepository.getAll({ salonId: salonRp.data, phone, id, creator })
 
             for (let e of rs.data) {
