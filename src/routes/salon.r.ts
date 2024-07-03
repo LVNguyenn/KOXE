@@ -42,8 +42,6 @@ router.post(
   salonController.createSalon
 );
 
-
-
 // router.post("/user", middlewareController.isAdminOfSalon, salonController.getEmployees);
 router.post(
   "/user",
@@ -74,13 +72,42 @@ router.post(
 router.get("/verify-invite/:token", salonController.verifyInviteFromMail);
 
 router.post("/employees", salonController.getAllEmployeesBySalon);
+router.delete(
+  "/employees/:id",
+  middlewareController.verifyToken,
+  salonController.deleteEmployeesBySalon
+);
 
 // role
-router.get("/role", middlewareController.verifyToken, salonController.getRoleForSalon);
-router.post("/role", middlewareController.verifyToken, middlewareController.isAdminOfSalon, salonController.createNewRole);
-router.patch("/role", middlewareController.verifyToken, middlewareController.isAdminOfSalon, salonController.updateRole);
-router.delete("/role/:id", middlewareController.verifyToken, middlewareController.isAdminOfSalon, salonController.deleteRole);
-router.post("/assign-role", middlewareController.verifyToken, middlewareController.isAdminOfSalon, salonController.assignRoleToUser);
+router.get(
+  "/role",
+  middlewareController.verifyToken,
+  salonController.getRoleForSalon
+);
+router.post(
+  "/role",
+  middlewareController.verifyToken,
+  middlewareController.isAdminOfSalon,
+  salonController.createNewRole
+);
+router.patch(
+  "/role",
+  middlewareController.verifyToken,
+  middlewareController.isAdminOfSalon,
+  salonController.updateRole
+);
+router.delete(
+  "/role/:id",
+  middlewareController.verifyToken,
+  middlewareController.isAdminOfSalon,
+  salonController.deleteRole
+);
+router.post(
+  "/assign-role",
+  middlewareController.verifyToken,
+  middlewareController.isAdminOfSalon,
+  salonController.assignRoleToUser
+);
 
 router.get("/:id", salonController.getSalonById);
 

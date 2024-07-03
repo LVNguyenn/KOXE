@@ -14,6 +14,7 @@ import search from "../helper/search";
 import pagination from "../helper/pagination";
 import SalonRepository from "../repository/salon";
 import RoleRepository from "../repository/role";
+import { getUserInfo } from "../helper/mInvoice";
 // import Cache from "../config/node-cache";
 
 const { v4: uuidv4 } = require("uuid");
@@ -799,6 +800,39 @@ const salonController = {
     const rs = await pagination({ data: userRp?.data, page, per_page });
 
     return res.json({ status: userRp?.status, msg: userRp?.msg, ...rs });
+  },
+
+  deleteEmployeesBySalon: async (req: Request, res: Response) => {
+    const userId: any = req.headers["userId"] || "";
+    const { id } = req.body;
+
+    const userRepository = getRepository(User);
+    const owner = await getUserInfo(userId);
+    const user = await getUserInfo(id);
+
+    if (!owner?.salonId.salon_id || !owner.permissions.includes("OWNER")) {
+      return res.status(403).json({
+        status: "failed",
+        msg: "You do not have permission to delete this employee.",
+      });
+    }
+    if (user?.salonId.salon_id !== owner?.salonId.salon_id) {
+      return res.status(403).json({
+        status: "failed",
+        msg: "User is not in this salon.",
+      });
+    }
+    if (user) {
+      user.salonId.salon_id = "";
+      user.permissions = [""];
+
+      userRepository.save(user);
+
+      res.status(200).json({
+        status: "success",
+        msg: "Delete successfully!",
+      });
+    }
   },
 
   getRoleForSalon: async (req: Request, res: Response) => {

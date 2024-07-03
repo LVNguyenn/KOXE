@@ -176,7 +176,7 @@ const carController = {
     const { page, per_page, q, sort }: any = req.query;
     try {
       let cars = await carRepository.find({
-        where: { salon: { salon_id: salon_id } },
+        where: { salon: { salon_id: salon_id }, available: 1 },
       });
 
       if (q) {

@@ -73,6 +73,7 @@
     <li>[GET] /cars/salon/:salon_id</li>
     <li>Có sắp xếp, hiện tại chỉ mới có cho xe, cần truyền vào VD: /cars/salon/e03942f6-1fc0-4864-9a70-647a070160d7?page=1&per_page=5&sort=price (nếu -price là sắp xếp giảm dần, muốn sắp xếp theo name cũng được)</li>
     <li>[GET] /purchase (Lấy thêm ngày mua và ngày hết hạn)</li>
+    
     <h3>Từ ngày 25/6/24 - Đến 1/7/24</h3>
     <li>[GET] /salon-payment</li>
     <li>[POST] /salon-payment/create</li>
@@ -80,6 +81,13 @@
     <li>[POST] /salon-payment/confirm-salon</li>
     <li>[DELETE] /salon-payment/:id</li>
     
+    <h3>Từ ngày 1/7/24 - Đến 8/7/24</h3>
+    Phần lấy xe của các salon đã loại bỏ những xe đã mua rồi (available = 0)
+    <li>[DELETE] /salons/employees/:id</li>(userId)
+    Dùng để xóa nhân viên ra khỏi salon
+    <li>[GET] /transactions</li> có lấy thêm được numOfCompletedTran (số giao dịch đã hoàn thành). Đã xử lý cho hoa tiêu và salon
+    <li>[GET] /invoice/get-invoice</li> (Khách hàng gọi, lấy theo tháng, quý, năm sẽ bổ sung sau)
+
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
     <h2>MỤC LỤC</h2>
@@ -245,7 +253,7 @@
     <li>[GET] /cars/:id</li>
     Lấy được xe khi biết id
     <li>[GET] /cars/salon/:salon_id</li>
-    Lấy được hết tất cả các xe khi biết id của 1 salon (có tìm kiếm, sắp xếp, phân trang)
+    Lấy được hết tất cả các xe khi biết id của 1 salon (có tìm kiếm, sắp xếp, phân trang) (Đã chỉnh chỉ lấy available = 1)
     <li>[GET] /cars/brand/:brand/salon/:salon_id</li>
     Lấy được hết tất cả xe của cùng hãng xem truyền vào tên hãng trong 1 salon
     <li>[POST] /cars</li>
@@ -292,6 +300,8 @@
     đến api xóa thông báo đó là được.
     <li>[POST] /salons/employees</li>
     Dùng để lấy ra toàn bộ danh sách nhân viên trong salon. Cần truyền vô {salonId}.
+    <li>[DELETE] /salons/employees/:id</li>(userId)
+    Dùng để xóa nhân viên ra khỏi salon. Xóa là gán lại cột salonId của user là "" và gán lại quyền là [""]
     <h3>Tạo role - Cần là chủ salon đăng nhập</h3>
     <li>[GET] /salons/role</li>
     lấy ra danh sách các role của salon.
@@ -679,6 +689,8 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     {"salonId", "warrantyId", "carId"}
     
     <h2 id="invoice">Hóa đơn</h2>
+    <li>[POST] /invoice/create-invoice</li>
+    Dùng để lấy ra tất cả các hóa đơn(mua xe, mua phụ tùng, bảo dưỡng). Có phân trang và search theo loại. Trong đây có total_expense là tổng số tiền
     <div>[POST] /invoice/get-invoice-buy-car</div>
     Tìm lịch sử giao dịch mua xe cho khách hàng. Yêu cầu khách hàng cần đăng nhập. Không truyền vô gì.
     <li>[POST] /invoice/create-invoice</li>
@@ -698,7 +710,8 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
      Trong này nó sẽ trả về thông tin xe và qui trình của xe luôn (nếu có xe đó).
     <li class="hot">[PATCH] /invoice/tick-done</li>
         Dùng để tick là hóa đơn đó đã hoàn thành tất cả qui trình cho khách hàng rồi. Cần truyền vô: {salonId, invoiceId}
-    <h3 id="mInvoice">Hóa đơn bảo dưỡng</h3>
+    
+        <h3 id="mInvoice">Hóa đơn bảo dưỡng</h3>
     <li>[GET] /invoice/get-invoice-maintenance</li>
     Nó sẽ lấy ra được thông tin tất cả các hóa đơn bảo dưỡng (xe gì, ai làm và những dịch vụ đã thực hiện, những phụ tùng đã dùng để sửa chữa) tại salon mình (Đối với chủ salon)
     <div>
@@ -999,7 +1012,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     </div>
     <li>[GET] /transactions</li>
     Sẽ lấy ra được tất cả các giao dịch của salon mình với các hoa tiêu. Nếu là user thì lấy ra được tất cả các giao dịch của mình với các salon (Lấy ra đươc tình trạng, tên user, quy trình áp dụng, ngày tạo kết nối)
-    <b>Ở đây đã được thêm search và khi lấy sẽ có thêm field là revenue(VỚi salon thì nó là số tiền đã chi cho hoa tiêu, với hoa tiêu là số tiền đã được nhận từ salon)</b>
+    <b>Ở đây đã được thêm search và khi lấy sẽ có thêm field là revenue(số tiền) và numOfCompletedTran (số giao dịch đã hoàn thành) (VỚi salon thì nó là số tiền đã chi cho hoa tiêu, với hoa tiêu là số tiền đã được nhận từ salon)</b>
     <li>[GET] /transactions/:id</li>
     Nó sẽ lấy ra được chi tiết của giao dịch đó
     <li>[PATCH] /transactions/:id/details</li>
@@ -1078,7 +1091,9 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Tìm kiếm theo name.
     <li>[GET] //salon-payment/</li>
     Nếu là người dùng thì tìm kiếm theo tên salon. Là salon tìm kiếm theo sdt người dùng.
-    
+    <li>[GET] /invoice/get-invoice</li>
+    Tìm kiếm theo loại.
+
     <h2 id="buy-accessory">Hóa đơn mua phụ tùng</h2>
     <li>[GET] /buy-accessory</li>
     Nó sẽ lấy ra được thông tin tất cả các hóa mua phụ tùng (thông tin khách hàng, các phụ tùng đã mua) tại salon mình (Đối với chủ salon)

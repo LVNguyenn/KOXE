@@ -5,6 +5,7 @@ import {
   MInvoiceDetail,
   AInvoiceDetail,
   Accessory,
+  Transaction,
 } from "../entities";
 import { getRepository, In } from "typeorm";
 import { formatDate } from "../utils";
@@ -512,4 +513,37 @@ export const formatAccessoryInvoiceList = (
   });
 
   return formattedInvoices;
+};
+
+export const getCompletedTransactionsCount = async (
+  userId?: string,
+  salonId?: string
+) => {
+  const transactionRepository = getRepository(Transaction);
+  let queryBuilder = transactionRepository.createQueryBuilder("transaction");
+
+  if (userId) {
+    queryBuilder = queryBuilder.innerJoin(
+      "transaction.user",
+      "user",
+      "user.user_id = :userId",
+      { userId }
+    );
+  }
+
+  if (salonId) {
+    queryBuilder = queryBuilder.innerJoin(
+      "transaction.salon",
+      "salon",
+      "salon.salon_id = :salonId",
+      { salonId }
+    );
+  }
+
+  queryBuilder = queryBuilder.andWhere("transaction.status = :status", {
+    status: "success",
+  });
+
+  const count = await queryBuilder.getCount();
+  return count;
 };

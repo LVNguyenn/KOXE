@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
-import { Invoice, MInvoiceDetail, AInvoiceDetail } from "../entities";
+import { User, Invoice, MInvoiceDetail, AInvoiceDetail } from "../entities";
 import { getRepository } from "typeorm";
-import moment from "moment";
 import {
   getUserInfo,
   getMaintenanceServiceList,
@@ -24,8 +23,78 @@ import {
 } from "../helper/mInvoice";
 import search from "../helper/search";
 import pagination from "../helper/pagination";
+import { formatDate } from "../utils";
 
 const maintainController = {
+  getAllInvoices: async (req: Request, res: Response) => {
+    const userId: any = req.headers["userId"] || "";
+    const userRepository = getRepository(User);
+    const invoiceRepository = getRepository(Invoice);
+    const { page, per_page, q }: any = req.query;
+    let totalExpense = 0;
+    try {
+      const user = await userRepository.findOne({ where: { user_id: userId } });
+      if (!user?.phone) {
+        return res.status(200).json({
+          status: "success",
+          invoices: [],
+          total_expense: 0,
+        });
+      }
+
+      let invoices = await invoiceRepository.find({
+        where: { phone: user.phone },
+        relations: ["seller"],
+        order: { create_at: "DESC" },
+      });
+
+      let formattedInvoices = invoices.map((invoice) => ({
+        invoiceId: invoice.invoice_id,
+        licensePlate: invoice.licensePlate,
+        carName: invoice.carName,
+        salonName: invoice.seller.name,
+        phone: invoice.phone,
+        createdAt: formatDate(invoice.create_at),
+        expense: invoice.expense,
+        type:
+          invoice.type === "maintenance"
+            ? "Bảo dưỡng"
+            : invoice.type === "buy accessory"
+            ? "Mua phụ tùng"
+            : "Mua xe",
+      }));
+
+      if (q) {
+        formattedInvoices = await search({
+          data: formattedInvoices,
+          q,
+          fieldname: "type",
+        });
+      }
+
+      const rs = await pagination({ data: formattedInvoices, page, per_page });
+
+      const a: any = rs.data;
+      if (a) {
+        totalExpense = a.reduce(
+          (acc: number, invoice: any) => acc + invoice.expense,
+          0
+        );
+      }
+
+      return res.status(200).json({
+        status: "success",
+        invoices: rs?.data,
+        total_expense: totalExpense,
+        total_page: rs?.total_page,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "failed",
+        msg: "Internal server error",
+      });
+    }
+  },
   getAllMaintenanceInvoices: async (req: Request, res: Response) => {
     const userId: any = req.headers["userId"] || "";
     const { page, per_page, q }: any = req.query;
