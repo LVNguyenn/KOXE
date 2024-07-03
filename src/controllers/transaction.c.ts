@@ -6,7 +6,7 @@ import { Connection } from "../entities/Connection";
 import { Process } from "../entities/Process";
 import { Stage } from "../entities/Stage";
 import { Revenue } from "../entities/Revenue";
-import { getUserInfo } from "../helper/mInvoice";
+import { getUserInfo, getCompletedTransactionsCount } from "../helper/mInvoice";
 import {
   getNextElement,
   isArraySubset,
@@ -56,10 +56,12 @@ const transactionController = {
   getAllTransactions: async (req: Request, res: Response) => {
     const transactionRepository = getRepository(Transaction);
     const revenueRepository = getRepository(Revenue);
+    const userRepository = getRepository(User);
     const userId: any = req.headers["userId"] || "";
     const { page, per_page, q }: any = req.query;
     let checkSalon = false;
     let totalRevenue = 0;
+    let completedTran = 0;
 
     const user = await getRepository(User).findOne({
       where: [{ user_id: userId }],
@@ -131,6 +133,10 @@ const transactionController = {
             Number(accumulator) + Number(currentRevenue.amount),
           0
         );
+        completedTran = await getCompletedTransactionsCount(
+          formatTransactions[0].user.user_id,
+          salonId
+        );
       } else if (q && checkSalon === false) {
         formatTransactions = await search({
           data: formatTransactions,
@@ -150,6 +156,10 @@ const transactionController = {
             Number(accumulator) + Number(currentRevenue.amount),
           0
         );
+        completedTran = await getCompletedTransactionsCount(
+          userId,
+          formatTransactions[0].salon.salon_id
+        );
       } else if (!q && checkSalon === true) {
         const revenue = await revenueRepository.find({
           where: { salon: { salon_id: salonId } },
@@ -160,6 +170,7 @@ const transactionController = {
             Number(accumulator) + Number(currentRevenue.amount),
           0
         );
+        completedTran = await getCompletedTransactionsCount(undefined, salonId);
       } else if (!q && checkSalon === false) {
         const revenue = await revenueRepository.find({
           where: { user: { user_id: userId } },
@@ -170,6 +181,11 @@ const transactionController = {
             Number(accumulator) + Number(currentRevenue.amount),
           0
         );
+        //completeTran = await getCompletedTransactionsCount(userId, undefined);
+        const user = await userRepository.findOne({
+          where: { user_id: userId },
+        });
+        if (user) completedTran = user?.completedTransactions;
       }
 
       const rs: any = await pagination({
@@ -181,6 +197,7 @@ const transactionController = {
       const result = {
         transaction: rs.data,
         revenue: totalRevenue,
+        numOfCompletedTran: completedTran,
       };
 
       return res.status(200).json({

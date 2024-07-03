@@ -145,12 +145,15 @@ function subtractHoursFromStringTime(timeString: string, hours: number) {
 }
 
 export const PublishPaymentEvent = async (payload: any) => {
-    const {data} = await axios.post(`${process.env.PAYMENT_SERVICE}app-events/`, {
-        payload
-    })
+  const { data } = await axios.post(
+    `${process.env.PAYMENT_SERVICE}app-events/`,
+    {
+      payload,
+    }
+  );
 
-    return data;
-}
+  return data;
+};
 
 export {
   generateRandomCode,

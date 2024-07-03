@@ -31,7 +31,10 @@ import {
   Revenue,
   Role,
   SalonPayment,
+<<<<<<< HEAD
   SalonPaymentInfor
+=======
+>>>>>>> 79c55756d90374383af6c81c30fa6ffff0f13c88
 } from "../entities";
 import { DataSourceOptions } from "typeorm";
 
@@ -77,7 +80,10 @@ export const connectionString: DataSourceOptions = {
     Revenue,
     Role,
     SalonPayment,
+<<<<<<< HEAD
     SalonPaymentInfor
+=======
+>>>>>>> 79c55756d90374383af6c81c30fa6ffff0f13c88
   ],
   synchronize: true,
   ssl: {
