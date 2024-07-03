@@ -20,6 +20,7 @@ import { Stage } from "./Stage";
 import { Promotion } from "./Promotion";
 import { Role } from "./Role";
 import { SalonPayment } from "./SalonPayment";
+import { SalonPaymentInfor } from "./SalonPaymentInfor";
 
 @Entity()
 export class Salon {
@@ -99,6 +100,9 @@ export class Salon {
 
   @OneToMany(() => SalonPayment, (pay) => pay.salon)
   pays!: SalonPayment[];
+
+  @OneToMany(() => SalonPaymentInfor, (sl) => sl.salon)
+  method_payment!: SalonPaymentInfor[];
 
   init(
     name: string,

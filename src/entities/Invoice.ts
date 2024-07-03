@@ -57,6 +57,9 @@ export class Invoice {
   policy!: string;
 
   @Column({ default: false })
+  payment_done!: boolean;
+
+  @Column({ default: false })
   done!: boolean;
 
   @Column({ nullable: true })
