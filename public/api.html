@@ -79,6 +79,11 @@
     <li>[POST] /salon-payment/confirm-user</li>
     <li>[POST] /salon-payment/confirm-salon</li>
     <li>[DELETE] /salon-payment/:id</li>
+    <h3>Từ ngày 02/07/24 - Đến 09/07/24</h3>
+    <li>[GET] /salon-payment/method</li>
+    <li>[POST] /salon-payment/create-method</li>
+    <li>[PATCH] /salon-payment/method</li>
+    <li>[DELETE] /salon-payment/method/:id</li>
     
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
@@ -1076,8 +1081,10 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Tìm kiếm theo fullname.
     <li>[GET] /admin/salons</li>
     Tìm kiếm theo name.
-    <li>[GET] //salon-payment/</li>
+    <li>[GET] /salon-payment/</li>
     Nếu là người dùng thì tìm kiếm theo tên salon. Là salon tìm kiếm theo sdt người dùng.
+
+
     
     <h2 id="buy-accessory">Hóa đơn mua phụ tùng</h2>
     <li>[GET] /buy-accessory</li>
@@ -1169,6 +1176,17 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <div>Yêu cầu truyền vô: {salonId, id: id của phiếu thanh toán.}</div>
     <li>[DELETE] /salon-payment/:id</li>
     Yêu cầu có quyền D_PMSL or chủ salon. Dùng để xóa phiếu thanh toán với id đó. Truyền id qua params.
+
+    <h3>Phương thức thanh toán của salon</h3>
+    <li>[GET] /salon-payment/method</li>
+    Lấy ra danh sách các phương thức thanh toán của salon. Nếu truyền vô ?id thì sẽ lấy theo id đó. Vì mỗi salon có cùng lắm 5 phương thức nên không phân trang.
+    <li>[POST] /salon-payment/create-method</li>
+    Yêu cầu là chủ salon or nhân viên có quyền C_PMT. Dùng để tạo ra phương thức thanh toán cho salon. Yêu cầu truyền vô: {type: kiểu phương thức (momo, agribank,...), content: Nội dung của phương thức (Số tài khoản), fullname: Tên người dùng của phương thức}.
+    <li>[PATCH] /salon-payment/method</li>
+    Yêu cầu là chủ salon or nhân viên có quyền U_PMT. Dùng để cập nhật thông tin phương thức. Cần truyền vô cái muốn cập nhật: {id: bắt buộc, content, type, fullname: nếu cần update.}
+    <li>[DELETE] /salon-payment/method/:id</li>
+    Yêu cầu có quyền D_PMT or chủ salon. Dùng để xóa phương thức thanh toán với id đó. Truyền id qua params.
+
 </body>
 
 </html>
