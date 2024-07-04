@@ -36,6 +36,7 @@ const carController = {
     try {
       const cars = await carRepository.find({
         relations: ["salon"],
+        where: { available: 1 },
         select: [
           "car_id",
           "name",

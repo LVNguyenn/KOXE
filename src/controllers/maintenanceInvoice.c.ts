@@ -23,14 +23,14 @@ import {
 } from "../helper/mInvoice";
 import search from "../helper/search";
 import pagination from "../helper/pagination";
-import { formatDate } from "../utils";
+import { formatDate, buildWhereCondition } from "../utils";
 
 const maintainController = {
   getAllInvoices: async (req: Request, res: Response) => {
     const userId: any = req.headers["userId"] || "";
     const userRepository = getRepository(User);
     const invoiceRepository = getRepository(Invoice);
-    const { page, per_page, q }: any = req.query;
+    const { page, per_page, q, year, quarter, month }: any = req.query;
     let totalExpense = 0;
     try {
       const user = await userRepository.findOne({ where: { user_id: userId } });
@@ -42,8 +42,15 @@ const maintainController = {
         });
       }
 
+      const whereCondition = buildWhereCondition(
+        user.phone,
+        year,
+        quarter,
+        month
+      );
+
       let invoices = await invoiceRepository.find({
-        where: { phone: user.phone },
+        where: whereCondition,
         relations: ["seller"],
         order: { create_at: "DESC" },
       });
@@ -89,6 +96,7 @@ const maintainController = {
         total_page: rs?.total_page,
       });
     } catch (error) {
+      console.log(error);
       return res.status(500).json({
         status: "failed",
         msg: "Internal server error",
