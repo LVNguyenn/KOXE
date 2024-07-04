@@ -5,17 +5,50 @@ import UserRepository from "../repository/user";
 import createNotification from "../helper/createNotification";
 import search from "../helper/search";
 import pagination from "../helper/pagination";
+import InvoiceRepository from "../repository/invoice";
 
 const apidocController = {
     createPayment: async (req: Request, res: Response) => {
-        const { cusPhone, cusFullname, reason, amount, salonId } = req.body;
+        let { cusPhone, cusFullname, reason, amount, salonId, invoiceId, methodPaymentId } = req.body;
         const creator = req.user;
+        let errorMsg = "";
+        let payment_method = "";
 
         try {
+            if (!methodPaymentId) {
+                errorMsg = "Missing method payment";
+                throw new Error(errorMsg);
+            }
+            
+            // get infor payment method
+            const paymentRp = await SalonPaymentRepository.getAllMethod({id: methodPaymentId, salonId});
+
+            if (!paymentRp?.data[0]) {
+                errorMsg = "Error method payment";
+                throw new Error(errorMsg);
+            }
+
+            payment_method = paymentRp?.data[0].type + "-" + paymentRp?.data[0].content + "-" + paymentRp?.data[0].fullname
+
             const salon = await SalonRepository.findSalonById({ salonId });
+
+            if (invoiceId) {
+                // get invoice infor
+                const invoiceRp = await InvoiceRepository.findById({invoiceId});
+
+                if (!invoiceRp.data) {
+                    errorMsg = "Invalid invoiceId.";
+                    throw new Error(errorMsg);
+                }
+
+                amount = invoiceRp?.data?.expense;
+                reason = invoiceRp?.data?.type;
+                cusPhone = invoiceRp?.data?.phone;
+                cusFullname = invoiceRp?.data?.fullname;
+            }
             const payRp = await SalonPaymentRepository.create({
                 custormer_phone: cusPhone, custormer_fullname: cusFullname,
-                reason, creator, amount, salon: salon?.data
+                reason, creator, amount, salon: salon?.data, payment_method, invoice_id: invoiceId
             });
 
             if (payRp?.data) {
@@ -33,9 +66,10 @@ const apidocController = {
 
             return res.json({ ...payRp });
         } catch (error) {
+            console.log(error);
             return res.json({
                 status: "failed",
-                msg: "Error creating."
+                msg: errorMsg || "Error creating."
             })
         }
     },
@@ -135,6 +169,11 @@ const apidocController = {
             // update status
             const rs = await SalonPaymentRepository.updateStatus({...payRp.data[0]});
             if (!rs?.data) throw new Error("Update failed.");
+            // update payment_done in invoice
+            if (rs.data?.invoice_id) {
+                const invoiceRp = await InvoiceRepository.findById({invoiceId: rs.data?.invoice_id});
+                await InvoiceRepository.update({...invoiceRp?.data, payment_done: true});
+            }
             // get userId by phone
             const userRp = await UserRepository.getProfileByOther({ phone: payRp.data[0]?.custormer_phone });
             createNotification({

@@ -27,6 +27,9 @@ export class SalonPayment {
     @Column({nullable: true})
     invoice_id!: string;
 
+    @Column({nullable: true})
+    payment_method!: string;
+
     @Column({
         type: "timestamptz",
         default: () => "timezone('Asia/Saigon', now())",

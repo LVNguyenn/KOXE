@@ -97,6 +97,9 @@
     <li>[POST] /salon-payment/create-method</li>
     <li>[PATCH] /salon-payment/method</li>
     <li>[DELETE] /salon-payment/method/:id</li>
+    <li>[POST] /salon-payment/create</li>
+    <li>[POST] /invoice/get-invoice-buy-car-salon</li>
+    Thêm cái payment_done: là thanh toán hay chưa, còn done cũ là đã hoàn tất qui trình hay chưa.
 
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
@@ -716,7 +719,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
      <li>[POST] /invoice/get-invoice-buy-car-salon</li>
      Đổi từ /invocice/all lúc đầu.
      Xem tất cả danh sách toàn bộ hóa đơn mua xe của salon đó. Yêu cầu là chủ salon, or nhân viên có quyền R_IV. Truyền vô: {"salonId"}.
-     Có thể tìm theo {"done", "employeeId"salonId, done: không truyền lấy tất cả, = false thì lấy ra các giao dịch chưa hoàn thành (user chưa hoàn thành thủ tục ), = true thì hoàn thành rồi.}. Không truyền thêm gì thì mặt định là không có.
+     Có thể tìm theo {"payment_done": hóa đơn đã thanh toán hay chưa(không truyền lấy tất cả, truyền thì true/false), "done", "employeeId"salonId, done: không truyền lấy tất cả, = false thì lấy ra các giao dịch chưa hoàn thành (user chưa hoàn thành thủ tục ), = true thì hoàn thành rồi.}. Không truyền thêm gì thì mặt định là không có.
      Trong này nó sẽ trả về thông tin xe và qui trình của xe luôn (nếu có xe đó).
     <li class="hot">[PATCH] /invoice/tick-done</li>
         Dùng để tick là hóa đơn đó đã hoàn thành tất cả qui trình cho khách hàng rồi. Cần truyền vô: {salonId, invoiceId}
@@ -1183,8 +1186,9 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Lấy ra danh sách các phiếu thanh toán của khách hàng or salon. Nếu truyền vô ?id thì sẽ lấy phiếu thanh toán với id đó.
     Lưu ý kết quả trả về creator: là người nhân viên tạo ra phiếu thanh toán đó, dùng để hiển thị thôi.
     <li>[POST] /salon-payment/create</li>
-    Yêu cầu là chủ salon or nhân viên có quyền C_PMSL. Dùng để tạo ra phiếu thanh toán và gửi cho khách hàng. Yêu cầu truyền vô: {cusPhone: số điện thoại khách hàng, cusFullname: tên khách hàng, reason: lý do nội dung tạo hóa đơn, amount: số tiền, salonId}.
+    Yêu cầu là chủ salon or nhân viên có quyền C_PMSL. Dùng để tạo ra phiếu thanh toán và gửi cho khách hàng. Yêu cầu truyền vô: {cusPhone: số điện thoại khách hàng, cusFullname: tên khách hàng, reason: lý do nội dung tạo hóa đơn, amount: số tiền, salonId, methodPaymentId: id của phương thức thanh toán cho salon, invoiceId}.
     <div>Sau khi tạo thành công thì bên khách hàng sẽ nhận được thông báo cần thanh toán, type là salon-payment, data là id của phiếu hóa đơn.</div>
+    <div>Lưu ý: nếu truyền invoiceId thì có thể không cần truyền các trường {cusPhone, cusFullname, reason, amount}</div>
     <li>[POST] /salon-payment/confirm-user</li>
     Khách hàng ấn xác nhận đã thanh toán, và sẽ gửi thông báo về cho salon. Yêu cầu truyền vô {id: id của phiếu thanh toán (data trong thông báo.)}
     <li>[POST] /salon-payment/confirm-salon</li>

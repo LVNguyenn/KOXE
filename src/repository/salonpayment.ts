@@ -90,8 +90,8 @@ const SalonPaymentRepository = {
             const payRepository = getRepository(SalonPaymentInfor);
             let rs;
             let queyString = payRepository
-            .createQueryBuilder("SalonPayment")
-            .innerJoin('SalonPayment.salon', 'salon', 'salon.salon_id =:salonId', {...data})
+            .createQueryBuilder("SalonPaymentInfor")
+            .innerJoin('SalonPaymentInfor.salon', 'salon', 'salon.salon_id =:salonId', {...data})
 
             if (data.id) {
                 queyString = queyString.where({id: data.id});

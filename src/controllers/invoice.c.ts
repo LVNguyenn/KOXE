@@ -234,7 +234,7 @@ const invoiceController = {
   },
 
   getAllInvoiceOfSalon: async (req: Request, res: Response) => {
-    const { salonId, done, employeeId, page, per_page, q } = req.body;
+    const { salonId, done, employeeId, page, per_page, q, payment_done } = req.body;
 
     try {
       const invoiceRepository = getRepository(Invoice);
@@ -252,6 +252,10 @@ const invoiceController = {
 
       if (employeeId !== undefined && employeeId !== "undefined") {
         queryBuilder = await queryBuilder.where({ employee_id: employeeId })
+      }
+
+      if (payment_done !== undefined && payment_done !== "undefined") {
+        queryBuilder = await queryBuilder.where({ payment_done })
       }
 
       invoiceDb = await queryBuilder.getMany();
