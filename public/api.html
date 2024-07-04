@@ -702,13 +702,13 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     {"salonId", "warrantyId", "carId"}
     
     <h2 id="invoice">Hóa đơn</h2>
-    <li>[POST] /invoice/create-invoice</li>
-    Dùng để lấy ra tất cả các hóa đơn(mua xe, mua phụ tùng, bảo dưỡng). Có phân trang và search theo loại. Trong đây có total_expense là tổng số tiền
+    <!-- <li>[POST] /invoice/create-invoice</li>
+    Dùng để lấy ra tất cả các hóa đơn(mua xe, mua phụ tùng, bảo dưỡng). Có phân trang và search theo loại. Trong đây có total_expense là tổng số tiền -->
     <div>[POST] /invoice/get-invoice-buy-car</div>
     Tìm lịch sử giao dịch mua xe cho khách hàng. Yêu cầu khách hàng cần đăng nhập. Không truyền vô gì.
     <li>[POST] /invoice/create-invoice</li>
     Dùng để tạo ra hóa đơn phụ trách việc mua xe của khách hàng. Yêu cầu chủ salon or nhân viên có quyền C_IV .Yêu cầu truyền vô:
-    {carId, salonId, note, fullname: tên khách hàng, email: email khách hàng, phone: sdt của khách hàng, expense: tổng chi phí., processId: id của qui trình cần thiết lập cho khách hàng., employeeId: id nhân viên của salon.}
+    {licensePlate: option,carId, salonId, note, fullname: tên khách hàng, email: email khách hàng, phone: sdt của khách hàng, expense: tổng chi phí., processId: id của qui trình cần thiết lập cho khách hàng., employeeId: id nhân viên của salon.}
     Sẽ tạo ra thông báo là cần bên khách hàng thanh toán. Type của thông báo đó là "invoice-paid". data là id của cái invoice, dùng để truyền vô khi khách hàng ấn là đã hoàn tất thanh toán thì truyền vô id đó.
     <li>[POST] /invoice/lookup</li>
     Dùng để tra cứu thông tin hóa đơn. Yêu cầu là chủ salon or có quyền R_IV.Yêu cầu truyền vô: {"invoiceId", "salonId", "phone", "licensePlate", "type"}. nếu muốn tìm theo gì thì truyền vô cái đó.

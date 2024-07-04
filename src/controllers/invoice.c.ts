@@ -18,94 +18,9 @@ import { getUserInfo } from "../helper/mInvoice";
 
 
 const invoiceController = {
-  printInvoiceBuyCar2: async (req: Request, res: Response) => {
-    const { carId, salonId, note, fullname, email, phone, expense, processId, employeeId } = req.body;
-
-    if (!employeeId || !expense || !phone || !processId || !carId) {
-      return res.json({
-        status: "failed",
-        msg: "Input is invalid."
-      })
-    }
-
-    try {
-      const invoiceRepository = getRepository(Invoice);
-      const carRepository = getRepository(Car);
-      const carDb: Car = await carRepository.findOneOrFail({
-        where: { car_id: carId, available: MoreThan(0) },
-        relations: ["salon", "warranties"],
-      });
-
-      if (carDb.salon?.salon_id !== salonId) {
-        return res.json({
-          status: "failed",
-          msg: "Error information.",
-        });
-      }
-      let limit_kilometer = carDb?.warranties?.limit_kilometer;
-      let months = carDb?.warranties?.months;
-      let policy = carDb?.warranties?.policy;
-
-      let saveInvoice: any = new Invoice();
-      saveInvoice.seller = carDb.salon;
-      saveInvoice = {
-        ...saveInvoice,
-        expense,
-        note,
-        fullname,
-        email,
-        phone,
-        carName: carDb.name,
-        limit_kilometer,
-        months,
-        policy,
-        employee_id: employeeId
-      };
-      const invoiceDb = await invoiceRepository.save(saveInvoice);
-
-      // set status for car is selled.
-      await carRepository.save({ ...carDb, available: Number(carDb.available) - 1 });
-
-      // add legal for custormer
-      await legalsController.addLegalForUser({ carId, salonId, phone, invoice: invoiceDb, processId })
-
-      // get userId by phone
-      const userRp = await UserRepository.getProfileByOther({ phone });
-      // send notification
-      createNotification({
-        to: userRp?.data?.user_id,
-        description: `Salon ${carDb?.salon?.name} vừa thêm tiến trình giấy tờ hoàn tất mua xe cho bạn`,
-        types: "process",
-        data: "",
-        avatar: carDb?.salon?.image,
-        isUser: false
-      })
-
-      createNotification({
-        to: userRp?.data?.user_id,
-        description: `Bạn cần thanh toán hóa đơn với salon ${carDb?.salon?.name} giao dịch mua xe chi phí ${expense} vnd. Vui lòng ấn xác nhận đã thanh toán nếu bạn đã hoàn tất.`,
-        types: "invoice-paid",
-        data: invoiceDb.invoice_id || "",
-        avatar: carDb?.salon?.image,
-        isUser: false
-      })
-
-      return res.json({
-        status: "success",
-        msg: "Create invoice successfully!",
-        invoice: { ...saveInvoice, warranty: carDb?.warranties },
-      });
-    } catch (error) {
-      console.log(error);
-      return res.json({
-        status: "failed",
-        msg: "Can not create the invoice.",
-      });
-    }
-  },
 
   printInvoiceBuyCar: async (req: Request, res: Response) => {
-    const { carId, salonId, note, fullname, email, phone, expense, processId, employeeId } = req.body;
+    const { carId, salonId, note, fullname, email, phone, expense, processId, employeeId, licensePlate} = req.body;
     let delInvoice = "";
     let flagCondition = 0;
     let msg = "";
@@ -151,7 +66,8 @@ const invoiceController = {
         limit_kilometer,
         months,
         policy,
-        employee_id: employeeId
+        employee_id: employeeId,
+        licensePlate
       };
 
       const invoiceDb = await invoiceRepository.save(saveInvoice);
@@ -302,6 +218,7 @@ const invoiceController = {
     try {
       const MTinvoiceDb: any = await statistics({ salonId, type: "maintenance", fromDate, year });
       const BCinvoiceDb: any = await statistics({ salonId, type: "buy car", fromDate, year });
+      const BAinvoiceDb: any = await statistics({ salonId, type: "buy accessory", fromDate, year });
       const avg = averageEachMonth(year);
 
 
@@ -310,6 +227,7 @@ const invoiceController = {
         maintenances: MTinvoiceDb,
         buyCars: BCinvoiceDb,
         total: MTinvoiceDb?.total + BCinvoiceDb?.total,
+        buyAccessory: BAinvoiceDb,
         year,
         avg
       })
