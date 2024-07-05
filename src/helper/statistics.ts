@@ -14,7 +14,7 @@ const statistics = async ({ salonId, type, fromDate, year }: { salonId: string, 
             let invoiceDb: any = await invoiceRepository
                 .createQueryBuilder('invoice')
                 .innerJoinAndSelect('invoice.seller', 'salon', 'salon.salon_id = :salonId', { salonId })
-                .where({ type: type, create_at: MoreThan(fromDate) && LessThan(toDate) })
+                .where({ type: type, create_at: MoreThan(fromDate) && LessThan(toDate), payment_done: true })
                 .getMany()
 
             for (let iv of invoiceDb) {

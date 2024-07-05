@@ -799,9 +799,9 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
 
     <h2 id="statistical">Thống kê doanh thu</h2>
     <li>[POST] /invoice/statistics</li>
-    Thống kê doanh thu của salon đó. Cần có quyền R_IV or là chủ salon. Yêu cầu truyền vô: {"salonId", "fromDate": "2024-04-21" kiểu string}.
+    Thống kê doanh thu của salon đó. Cần có quyền R_IV or là chủ salon. Yêu cầu truyền vô: {"salonId", "fromDate": "2024-04-21" kiểu string(Không truyền mặc định là năm 2024.)}.
     <div>fromDate là thống kê từ ngày fromDate đến nay.</div>
-    Dữ liệu trả về: {status, "maintenances": {"invoiceDb": [{}, {}, danh sách invoice theo bảo trì], total: tổng tất cả chi phí bảo trì.},
+    Dữ liệu trả về: {status, "maintenances": {"invoiceDb": [{}, {}, danh sách invoice theo bảo trì], total: tổng tất cả chi phí bảo trì., rsQuater: [100000000, 20654003, 2290000000, 0]: tổng doanh thu tương ứng với mỗi quí, totalCarSold: tổng số xe đã bán trong năm},
     "buyCars": {"invoiceDb" : [{}, {}, danh sách invoice theo mua xe], total: tổng tất cả chi phí mua xe.}, total: tổng cả 2 chi phí trên cộng lại.}
     Dữ liệu trả về có thêm: "year": {"january": {
         "value": 1,

@@ -20,7 +20,7 @@ import { getUserInfo } from "../helper/mInvoice";
 const invoiceController = {
 
   printInvoiceBuyCar: async (req: Request, res: Response) => {
-    const { carId, salonId, note, fullname, email, phone, expense, processId, employeeId, licensePlate} = req.body;
+    const { carId, salonId, note, fullname, email, phone, expense, processId, employeeId, licensePlate } = req.body;
     let delInvoice = "";
     let flagCondition = 0;
     let msg = "";
@@ -212,8 +212,10 @@ const invoiceController = {
   },
 
   revenueStatistics: async (req: Request, res: Response) => {
-    const { salonId, fromDate } = req.body;
+    let { salonId, fromDate } = req.body;
+    let rsQuater = [0, 0, 0, 0];
     let year = new Year().months;
+    if (!fromDate) fromDate = "2024-01-01";
 
     try {
       const MTinvoiceDb: any = await statistics({ salonId, type: "maintenance", fromDate, year });
@@ -221,6 +223,12 @@ const invoiceController = {
       const BAinvoiceDb: any = await statistics({ salonId, type: "buy accessory", fromDate, year });
       const avg = averageEachMonth(year);
 
+      for (const key in year) {
+        if (year[key].value <= 3) rsQuater[0] += year[key].total;
+        else if (year[key].value <= 6) rsQuater[1] += year[key].total;
+        else if (year[key].value <= 9) rsQuater[2] += year[key].total;
+        else rsQuater[0] += year[key].total;
+      }
 
       return res.json({
         status: "success",
@@ -229,9 +237,16 @@ const invoiceController = {
         total: MTinvoiceDb?.total + BCinvoiceDb?.total,
         buyAccessory: BAinvoiceDb,
         year,
-        avg
+        rsQuater,
+        avg,
+        totalCarSold: BCinvoiceDb.invoiceDb.length
       })
+
+
+
+
     } catch (error) {
+      console.log(error)
       return res.json({
         status: "failed",
         msg: "error revenue statistics."
