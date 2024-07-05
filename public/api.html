@@ -102,6 +102,8 @@
     Thêm cái payment_done: là thanh toán hay chưa, còn done cũ là đã hoàn tất qui trình hay chưa.
     <li>[POST] /invoice/statistics</li>
     có thêm doanh thu theo quý.
+    <li>[POST] /invoice/get-top</li>
+    có chỉnh nhiều, nên đọc kĩ lại.
 
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
@@ -817,7 +819,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     "password": "123456".
     <div>Lưu ý: thống kê theo năm. Thay vì truyền vô là năm 2024, thì truyền vô là ngày đầu tiên của năm là "2024-01-01". Năm - tháng - ngày.</div>
     <li>[POST] /invoice/get-top</li>
-    Lấy ra danh sách các loại xe ô tô bán chạy nhất. Dữ liệu đầu vào: {"salonId", "fromDate": string: năm tháng ngày: vd "2024-01-01" }
+    Lấy ra danh sách các loại xe ô tô bán chạy nhất. Dữ liệu đầu vào: {"salonId", year: 2024, quater: 1->4 , months: 1-> 12 }. Nếu truyền quater thì không cần truyền months. Mặc định năm 2024, tháng 01. 
     <div>
         output: {"status", "buyCarTop": [{
             "name": "Toyota",

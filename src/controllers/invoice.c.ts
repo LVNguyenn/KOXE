@@ -280,17 +280,24 @@ const invoiceController = {
   },
 
   getTopThingBestSeller: async (req: Request, res: Response) => {
-    const { salonId, fromDate } = req.body;
+    let { salonId, year, quater, months } = req.body;
+
+    if (!year) year = 2024;
+    if (!quater && !months) months = 1;
+    let toMonth = quater ? 3*quater : months;
+
+    let fromDate: any = `${year}-${months}-01`;
+    let toDate: any = `${year}-${toMonth}-28`;
 
     try {
-      const BCTopDb = await getTopSeller({ salonId, type: "buy car", fromDate });
+      const BCTopDb = await getTopSeller({ salonId, type: "buy car", fromDate, toDate });
       let totalBuyCar = 0;
 
       for (const bc of BCTopDb) {
         totalBuyCar += bc.quantitySold;
       }
-      const MTTopDb = await getTopSeller({ salonId, type: "maintenance", fromDate });
-      const ATopDb = await getTopSeller({ salonId, type: "accessory", fromDate });
+      const MTTopDb = await getTopSeller({ salonId, type: "maintenance", fromDate, toDate });
+      const ATopDb = await getTopSeller({ salonId, type: "accessory", fromDate, toDate });
 
       return res.json({
         status: "success",

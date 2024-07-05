@@ -63,8 +63,8 @@ export const averageEachMonth = (year: any) => {
     return sum / 12;
 }
 
-export const getTopSeller = async ({ salonId, type, fromDate }: { salonId: string, type: string, fromDate: Date }) => {
-    let toDate = new Date(new Date(fromDate).getFullYear(), 11, 31);
+export const getTopSeller = async ({ salonId, type, fromDate, toDate }: { salonId: string, type: string, fromDate: Date, toDate: Date }) => {
+    // let toDate = new Date(new Date(fromDate).getFullYear(), 11, 31);
     const invoiceRepository = getRepository(Invoice);
     let rs: any = new Map<string, number>();
     let rs2: any = [];
