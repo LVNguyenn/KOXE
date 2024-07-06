@@ -844,11 +844,11 @@ const salonController = {
     let roleRp = await RoleRepository.getAllBySalon({ salonId });
 
     // parse role
-    try {
-      for (let e of roleRp?.data) {
-        e.permissions = await parsePermission(e.permissions);
-      }
-    } catch (error) {}
+    // try {
+    //   for (let e of roleRp?.data) {
+    //     e.permissions = await parsePermission(e.permissions);
+    //   }
+    // } catch (error) {}
 
     return res.json({ ...roleRp });
   },

@@ -28,7 +28,7 @@ const apidocController = {
                 throw new Error(errorMsg);
             }
 
-            payment_method = paymentRp?.data[0].type + "-" + paymentRp?.data[0].content + "-" + paymentRp?.data[0].fullname
+            payment_method = paymentRp?.data[0].type + " " + paymentRp?.data[0].content + " " + paymentRp?.data[0].fullname
 
             const salon = await SalonRepository.findSalonById({ salonId });
 
@@ -42,7 +42,9 @@ const apidocController = {
                 }
 
                 amount = invoiceRp?.data?.expense;
-                reason = invoiceRp?.data?.type;
+                if (invoiceRp?.data?.type === "buy car") reason = "Thanh toán hóa đơn mua xe";
+                if (invoiceRp?.data?.type === "maintenance") reason = "Thanh toán hóa đơn bảo dưỡng";
+                if (invoiceRp?.data?.type === "buy accessory") reason = "Thanh toán hóa đơn phụ tùng";
                 cusPhone = invoiceRp?.data?.phone;
                 cusFullname = invoiceRp?.data?.fullname;
             }
