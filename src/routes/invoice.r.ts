@@ -5,11 +5,11 @@ import middlewareController from "../middleware/middleware";
 
 const router = Router();
 
-// router.get(
-//   "/get-invoice-maintenance",
-//   middlewareController.verifyToken,
-//   mInvoiceController.getAllMaintenanceInvoices
-// );
+router.get(
+  "/get-invoice-maintenance",
+  middlewareController.verifyToken,
+  mInvoiceController.getAllMaintenanceInvoices
+);
 router.get(
   "/get-invoice",
   middlewareController.verifyToken,
