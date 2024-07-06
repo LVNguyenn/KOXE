@@ -163,17 +163,16 @@ export const buildWhereCondition = (
   month?: number
 ) => {
   let whereCondition: any = { phone: phone };
-
   if (year) {
     if (quarter) {
       const startMonth = (quarter - 1) * 3 + 1;
       const endMonth = startMonth + 2;
-      const startDate = new Date(year, startMonth - 1, 1); // month - 1 vì tháng trong JavaScript bắt đầu từ 0
-      const endDate = new Date(year, endMonth - 1, 31); // Ngày cuối cùng của tháng
+      const startDate = new Date(year, startMonth - 1, 1);
+      const endDate = new Date(year, endMonth - 1, 31);
       whereCondition.create_at = Between(startDate, endDate);
     } else if (month) {
-      const startDate = new Date(year, month - 1, 1); // month - 1 vì tháng trong JavaScript bắt đầu từ 0
-      const endDate = new Date(year, month, 0); // Ngày cuối cùng của tháng
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 0);
       whereCondition.create_at = Between(startDate, endDate);
     } else {
       whereCondition.create_at = Between(
@@ -184,12 +183,12 @@ export const buildWhereCondition = (
   } else if (quarter) {
     const startMonth = (quarter - 1) * 3 + 1;
     const endMonth = startMonth + 2;
-    const startDate = new Date(new Date().getFullYear(), startMonth - 1, 1); // month - 1 vì tháng trong JavaScript bắt đầu từ 0
-    const endDate = new Date(new Date().getFullYear(), endMonth - 1, 31); // Ngày cuối cùng của tháng
+    const startDate = new Date(new Date().getFullYear(), startMonth - 1, 1);
+    const endDate = new Date(new Date().getFullYear(), endMonth - 1, 31);
     whereCondition.create_at = Between(startDate, endDate);
   } else if (month) {
-    const startDate = new Date(new Date().getFullYear(), month - 1, 1); // month - 1 vì tháng trong JavaScript bắt đầu từ 0
-    const endDate = new Date(new Date().getFullYear(), month, 0); // Ngày cuối cùng của tháng
+    const startDate = new Date(new Date().getFullYear(), month - 1, 1);
+    const endDate = new Date(new Date().getFullYear(), month, 0);
     whereCondition.create_at = Between(startDate, endDate);
   }
 

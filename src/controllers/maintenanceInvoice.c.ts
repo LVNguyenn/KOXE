@@ -30,7 +30,7 @@ const maintainController = {
     const userId: any = req.headers["userId"] || "";
     const userRepository = getRepository(User);
     const invoiceRepository = getRepository(Invoice);
-    const { page, per_page, q, year, quarter, month }: any = req.query;
+    let { page, per_page, q, year, quarter, month }: any = req.query;
     let totalExpense = 0;
     try {
       const user = await userRepository.findOne({ where: { user_id: userId } });
