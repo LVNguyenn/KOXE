@@ -86,7 +86,7 @@
     <li>[DELETE] /salons/employees/:id</li>(userId)
     Dùng để xóa nhân viên ra khỏi salon
     <li>[GET] /transactions</li> có lấy thêm được numOfCompletedTran (số giao dịch đã hoàn thành). Đã xử lý cho hoa tiêu và salon
-    <li>[GET] /invoice/get-invoice</li> (Khách hàng gọi, lấy theo tháng, quý, năm sẽ bổ sung sau)
+    <li>[GET] /invoice/get-invoice</li> (Khách hàng gọi, có thể lấy theo năm, quý, tháng (?year= , quarter= , month= , có thể kết hợp năm và quý hoặc tháng ?year=&quarter=))
     
    <div>Tạo phương thức thanh toán</div> 
     <li>[GET] /salon-payment/method</li>
@@ -707,7 +707,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     
     <h2 id="invoice">Hóa đơn</h2>
     <li>[GET] /invoice/get-invoice</li>
-    Dùng để lấy ra tất cả các hóa đơn(mua xe, mua phụ tùng, bảo dưỡng). Có phân trang và search theo loại. Trong đây có total_expense là tổng số tiền
+    Dùng để lấy ra tất cả các hóa đơn(mua xe, mua phụ tùng, bảo dưỡng). Có phân trang và search theo loại. Trong đây có total_expense là tổng số tiền. Có thể lấy theo năm, quý, tháng (?year = , quarter= , month=, có thể lấy năm và quý hoặc tháng luôn)
     <!-- <li>[POST] /invoice/create-invoice</li>
     Dùng để lấy ra tất cả các hóa đơn(mua xe, mua phụ tùng, bảo dưỡng). Có phân trang và search theo loại. Trong đây có total_expense là tổng số tiền -->
     <div>[POST] /invoice/get-invoice-buy-car</div>

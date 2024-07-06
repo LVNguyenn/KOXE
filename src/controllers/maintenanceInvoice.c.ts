@@ -30,7 +30,7 @@ const maintainController = {
     const userId: any = req.headers["userId"] || "";
     const userRepository = getRepository(User);
     const invoiceRepository = getRepository(Invoice);
-    const { page, per_page, q, year, quarter, month }: any = req.query;
+    let { page, per_page, q, year, quarter, month }: any = req.query;
     let totalExpense = 0;
     try {
       const user = await userRepository.findOne({ where: { user_id: userId } });
@@ -41,6 +41,10 @@ const maintainController = {
           total_expense: 0,
         });
       }
+
+      year = isNaN(Number(year)) ? "0" : year;
+      quarter = isNaN(Number(quarter)) ? "0" : quarter;
+      month = isNaN(Number(month)) ? "0" : month;
 
       const whereCondition = buildWhereCondition(
         user.phone,
