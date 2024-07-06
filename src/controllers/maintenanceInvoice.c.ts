@@ -42,10 +42,6 @@ const maintainController = {
         });
       }
 
-      year = isNaN(Number(year)) ? "0" : year;
-      quarter = isNaN(Number(quarter)) ? "0" : quarter;
-      month = isNaN(Number(month)) ? "0" : month;
-
       const whereCondition = buildWhereCondition(
         user.phone,
         year,
