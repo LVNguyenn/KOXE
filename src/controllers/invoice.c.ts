@@ -15,6 +15,8 @@ import PurchaseRepository from "../repository/purchase";
 import InvoiceRepository from "../repository/invoice";
 import NotificationRepository from "../repository/notification";
 import { getUserInfo } from "../helper/mInvoice";
+import PackageRepository from "../repository/package";
+import FeatureRepository from "../repository/feature";
 
 
 const invoiceController = {
@@ -262,16 +264,42 @@ const invoiceController = {
       const rs = await pagination({ data: purchaseDb.purchases, per_page: 10 });
       purchaseDb.purchases = rs.data || "";
       const getTopPackage = await PurchaseRepository.getAllPurchase({});
-      const avg = averageEachMonth(year)
+      const avg = averageEachMonth(year);
+
+      // get package and features
+      const packageRp = await PackageRepository.getAll({});
+      let featureRp: any = await FeatureRepository.getAll({});
+      let topFeature: any = featureRp.data;
+
+      // init count = 0
+      for (let f of topFeature) {
+        f.count = 0;
+      }
+
+      for (let pkg of getTopPackage.data)
+        // find featureId of pkg
+        for (let p of packageRp.data)
+          if (pkg.packageId === p.package_id)
+            for (let fp of p.features)
+              // find same and update new cout
+              for (let f of topFeature)
+                //feature_id existed
+                if (f.feature_id === fp.feature_id)
+                  f.count += +pkg.count;
+
+      // arrage rs
+      topFeature.sort((a: any, b: any) => b.count - a.count);
 
       return res.json({
         status: "success",
         purchases: purchaseDb,
         months: year,
         avg,
-        topPackages: getTopPackage?.data
+        topPackages: getTopPackage?.data,
+        topFeature
       })
     } catch (error) {
+      console.log(error);
       return res.json({
         status: "failed",
         msg: "error revenue statistics."
@@ -284,7 +312,7 @@ const invoiceController = {
 
     if (!year) year = 2024;
     if (!quater && !months) months = 1;
-    let toMonth = quater ? 3*quater : months;
+    let toMonth = quater ? 3 * quater : months;
 
     let fromDate: any = `${year}-${months}-01`;
     let toDate: any = `${year}-${toMonth}-28`;
