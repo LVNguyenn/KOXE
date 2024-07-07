@@ -48,6 +48,7 @@ const UserRepository = {
 
             return FormatData("success", null, others);
         } catch (error) {
+            console.log(error)
             return FormatData("failed", "Invalid information.");
         }
     },
@@ -61,6 +62,7 @@ const UserRepository = {
 
             return FormatData("success", null, others);
         } catch (error) {
+            console.log(error)
             return FormatData("failed", "Invalid information.");
         }
     },
@@ -89,6 +91,7 @@ const UserRepository = {
             return FormatData("success", "Update successfully!")
 
         } catch (error) {
+            console.log(error)
             return FormatData("failed", "Invalid information.")
         }
     },
@@ -112,6 +115,7 @@ const UserRepository = {
 
             return FormatData("success", null, userDb);
         } catch (error) {
+            console.log(error)
             return FormatData("failed", "Invalid information.");
         }
     },
@@ -139,6 +143,7 @@ const UserRepository = {
 
             return FormatData("success", "deleted successfully!", userDb); 
         } catch (error) {
+            console.log(error)
             return FormatData("failed", "Invalid information.");
         }
     },

@@ -33,13 +33,10 @@ router.get(
 );
 
 router.post(
-  "/",
+  "/assign-role",
   middlewareController.verifyToken,
-  uploadCloud.fields([
-    { name: "image", maxCount: 1 },
-    { name: "banner", maxCount: 5 },
-  ]),
-  salonController.createSalon
+  middlewareController.isAdminOfSalon,
+  salonController.assignRoleToUser
 );
 
 // router.post("/user", middlewareController.isAdminOfSalon, salonController.getEmployees);
@@ -102,12 +99,7 @@ router.delete(
   middlewareController.isAdminOfSalon,
   salonController.deleteRole
 );
-router.post(
-  "/assign-role",
-  middlewareController.verifyToken,
-  middlewareController.isAdminOfSalon,
-  salonController.assignRoleToUser
-);
+
 
 router.get("/:id", salonController.getSalonById);
 
@@ -127,4 +119,15 @@ router.delete(
   middlewareController.havePermission("D_SL"),
   salonController.deleteSalon
 );
+
+router.post(
+  "/",
+  middlewareController.verifyToken,
+  uploadCloud.fields([
+    { name: "image", maxCount: 1 },
+    { name: "banner", maxCount: 5 },
+  ]),
+  salonController.createSalon
+);
+
 export default router;

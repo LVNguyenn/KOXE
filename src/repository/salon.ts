@@ -39,6 +39,7 @@ const SalonRepository = {
 
             return FormatData("success", "deleted successfully!", salonDb); 
         } catch (error) {
+            console.log(error)
             return FormatData("failed", "Invalid information.");
         }
     },

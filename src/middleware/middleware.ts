@@ -78,8 +78,11 @@ const middlewareController = {
 
   isAdminOfSalon: async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization || req.headers["authorization"];
-    const { salonId } = req.body;
-    let userId: any = "";
+    let userId: any = req.user||"";
+    const salonRp = await UserRepository.getSalonIdByUserId({ userId });
+    const salonId = req.body.salonId || salonRp?.data;
+
+    console.log(salonRp)
 
     if (!salonId) {
       return res.status(400).json({
