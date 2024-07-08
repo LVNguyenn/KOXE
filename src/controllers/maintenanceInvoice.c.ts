@@ -23,15 +23,18 @@ import {
 } from "../helper/mInvoice";
 import search from "../helper/search";
 import pagination from "../helper/pagination";
-import { formatDate, buildWhereCondition } from "../utils";
+import { formatDate, buildWhereCondition, calcTotal } from "../utils";
 
 const maintainController = {
   getAllInvoices: async (req: Request, res: Response) => {
     const userId: any = req.headers["userId"] || "";
     const userRepository = getRepository(User);
     const invoiceRepository = getRepository(Invoice);
-    let { page, per_page, q, year, quarter, month }: any = req.query;
-    let totalExpense = 0;
+    let { page, per_page, year, quarter, month }: any = req.query;
+    let totalExpenseBuyCar;
+    let totalExpenseBuyAccessory;
+    let totalExpenseMaintenance;
+    let totalExpense;
     try {
       const user = await userRepository.findOne({ where: { user_id: userId } });
       if (!user?.phone) {
@@ -63,36 +66,67 @@ const maintainController = {
         phone: invoice.phone,
         createdAt: formatDate(invoice.create_at),
         expense: invoice.expense,
-        type:
-          invoice.type === "maintenance"
-            ? "Bảo dưỡng"
-            : invoice.type === "buy accessory"
-            ? "Mua phụ tùng"
-            : "Mua xe",
+        type: invoice.type,
+        //type:
+        //  invoice.type === "maintenance"
+        //    ? "Bảo dưỡng"
+        //    : invoice.type === "buy accessory"
+        //    ? "Mua phụ tùng"
+        //    : "Mua xe",
       }));
+      if (formattedInvoices.length === 0) {
+        totalExpenseBuyCar = 0;
+        totalExpenseBuyAccessory = 0;
+        totalExpenseMaintenance = 0;
+        totalExpense = 0;
+      } else {
+        totalExpenseBuyCar = calcTotal(
+          formattedInvoices,
+          formattedInvoices[0].phone,
+          "buy car"
+        );
+        totalExpenseBuyAccessory = calcTotal(
+          formattedInvoices,
+          formattedInvoices[0].phone,
+          "buy accessory"
+        );
+        totalExpenseMaintenance = calcTotal(
+          formattedInvoices,
+          formattedInvoices[0].phone,
+          "maintenance"
+        );
 
-      if (q) {
-        formattedInvoices = await search({
-          data: formattedInvoices,
-          q,
-          fieldname: "type",
-        });
+        totalExpense =
+          totalExpenseBuyCar +
+          totalExpenseBuyAccessory +
+          totalExpenseMaintenance;
       }
+
+      // if (q) {
+      //   formattedInvoices = await search({
+      //     data: formattedInvoices,
+      //     q,
+      //     fieldname: "type",
+      //   });
+      // }
 
       const rs = await pagination({ data: formattedInvoices, page, per_page });
 
-      const a: any = rs.data;
-      if (a) {
-        totalExpense = a.reduce(
-          (acc: number, invoice: any) => acc + invoice.expense,
-          0
-        );
-      }
+      // const a: any = rs.data;
+      // if (a) {
+      //   totalExpense = a.reduce(
+      //     (acc: number, invoice: any) => acc + invoice.expense,
+      //     0
+      //   );
+      // }
 
       return res.status(200).json({
         status: "success",
         invoices: rs?.data,
-        total_expense: totalExpense,
+        totalExpenseBuyCar: totalExpenseBuyCar,
+        totalExpenseBuyAccessory: totalExpenseBuyAccessory,
+        totalExpenseMaintenance: totalExpenseMaintenance,
+        totalExpense: totalExpense,
         total_page: rs?.total_page,
       });
     } catch (error) {

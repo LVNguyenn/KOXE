@@ -2,7 +2,7 @@ import crypto from "crypto";
 import dayjs from "dayjs";
 import vi from "dayjs/locale/vi";
 import axios from "axios";
-import { Between, Raw } from "typeorm";
+import { Between } from "typeorm";
 
 dayjs.locale(vi);
 
@@ -193,6 +193,22 @@ export const buildWhereCondition = (
   }
 
   return whereCondition;
+};
+
+export const calcTotal = (invoices: any, phone: string, type: string) => {
+  // const invoiceRepository = getRepository(Invoice);
+  // const invoices = await invoiceRepository.find({
+  //   where: {
+  //     phone: phone,
+  //     type: type,
+  //   },
+  // });
+  invoices = invoices.filter((invoice: any) => invoice.type === type);
+  const totalExpense: any = invoices.reduce(
+    (acc: number, invoice: any) => acc + invoice.expense,
+    0
+  );
+  return totalExpense;
 };
 
 export {
