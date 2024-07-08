@@ -67,7 +67,7 @@ const promotionController = {
       });
 
       if (promotions.length === 0) {
-        return res.status(404).json({
+        return res.status(200).json({
           status: "failed",
           msg: `No promotion found for salonId: ${salonId}`,
         });

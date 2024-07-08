@@ -11,6 +11,7 @@ import {
   getNextElement,
   isArraySubset,
   calculateAverageRating,
+  calcTotalNumOfCompletedTran,
 } from "../utils/index";
 import { formatDate } from "../utils";
 import createNotification from "../helper/createNotification";
@@ -78,145 +79,215 @@ const transactionController = {
       let transactionList;
       let formatTransactions: any;
       if (salonId !== "") {
-        checkSalon = true;
-        transactionList = await transactionRepository.find({
-          where: { salon: { salon_id: salonId } },
-          relations: ["user", "connection", "process", "stage"],
-        });
+        // checkSalon = true;
+        // transactionList = await transactionRepository.find({
+        //   where: { salon: { salon_id: salonId } },
+        //   relations: ["user", "connection", "process", "stage"],
+        // });
 
-        formatTransactions = transactionList.map((transaction) => ({
-          ...transaction,
-          user: {
-            user_id: transaction.user.user_id,
-            name: transaction.user.fullname,
+        // formatTransactions = transactionList.map((transaction) => ({
+        //   ...transaction,
+        //   user: {
+        //     user_id: transaction.user.user_id,
+        //     name: transaction.user.fullname,
+        //   },
+        //   connection: {
+        //     connection_id: transaction.connection.connection_id,
+        //     created_at: formatDate(transaction.connection.createdAt),
+        //   },
+        // }));
+        const abc = await revenueRepository.find({
+          where: {
+            salon: { salon_id: salonId },
           },
-          connection: {
-            connection_id: transaction.connection.connection_id,
-            created_at: formatDate(transaction.connection.createdAt),
+          relations: ["user"],
+        });
+        const xyz = await Promise.all(
+          abc.map(async (x) => ({
+            amount: x.amount,
+            user: {
+              phone: x.user.user_id,
+              name: x.user.fullname,
+            },
+            numOfCompletedTran: await calcTotalNumOfCompletedTran(
+              x.user.user_id,
+              salonId
+            ),
+          }))
+        );
+        const totals = xyz.reduce(
+          (acc, curr) => {
+            acc.totalAmount = Number(acc.totalAmount) + Number(curr.amount);
+            acc.totalNumOfCompletedTran =
+              Number(acc.totalNumOfCompletedTran) +
+              Number(curr.numOfCompletedTran);
+            return acc;
           },
-        }));
+          { totalAmount: 0, totalNumOfCompletedTran: 0 }
+        );
+
+        return res.status(200).json({
+          status: "success",
+          transaction: { data: xyz, totals },
+        });
       } else {
-        transactionList = await transactionRepository.find({
-          where: { user: { user_id: userId } },
-          relations: ["salon", "connection", "process", "stage"],
-        });
+        // transactionList = await transactionRepository.find({
+        //   where: { user: { user_id: userId } },
+        //   relations: ["salon", "connection", "process", "stage"],
+        // });
 
-        formatTransactions = transactionList.map((transaction) => ({
-          ...transaction,
-          salon: {
-            salon_id: transaction.salon.salon_id,
-            name: transaction.salon.name,
+        // formatTransactions = transactionList.map((transaction) => ({
+        //   //...transaction,
+        //   transaction_id: transaction.transaction_id,
+        //   salon: {
+        //     salon_id: transaction.salon.salon_id,
+        //     name: transaction.salon.name,
+        //   },
+        //   //connection: {
+        //   //  connection_id: transaction.connection.connection_id,
+        //   //  created_at: formatDate(transaction.connection.createdAt),
+        //   //},
+        // }));
+        const abc = await revenueRepository.find({
+          where: {
+            user: { user_id: userId },
           },
-          connection: {
-            connection_id: transaction.connection.connection_id,
-            created_at: formatDate(transaction.connection.createdAt),
+          relations: ["salon"],
+        });
+        const xyz = await Promise.all(
+          abc.map(async (x) => ({
+            amount: x.amount,
+            salon: {
+              salon_id: x.salon.salon_id,
+              phone: x.salon.phoneNumber,
+              name: x.salon.name,
+            },
+            numOfCompletedTran: await calcTotalNumOfCompletedTran(
+              userId,
+              x.salon.salon_id
+            ),
+          }))
+        );
+        const totals = xyz.reduce(
+          (acc, curr) => {
+            acc.totalAmount = Number(acc.totalAmount) + Number(curr.amount);
+            acc.totalNumOfCompletedTran =
+              Number(acc.totalNumOfCompletedTran) +
+              Number(curr.numOfCompletedTran);
+            return acc;
           },
-        }));
+          { totalAmount: 0, totalNumOfCompletedTran: 0 }
+        );
+
+        return res.status(200).json({
+          status: "success",
+          transaction: { data: xyz, totals },
+        });
       }
 
       // search and pagination
-      if (q && checkSalon === true) {
-        formatTransactions = await search({
-          data: formatTransactions,
-          q,
-          fieldname: "user",
-          fieldname2: "name",
-        });
-        if (formatTransactions.length === 0) {
-          totalRevenue = 0;
-          completedTran = 0;
-        } else {
-          revenue = await revenueRepository.find({
-            where: {
-              salon: { salon_id: salonId },
-              user: { user_id: formatTransactions[0].user.user_id },
-            },
-            select: ["amount"],
-          });
+      // if (q && checkSalon === true) {
+      //   formatTransactions = await search({
+      //     data: formatTransactions,
+      //     q,
+      //     fieldname: "user",
+      //     fieldname2: "name",
+      //   });
+      //   if (formatTransactions.length === 0) {
+      //     totalRevenue = 0;
+      //     completedTran = 0;
+      //   } else {
+      //     revenue = await revenueRepository.find({
+      //       where: {
+      //         salon: { salon_id: salonId },
+      //         user: { user_id: formatTransactions[0].user.user_id },
+      //       },
+      //       select: ["amount"],
+      //     });
 
-          totalRevenue = revenue.reduce(
-            (accumulator: any, currentRevenue: any) =>
-              Number(accumulator) + Number(currentRevenue.amount),
-            0
-          );
-          completedTran = await getCompletedTransactionsCount(
-            formatTransactions[0].user.user_id,
-            salonId
-          );
-        }
-      } else if (q && checkSalon === false) {
-        formatTransactions = await search({
-          data: formatTransactions,
-          q,
-          fieldname: "salon",
-          fieldname2: "name",
-        });
-        if (formatTransactions.length === 0) {
-          totalRevenue = 0;
-          completedTran = 0;
-        } else {
-          const revenue = await revenueRepository.find({
-            where: {
-              salon: { salon_id: formatTransactions[0].salon.salon_id },
-              user: { user_id: userId },
-            },
-            select: ["amount"],
-          });
-          totalRevenue = revenue.reduce(
-            (accumulator, currentRevenue) =>
-              Number(accumulator) + Number(currentRevenue.amount),
-            0
-          );
-          completedTran = await getCompletedTransactionsCount(
-            userId,
-            formatTransactions[0].salon.salon_id
-          );
-        }
-      } else if (!q && checkSalon === true) {
-        const revenue = await revenueRepository.find({
-          where: { salon: { salon_id: salonId } },
-          select: ["amount"],
-        });
-        totalRevenue = revenue.reduce(
-          (accumulator, currentRevenue) =>
-            Number(accumulator) + Number(currentRevenue.amount),
-          0
-        );
-        completedTran = await getCompletedTransactionsCount(undefined, salonId);
-      } else if (!q && checkSalon === false) {
-        const revenue = await revenueRepository.find({
-          where: { user: { user_id: userId } },
-          select: ["amount"],
-        });
-        totalRevenue = revenue.reduce(
-          (accumulator, currentRevenue) =>
-            Number(accumulator) + Number(currentRevenue.amount),
-          0
-        );
-        //completeTran = await getCompletedTransactionsCount(userId, undefined);
-        const user = await userRepository.findOne({
-          where: { user_id: userId },
-        });
-        if (user) completedTran = user?.completedTransactions;
-      }
+      //     totalRevenue = revenue.reduce(
+      //       (accumulator: any, currentRevenue: any) =>
+      //         Number(accumulator) + Number(currentRevenue.amount),
+      //       0
+      //     );
+      //     completedTran = await getCompletedTransactionsCount(
+      //       formatTransactions[0].user.user_id,
+      //       salonId
+      //     );
+      //   }
+      // } else if (q && checkSalon === false) {
+      //   formatTransactions = await search({
+      //     data: formatTransactions,
+      //     q,
+      //     fieldname: "salon",
+      //     fieldname2: "name",
+      //   });
+      //   if (formatTransactions.length === 0) {
+      //     totalRevenue = 0;
+      //     completedTran = 0;
+      //   } else {
+      //     const revenue = await revenueRepository.find({
+      //       where: {
+      //         salon: { salon_id: formatTransactions[0].salon.salon_id },
+      //         user: { user_id: userId },
+      //       },
+      //       select: ["amount"],
+      //     });
+      //     totalRevenue = revenue.reduce(
+      //       (accumulator, currentRevenue) =>
+      //         Number(accumulator) + Number(currentRevenue.amount),
+      //       0
+      //     );
+      //     completedTran = await getCompletedTransactionsCount(
+      //       userId,
+      //       formatTransactions[0].salon.salon_id
+      //     );
+      //   }
+      // } else if (!q && checkSalon === true) {
+      //   const revenue = await revenueRepository.find({
+      //     where: { salon: { salon_id: salonId } },
+      //     select: ["amount"],
+      //   });
+      //   totalRevenue = revenue.reduce(
+      //     (accumulator, currentRevenue) =>
+      //       Number(accumulator) + Number(currentRevenue.amount),
+      //     0
+      //   );
+      //   completedTran = await getCompletedTransactionsCount(undefined, salonId);
+      // } else if (!q && checkSalon === false) {
+      //   const revenue = await revenueRepository.find({
+      //     where: { user: { user_id: userId } },
+      //     select: ["amount"],
+      //   });
+      //   totalRevenue = revenue.reduce(
+      //     (accumulator, currentRevenue) =>
+      //       Number(accumulator) + Number(currentRevenue.amount),
+      //     0
+      //   );
+      //   //completeTran = await getCompletedTransactionsCount(userId, undefined);
+      //   const user = await userRepository.findOne({
+      //     where: { user_id: userId },
+      //   });
+      //   if (user) completedTran = user?.completedTransactions;
+      // }
 
-      const rs: any = await pagination({
-        data: formatTransactions,
-        page,
-        per_page,
-      });
+      // const rs: any = await pagination({
+      //   data: formatTransactions,
+      //   page,
+      //   per_page,
+      // });
 
-      const result = {
-        transaction: rs.data,
-        revenue: totalRevenue,
-        numOfCompletedTran: completedTran,
-      };
+      // const result = {
+      //   transaction: rs.data,
+      //   revenue: totalRevenue,
+      //   numOfCompletedTran: completedTran,
+      // };
 
-      return res.status(200).json({
-        status: "success",
-        transaction: result,
-        total_page: rs?.total_page,
-      });
+      // return res.status(200).json({
+      //   status: "success",
+      //   transaction: result,
+      //   total_page: rs?.total_page,
+      // });
     } catch (error) {
       console.log(error);
       return res
