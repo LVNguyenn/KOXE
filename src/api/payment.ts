@@ -10,7 +10,7 @@ dotenv.config();
 export const payment = (app: any) => {
     const service = new PaymentService();
 
-    app.post("/test/", async (req: Request, res: Response) => {
+    app.get("/test/", async (req: Request, res: Response) => {
         const date = new Purchase();
 
         return res.json(date)
