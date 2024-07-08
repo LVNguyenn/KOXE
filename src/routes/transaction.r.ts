@@ -9,6 +9,11 @@ router.get(
   middlewareController.verifyToken,
   transactionController.getAllTransactions
 );
+router.get(
+  "/statistics",
+  middlewareController.verifyToken,
+  transactionController.statisticsTransactions
+);
 router.get("/:id", transactionController.getTransactionById);
 router.patch(
   "/:id/details",

@@ -67,12 +67,6 @@ const maintainController = {
         createdAt: formatDate(invoice.create_at),
         expense: invoice.expense,
         type: invoice.type,
-        //type:
-        //  invoice.type === "maintenance"
-        //    ? "Bảo dưỡng"
-        //    : invoice.type === "buy accessory"
-        //    ? "Mua phụ tùng"
-        //    : "Mua xe",
       }));
       if (formattedInvoices.length === 0) {
         totalExpenseBuyCar = 0;

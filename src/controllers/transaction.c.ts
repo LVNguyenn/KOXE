@@ -61,9 +61,8 @@ const transactionController = {
     const userId: any = req.headers["userId"] || "";
     const { page, per_page, q }: any = req.query;
     let checkSalon = false;
-    let totalRevenue = 0;
-    let completedTran = 0;
-    let revenue: any;
+    //let totalRevenue = 0;
+    //let completedTran = 0;
 
     const user = await getRepository(User).findOne({
       where: [{ user_id: userId }],
@@ -79,43 +78,178 @@ const transactionController = {
       let transactionList;
       let formatTransactions: any;
       if (salonId !== "") {
-        // checkSalon = true;
-        // transactionList = await transactionRepository.find({
-        //   where: { salon: { salon_id: salonId } },
-        //   relations: ["user", "connection", "process", "stage"],
-        // });
+        checkSalon = true;
+        transactionList = await transactionRepository.find({
+          where: { salon: { salon_id: salonId } },
+          relations: ["user", "connection", "process", "stage"],
+        });
 
-        // formatTransactions = transactionList.map((transaction) => ({
-        //   ...transaction,
-        //   user: {
-        //     user_id: transaction.user.user_id,
-        //     name: transaction.user.fullname,
+        formatTransactions = transactionList.map((transaction) => ({
+          ...transaction,
+          user: {
+            user_id: transaction.user.user_id,
+            name: transaction.user.fullname,
+          },
+          connection: {
+            connection_id: transaction.connection.connection_id,
+            created_at: formatDate(transaction.connection.createdAt),
+          },
+        }));
+      } else {
+        transactionList = await transactionRepository.find({
+          where: { user: { user_id: userId } },
+          relations: ["salon", "connection", "process", "stage"],
+        });
+
+        formatTransactions = transactionList.map((transaction) => ({
+          ...transaction,
+          salon: {
+            salon_id: transaction.salon.salon_id,
+            name: transaction.salon.name,
+          },
+          connection: {
+            connection_id: transaction.connection.connection_id,
+            created_at: formatDate(transaction.connection.createdAt),
+          },
+        }));
+      }
+
+      // search and pagination
+      if (q && checkSalon === true) {
+        formatTransactions = await search({
+          data: formatTransactions,
+          q,
+          fieldname: "user",
+          fieldname2: "name",
+        });
+        // const revenue = await revenueRepository.find({
+        //   where: {
+        //     salon: { salon_id: salonId },
+        //     user: { user_id: formatTransactions[0].user.user_id },
         //   },
-        //   connection: {
-        //     connection_id: transaction.connection.connection_id,
-        //     created_at: formatDate(transaction.connection.createdAt),
+        //   select: ["amount"],
+        // });
+        // totalRevenue = revenue.reduce(
+        //   (accumulator, currentRevenue) =>
+        //     Number(accumulator) + Number(currentRevenue.amount),
+        //   0
+        // );
+        // completedTran = await getCompletedTransactionsCount(
+        //   formatTransactions[0].user.user_id,
+        //   salonId
+        // );
+      } else if (q && checkSalon === false) {
+        formatTransactions = await search({
+          data: formatTransactions,
+          q,
+          fieldname: "salon",
+          fieldname2: "name",
+        });
+        // const revenue = await revenueRepository.find({
+        //   where: {
+        //     salon: { salon_id: formatTransactions[0].salon.salon_id },
+        //     user: { user_id: userId },
         //   },
-        // }));
-        const abc = await revenueRepository.find({
+        //   select: ["amount"],
+        // });
+        // totalRevenue = revenue.reduce(
+        //   (accumulator, currentRevenue) =>
+        //     Number(accumulator) + Number(currentRevenue.amount),
+        //   0
+        // );
+        // completedTran = await getCompletedTransactionsCount(
+        //   userId,
+        //   formatTransactions[0].salon.salon_id
+        // );
+      } else if (!q && checkSalon === true) {
+        const revenue = await revenueRepository.find({
+          where: { salon: { salon_id: salonId } },
+          select: ["amount"],
+        });
+        // totalRevenue = revenue.reduce(
+        //   (accumulator, currentRevenue) =>
+        //     Number(accumulator) + Number(currentRevenue.amount),
+        //   0
+        // );
+        // completedTran = await getCompletedTransactionsCount(undefined, salonId);
+      } else if (!q && checkSalon === false) {
+        const revenue = await revenueRepository.find({
+          where: { user: { user_id: userId } },
+          select: ["amount"],
+        });
+        // totalRevenue = revenue.reduce(
+        //   (accumulator, currentRevenue) =>
+        //     Number(accumulator) + Number(currentRevenue.amount),
+        //   0
+        // );
+        // //completeTran = await getCompletedTransactionsCount(userId, undefined);
+        // const user = await userRepository.findOne({
+        //   where: { user_id: userId },
+        // });
+        // if (user) completedTran = user?.completedTransactions;
+      }
+
+      const rs: any = await pagination({
+        data: formatTransactions,
+        page,
+        per_page,
+      });
+
+      const result = {
+        transaction: rs.data,
+        //revenue: totalRevenue,
+        //numOfCompletedTran: completedTran,
+      };
+
+      return res.status(200).json({
+        status: "success",
+        transaction: result,
+        total_page: rs?.total_page,
+      });
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(500)
+        .json({ status: "failed", msg: "Internal server error" });
+    }
+  },
+  statisticsTransactions: async (req: Request, res: Response) => {
+    const revenueRepository = getRepository(Revenue);
+    const userId: any = req.headers["userId"] || "";
+    let formatRevenue, totals;
+
+    const user = await getRepository(User).findOne({
+      where: [{ user_id: userId }],
+      relations: ["salonId"],
+    });
+
+    let salonId = "";
+    if (user?.salonId) {
+      salonId = user.salonId.salon_id;
+    }
+
+    try {
+      if (salonId !== "") {
+        const revenueList = await revenueRepository.find({
           where: {
             salon: { salon_id: salonId },
           },
           relations: ["user"],
         });
-        const xyz = await Promise.all(
-          abc.map(async (x) => ({
-            amount: x.amount,
+        formatRevenue = await Promise.all(
+          revenueList.map(async (revenue) => ({
+            amount: revenue.amount,
             user: {
-              phone: x.user.user_id,
-              name: x.user.fullname,
+              phone: revenue.user.user_id,
+              name: revenue.user.fullname,
             },
             numOfCompletedTran: await calcTotalNumOfCompletedTran(
-              x.user.user_id,
+              revenue.user.user_id,
               salonId
             ),
           }))
         );
-        const totals = xyz.reduce(
+        totals = formatRevenue.reduce(
           (acc, curr) => {
             acc.totalAmount = Number(acc.totalAmount) + Number(curr.amount);
             acc.totalNumOfCompletedTran =
@@ -125,50 +259,28 @@ const transactionController = {
           },
           { totalAmount: 0, totalNumOfCompletedTran: 0 }
         );
-
-        return res.status(200).json({
-          status: "success",
-          transaction: { data: xyz, totals },
-        });
       } else {
-        // transactionList = await transactionRepository.find({
-        //   where: { user: { user_id: userId } },
-        //   relations: ["salon", "connection", "process", "stage"],
-        // });
-
-        // formatTransactions = transactionList.map((transaction) => ({
-        //   //...transaction,
-        //   transaction_id: transaction.transaction_id,
-        //   salon: {
-        //     salon_id: transaction.salon.salon_id,
-        //     name: transaction.salon.name,
-        //   },
-        //   //connection: {
-        //   //  connection_id: transaction.connection.connection_id,
-        //   //  created_at: formatDate(transaction.connection.createdAt),
-        //   //},
-        // }));
-        const abc = await revenueRepository.find({
+        const revenueList = await revenueRepository.find({
           where: {
             user: { user_id: userId },
           },
           relations: ["salon"],
         });
-        const xyz = await Promise.all(
-          abc.map(async (x) => ({
-            amount: x.amount,
+        formatRevenue = await Promise.all(
+          revenueList.map(async (revenue) => ({
+            amount: revenue.amount,
             salon: {
-              salon_id: x.salon.salon_id,
-              phone: x.salon.phoneNumber,
-              name: x.salon.name,
+              salon_id: revenue.salon.salon_id,
+              phone: revenue.salon.phoneNumber,
+              name: revenue.salon.name,
             },
             numOfCompletedTran: await calcTotalNumOfCompletedTran(
               userId,
-              x.salon.salon_id
+              revenue.salon.salon_id
             ),
           }))
         );
-        const totals = xyz.reduce(
+        totals = formatRevenue.reduce(
           (acc, curr) => {
             acc.totalAmount = Number(acc.totalAmount) + Number(curr.amount);
             acc.totalNumOfCompletedTran =
@@ -178,116 +290,12 @@ const transactionController = {
           },
           { totalAmount: 0, totalNumOfCompletedTran: 0 }
         );
-
-        return res.status(200).json({
-          status: "success",
-          transaction: { data: xyz, totals },
-        });
       }
 
-      // search and pagination
-      // if (q && checkSalon === true) {
-      //   formatTransactions = await search({
-      //     data: formatTransactions,
-      //     q,
-      //     fieldname: "user",
-      //     fieldname2: "name",
-      //   });
-      //   if (formatTransactions.length === 0) {
-      //     totalRevenue = 0;
-      //     completedTran = 0;
-      //   } else {
-      //     revenue = await revenueRepository.find({
-      //       where: {
-      //         salon: { salon_id: salonId },
-      //         user: { user_id: formatTransactions[0].user.user_id },
-      //       },
-      //       select: ["amount"],
-      //     });
-
-      //     totalRevenue = revenue.reduce(
-      //       (accumulator: any, currentRevenue: any) =>
-      //         Number(accumulator) + Number(currentRevenue.amount),
-      //       0
-      //     );
-      //     completedTran = await getCompletedTransactionsCount(
-      //       formatTransactions[0].user.user_id,
-      //       salonId
-      //     );
-      //   }
-      // } else if (q && checkSalon === false) {
-      //   formatTransactions = await search({
-      //     data: formatTransactions,
-      //     q,
-      //     fieldname: "salon",
-      //     fieldname2: "name",
-      //   });
-      //   if (formatTransactions.length === 0) {
-      //     totalRevenue = 0;
-      //     completedTran = 0;
-      //   } else {
-      //     const revenue = await revenueRepository.find({
-      //       where: {
-      //         salon: { salon_id: formatTransactions[0].salon.salon_id },
-      //         user: { user_id: userId },
-      //       },
-      //       select: ["amount"],
-      //     });
-      //     totalRevenue = revenue.reduce(
-      //       (accumulator, currentRevenue) =>
-      //         Number(accumulator) + Number(currentRevenue.amount),
-      //       0
-      //     );
-      //     completedTran = await getCompletedTransactionsCount(
-      //       userId,
-      //       formatTransactions[0].salon.salon_id
-      //     );
-      //   }
-      // } else if (!q && checkSalon === true) {
-      //   const revenue = await revenueRepository.find({
-      //     where: { salon: { salon_id: salonId } },
-      //     select: ["amount"],
-      //   });
-      //   totalRevenue = revenue.reduce(
-      //     (accumulator, currentRevenue) =>
-      //       Number(accumulator) + Number(currentRevenue.amount),
-      //     0
-      //   );
-      //   completedTran = await getCompletedTransactionsCount(undefined, salonId);
-      // } else if (!q && checkSalon === false) {
-      //   const revenue = await revenueRepository.find({
-      //     where: { user: { user_id: userId } },
-      //     select: ["amount"],
-      //   });
-      //   totalRevenue = revenue.reduce(
-      //     (accumulator, currentRevenue) =>
-      //       Number(accumulator) + Number(currentRevenue.amount),
-      //     0
-      //   );
-      //   //completeTran = await getCompletedTransactionsCount(userId, undefined);
-      //   const user = await userRepository.findOne({
-      //     where: { user_id: userId },
-      //   });
-      //   if (user) completedTran = user?.completedTransactions;
-      // }
-
-      // const rs: any = await pagination({
-      //   data: formatTransactions,
-      //   page,
-      //   per_page,
-      // });
-
-      // const result = {
-      //   transaction: rs.data,
-      //   revenue: totalRevenue,
-      //   numOfCompletedTran: completedTran,
-      // };
-
-      // return res.status(200).json({
-      //   status: "success",
-      //   transaction: result,
-      //   total_page: rs?.total_page,
-      // });
+      return res.status(200).json({
+        status: "success",
+        transaction: { data: formatRevenue, totals },
+      });
     } catch (error) {
       console.log(error);
       return res
