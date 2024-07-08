@@ -40,6 +40,10 @@ const SalonPaymentRepository = {
                 queyString = queyString.where({creator: data.creator});
             }
 
+            if (data.status) {
+                queyString = queyString.where({status: data.status});
+            }
+
             rs = await queyString.getMany();
 
             return FormatData("success", "find successfully!", rs);

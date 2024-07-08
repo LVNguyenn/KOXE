@@ -1196,7 +1196,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <h2 id="salon-payment">Salon tạo thanh toán gửi cho khách hàng</h2>
     <li>[GET] /salon-payment</li>
     Lấy ra danh sách các phiếu thanh toán của khách hàng or salon. Nếu truyền vô ?id thì sẽ lấy phiếu thanh toán với id đó.
-    Lưu ý kết quả trả về creator: là người nhân viên tạo ra phiếu thanh toán đó, dùng để hiển thị thôi.
+    Lưu ý kết quả trả về creator: là người nhân viên tạo ra phiếu thanh toán đó, dùng để hiển thị thôi. Nếu muốn lọc status = true thì truyền vô luôn
     <li>[POST] /salon-payment/create</li>
     Yêu cầu là chủ salon or nhân viên có quyền C_PMSL. Dùng để tạo ra phiếu thanh toán và gửi cho khách hàng. Yêu cầu truyền vô: {cusPhone: số điện thoại khách hàng, cusFullname: tên khách hàng, reason: lý do nội dung tạo hóa đơn, amount: số tiền, salonId, methodPaymentId: id của phương thức thanh toán cho salon, invoiceId}.
     <div>Sau khi tạo thành công thì bên khách hàng sẽ nhận được thông báo cần thanh toán, type là salon-payment, data là id của phiếu hóa đơn.</div>

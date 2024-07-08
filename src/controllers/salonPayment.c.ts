@@ -77,7 +77,7 @@ const apidocController = {
     },
 
     get: async (req: Request, res: Response) => {
-        const { id, page, per_page, q, creator }: any = req.query;
+        const { id, page, per_page, q, creator, status }: any = req.query;
         const userId: any = req.user;
         let phone = req.query.phone;
 
@@ -98,7 +98,7 @@ const apidocController = {
                 phone = userRp?.data?.phone;
             }
 
-            let rs = await SalonPaymentRepository.getAll({ salonId: salonRp.data, phone, id, creator })
+            let rs = await SalonPaymentRepository.getAll({ salonId: salonRp.data, phone, id, creator, status })
 
             for (let e of rs.data) {
                 // get information of creator
