@@ -33,7 +33,7 @@ export class Purchase {
   init(
     userId: string,
     packageId: string,
-    purchaseDate: Date,
+    purchaseDate: Date = new Date(),
     expirationDate: Date,
     total: number
   ) {

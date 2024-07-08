@@ -29,7 +29,9 @@ import {
   Promotion,
   GroupSalon,
   Revenue,
-  Role
+  Role,
+  SalonPayment,
+  SalonPaymentInfor
 } from "../database/models";
 import { DataSourceOptions } from "typeorm";
 
@@ -74,6 +76,8 @@ export const connectionString: DataSourceOptions = {
     GroupSalon,
     Revenue,
     Role,
+    SalonPayment,
+    SalonPaymentInfor
   ],
   synchronize: true,
   ssl: {

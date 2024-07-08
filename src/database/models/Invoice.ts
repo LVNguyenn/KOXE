@@ -57,6 +57,9 @@ export class Invoice {
   policy!: string;
 
   @Column({ default: false })
+  payment_done!: boolean;
+
+  @Column({ default: false })
   done!: boolean;
 
   @Column({ nullable: true })
@@ -86,7 +89,7 @@ export class Invoice {
     policy: string,
     maintenanceServices: string[],
     accessories: string[],
-    legals_user: Car_User_Legals
+    legals_user: Car_User_Legals,
   ) {
     this.type = type;
     this.expense = expense;
