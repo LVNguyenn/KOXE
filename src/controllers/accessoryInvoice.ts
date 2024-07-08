@@ -91,7 +91,6 @@ const accessoryController = {
         total_page: rs?.total_page,
       });
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         status: "failed",
         msg: "Internal server error",
