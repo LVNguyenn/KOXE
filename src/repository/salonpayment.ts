@@ -26,6 +26,7 @@ const SalonPaymentRepository = {
             let queyString = payRepository
             .createQueryBuilder("SalonPayment")
             .innerJoinAndSelect('SalonPayment.salon', 'salon', data?.salonId? 'salon.salon_id =:salonId' : '', {...data})
+            .orderBy('create_date', 'DESC')
 
             if (data.phone) {
                 queyString = queyString.where({custormer_phone: data.phone});
