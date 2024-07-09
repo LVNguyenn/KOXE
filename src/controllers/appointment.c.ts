@@ -41,7 +41,7 @@ const appointmentController = {
       appoint.date = date;
       appoint.notificationTime = subtractHoursFromStringTime(
         appoint.date.toString(),
-        1
+        0.5
       );
       appoint.description = description;
       appoint.car_id = carId;
