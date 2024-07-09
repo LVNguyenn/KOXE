@@ -68,7 +68,6 @@
     <li>[PATCH] /salons/role</li>
     <li>[DELETE] /salons/role/:id</li> 
     <li>[POST] /salons/assign-role</li>
-
     <li>API get salon theo id tui không lấy ra các xe của salon đó nữa mà giờ sẽ có 1 API riêng để gọi. API get salon theo id chỉ lấy ra được các thông tin của salon thôi</li>
     <li>[GET] /cars/salon/:salon_id</li>
     <li>Có sắp xếp, hiện tại chỉ mới có cho xe, cần truyền vào VD: /cars/salon/e03942f6-1fc0-4864-9a70-647a070160d7?page=1&per_page=5&sort=price (nếu -price là sắp xếp giảm dần, muốn sắp xếp theo name cũng được)</li>
@@ -83,12 +82,12 @@
     
     <h3>Từ ngày 1/7/24 - Đến 8/7/24</h3>
     Phần lấy xe của các salon đã loại bỏ những xe đã mua rồi (available = 0)
-    <li>[DELETE] /salons/employees/:id</li>(userId)
+    <li>[DELETE] /salons/employees/:id(userId)</li>
     Dùng để xóa nhân viên ra khỏi salon
-    <li>[GET] /transactions</li> dùng để xem lại được tất cả các lịch sử giao dịch. Đã xử lý cho hoa tiêu và salon
+    <li>[GET] /transactions</li>
+    Dùng để xem lại được tất cả các lịch sử giao dịch. Đã xử lý cho hoa tiêu và salon
     <li>[GET] /invoice/get-invoice</li> (Khách hàng gọi, có thể lấy theo năm, quý, tháng (?year= , quarter= , month= , có thể kết hợp năm và quý hoặc tháng ?year=&quarter=)). Trong đây đã có tổng tiền của 3 loại hóa đơn và total_expense là tổng tất cả
-    
-   <div>Tạo phương thức thanh toán</div> 
+    <div>Tạo phương thức thanh toán</div> 
     <li>[GET] /salon-payment/method</li>
     <li>[POST] /salon-payment/create-method</li>
     <li>[PATCH] /salon-payment/method</li>
@@ -104,12 +103,10 @@
     có thêm doanh thu theo quý.
     <li>[POST] /invoice/get-top</li>
     có chỉnh nhiều, nên đọc kĩ lại.
-
     <li>[POST] /invoice/statistics-admin</li>
     có thêm lấy top các tính năng.
-    
     <li>[GET] /transactions/statistics</li>
-    Thống kê cho hoa tiêu và salon về giao dịch buôn bán xe
+    Thống kê cho hoa tiêu và salon về giao dịch buôn bán xe (Bên salon cũng cần gọi API này để thống kê những hoa tiêu đã hoàn thành giao dịch với mình. Nếu bên hoa tiêu là số tiền nhận được thì bên salon là số tiền đã chi)
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
     <h2>MỤC LỤC</h2>
@@ -1039,7 +1036,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Sẽ lấy ra được tất cả các giao dịch của salon mình với các hoa tiêu. Nếu là user thì lấy ra được tất cả các giao dịch của mình với các salon (Lấy ra đươc tình trạng, tên user, quy trình áp dụng, ngày tạo kết nối)
     <b>Ở đây đã được thêm search theo tên của salon và tên hoa tiêu</b>
     <li>[GET] /transactions/statistics</li>
-    Dùng để thống kê cho hoa tiêu và salon về giao dịch buôn bán xe. Lấy ra được các salon mà hoa tiêu đã giao dịch, có tổng tiền mà từng salon đã chi và số giao dịch hoàn thành với salon đó. Total có 2 cái là totalAmount và totalNumOfCompletedTran
+    Dùng để thống kê cho hoa tiêu và salon về giao dịch buôn bán xe. Lấy ra được các salon mà hoa tiêu đã giao dịch, có tổng tiền mà từng salon đã chi và số giao dịch hoàn thành với salon đó. Total có 2 cái là totalAmount (tổng số tiền nhận được từ tất cả salon) và totalNumOfCompletedTran (tổng số giao dịch hoàn thành từ tất cả salon)
     <li>[GET] /transactions/:id</li>
     Nó sẽ lấy ra được chi tiết của giao dịch đó
     <li>[PATCH] /transactions/:id/details</li>

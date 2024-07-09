@@ -1,15 +1,14 @@
 import { Request, Response } from "express";
-import { Car } from "../entities/Car";
 import { getRepository } from "typeorm";
+import { Invoice, Car } from "../entities";
 const cloudinary = require("cloudinary").v2;
 import { getFileName } from "../utils/index";
 import { newLogs } from "../helper/createLogs";
 // import Cache from '../config/node-cache';
-import { Invoice, Salon } from "../entities";
 import CarRepository from "../repository/car";
 import search from "../helper/search";
-import pagination from "../helper/pagination";
 import Sort from "../helper/sort";
+import pagination from "../helper/pagination";
 
 interface MulterFile {
   path: string;

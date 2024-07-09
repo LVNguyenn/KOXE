@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { Feature } from "../entities/Feature";
 import { getRepository } from "typeorm";
+import { Feature } from "../entities/Feature";
 import { newLogs } from "../helper/createLogs";
-import Cache from "../config/node-cache";
+//import Cache from "../config/node-cache";
 import search from "../helper/search";
 import pagination from "../helper/pagination";
 

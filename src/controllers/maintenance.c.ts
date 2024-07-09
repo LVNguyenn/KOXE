@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { Maintenance } from "../entities/Maintenance";
 import { getRepository } from "typeorm";
+import { Maintenance } from "../entities/Maintenance";
 import { getUserInfo } from "../helper/mInvoice";
 import search from "../helper/search";
 import pagination from "../helper/pagination";
@@ -31,14 +31,22 @@ const maintenanceController = {
 
       // search and pagination
       if (q) {
-        maintenanceFormat.maintenances = await search({ data: maintenanceFormat.maintenances, q, fieldname: "name" })
+        maintenanceFormat.maintenances = await search({
+          data: maintenanceFormat.maintenances,
+          q,
+          fieldname: "name",
+        });
       }
-      const rs = await pagination({ data: maintenanceFormat.maintenances, page, per_page });
-      
+      const rs = await pagination({
+        data: maintenanceFormat.maintenances,
+        page,
+        per_page,
+      });
+
       return res.status(200).json({
         status: "success",
         maintenances: rs?.data,
-        total_page: rs?.total_page
+        total_page: rs?.total_page,
       });
     } catch (error) {
       return res
@@ -101,16 +109,15 @@ const maintenanceController = {
 
       // search and pagination
       if (q) {
-        maintenance = await search({ data: maintenance, q, fieldname: "name" })
+        maintenance = await search({ data: maintenance, q, fieldname: "name" });
       }
 
       const rs = await pagination({ data: maintenance, page, per_page });
 
-
       return res.status(200).json({
         status: "success",
         maintenance: rs?.data,
-        total_page: rs?.total_page
+        total_page: rs?.total_page,
       });
     } catch (error) {
       return res

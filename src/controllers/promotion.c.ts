@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { getRepository } from "typeorm";
 import { Promotion } from "../entities/Promotion";
 import { getUserInfo } from "../helper/mInvoice";
-import moment from "moment";
 const cloudinary = require("cloudinary").v2;
 import { getFileName } from "../utils/index";
 import dayjs from "dayjs";

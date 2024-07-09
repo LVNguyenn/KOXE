@@ -1,11 +1,6 @@
 import { Request, Response } from "express";
-import { getRepository, In } from "typeorm";
-import { Transaction } from "../entities/Transaction";
-import { User } from "../entities/User";
-import { Connection } from "../entities/Connection";
-import { Process } from "../entities/Process";
-import { Stage } from "../entities/Stage";
-import { Revenue } from "../entities/Revenue";
+import { getRepository } from "typeorm";
+import { Transaction, User, Process, Stage, Revenue } from "../entities";
 import { getUserInfo, getCompletedTransactionsCount } from "../helper/mInvoice";
 import {
   getNextElement,
@@ -514,36 +509,6 @@ const transactionController = {
         .json({ status: "failed", msg: "Internal server error" });
     }
   },
-  // backStage: async (req: Request, res: Response) => {
-  //   const { id } = req.params;
-  //   const { stageId } = req.body;
-  //   const transactionRepository = getRepository(Transaction);
-
-  //   try {
-  //     const transaction = await transactionRepository.update(id, {
-  //       stage: { stage_id: stageId },
-  //     });
-  //     if (transaction.affected === 0) {
-  //       return res
-  //         .status(404)
-  //         .json({ status: "failed", msg: `No transaction with id: ${id}` });
-  //     }
-  //     const result = await transactionRepository.findOne({
-  //       where: { transaction_id: id },
-  //       relations: ["user", "process", "stage"],
-  //     });
-
-  //     return res.status(200).json({
-  //       status: "success",
-  //       msg: "Update successfully!",
-  //       transaction: result,
-  //     });
-  //   } catch (error) {
-  //     return res
-  //       .status(500)
-  //       .json({ status: "failed", msg: "Internal server error" });
-  //   }
-  // },
   deleteTransaction: async (req: Request, res: Response) => {
     const { id } = req.params;
     const transactionRepository = getRepository(Transaction);

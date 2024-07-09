@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { User, Invoice, MInvoiceDetail, AInvoiceDetail } from "../entities";
 import { getRepository } from "typeorm";
+import { User, Invoice, MInvoiceDetail, AInvoiceDetail } from "../entities";
 import {
   getUserInfo,
   getMaintenanceServiceList,

@@ -1,12 +1,8 @@
 import { Request, Response } from "express";
-import { getRepository, Not } from "typeorm";
-import moment from "moment";
-import { Post } from "../entities/Post";
-import { User } from "../entities/User";
-import { Salon } from "../entities/Salon";
-import { Connection } from "../entities/Connection";
-import createNotification from "../helper/createNotification";
+import { getRepository } from "typeorm";
+import { Post, User, Salon, Connection } from "../entities";
 import { getUserInfo } from "../helper/mInvoice";
+import createNotification from "../helper/createNotification";
 import search from "../helper/search";
 import pagination from "../helper/pagination";
 

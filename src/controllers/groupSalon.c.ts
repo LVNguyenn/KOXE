@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { GroupSalon } from "../entities/GroupSalon";
-import { Salon } from "../entities/Salon";
 import { getRepository } from "typeorm";
+import { Salon } from "../entities/Salon";
+import { GroupSalon } from "../entities/GroupSalon";
 
 const groupSalonController = {
   getAllGroupSalons: async (req: Request, res: Response) => {

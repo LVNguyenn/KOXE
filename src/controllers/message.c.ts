@@ -1,10 +1,7 @@
-import moment from "moment";
-import { getRepository } from "typeorm";
 import { Request, Response } from "express";
-import { Message } from "../entities/Message";
-import { User } from "../entities/User";
-import { Salon } from "../entities/Salon";
-import { Conversation } from "../entities/Conversation";
+import { getRepository } from "typeorm";
+import { Message, User, Salon, Conversation } from "../entities";
+import moment from "moment";
 import { getReceiverSocketId, io } from "../socket/socket";
 import { getUserInfo } from "../helper/mInvoice";
 const cloudinary = require("cloudinary").v2;

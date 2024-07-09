@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
+import { getRepository } from "typeorm";
 import { Stage } from "../entities/Stage";
 import { CommissionDetails } from "../entities/CommissionDetails";
-import { getRepository } from "typeorm";
 import { getUserInfo } from "../helper/mInvoice";
 
 const stageController = {
@@ -36,37 +36,6 @@ const stageController = {
         .json({ status: "failed", msg: "Internal server error" });
     }
   },
-  // getStageBySalonId: async (req: Request, res: Response) => {
-  //   const userId: any = req.headers["userId"] || "";
-  //   const stageRepository = getRepository(Stage);
-
-  //   const user = await getUserInfo(userId);
-  //   const salonId = user?.salonId.salon_id;
-
-  //   try {
-  //     const stage = await stageRepository.find({
-  //       where: { salon: { salon_id: salonId } },
-  //       relations: ["commissionDetails"],
-  //     });
-
-  //     if (!stage) {
-  //       return res.status(404).json({
-  //         status: "failed",
-  //         msg: `No stage with salon id: ${salonId}`,
-  //       });
-  //     }
-
-  //     return res.status(200).json({
-  //       status: "success",
-  //       stage: stage,
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //     return res
-  //       .status(500)
-  //       .json({ status: "failed", msg: "Internal server error" });
-  //   }
-  // },
   getStageById: async (req: Request, res: Response) => {
     const { id } = req.params;
     const stageRepository = getRepository(Stage);

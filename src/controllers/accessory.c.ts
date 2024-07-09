@@ -1,31 +1,11 @@
 import { Request, Response } from "express";
-import { Accessory } from "../entities/Accessory";
 import { getRepository } from "typeorm";
+import { Accessory } from "../entities/Accessory";
 import { getUserInfo } from "../helper/mInvoice";
 import search from "../helper/search";
 import pagination from "../helper/pagination";
 
 const accessoryController = {
-  //   getAllAccessorys: async (req: Request, res: Response) => {
-  //     const accessoryRepository = getRepository(Accessory);
-  //     try {
-  //       const accessories = await accessoryRepository.find({});
-
-  //       const accessorySave = {
-  //         accessories,
-  //         nbHits: accessories.length,
-  //       };
-
-  //       return res.status(200).json({
-  //         status: "success",
-  //         accessories: accessorySave,
-  //       });
-  //     } catch (error) {
-  //       return res
-  //         .status(500)
-  //         .json({ status: "failed", msg: "Internal server error" });
-  //     }
-  //   },
   getAccessoryBySalonId: async (req: Request, res: Response) => {
     const accessoryRepository = getRepository(Accessory);
     const { salonId } = req.params;

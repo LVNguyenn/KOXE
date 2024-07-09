@@ -1,13 +1,15 @@
 import { Request, Response } from "express";
 import { getRepository } from "typeorm";
-import { User } from "../entities/User";
-import { Connection } from "../entities/Connection";
-import { Salon } from "../entities/Salon";
-import { Process } from "../entities/Process";
-import { Stage } from "../entities/Stage";
-import { Post } from "../entities/Post";
+import {
+  User,
+  Connection,
+  Salon,
+  Process,
+  Stage,
+  Post,
+  Transaction,
+} from "../entities";
 import createNotification from "../helper/createNotification";
-import { Transaction } from "../entities";
 import { formatDate } from "../utils";
 import pagination from "../helper/pagination";
 

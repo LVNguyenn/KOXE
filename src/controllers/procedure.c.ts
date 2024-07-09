@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
+import { getRepository } from "typeorm";
 import { Process } from "../entities/Process";
 import { Stage } from "../entities/Stage";
-import { getRepository } from "typeorm";
 import { getUserInfo } from "../helper/mInvoice";
 import search from "../helper/search";
 import pagination from "../helper/pagination";
@@ -22,11 +22,13 @@ const processController = {
       const whereCondition: any = { salon: { salon_id: salonId } };
       if (type !== undefined) whereCondition.type = type;
 
-      let processes: any = await processRepository.find({ where: whereCondition });
+      let processes: any = await processRepository.find({
+        where: whereCondition,
+      });
 
       // search and pagination
       if (q) {
-        processes = await search({ data: processes, q, fieldname: "name" })
+        processes = await search({ data: processes, q, fieldname: "name" });
       }
 
       const rs = await pagination({ data: processes, page, per_page });
@@ -40,7 +42,7 @@ const processController = {
       return res.status(200).json({
         status: "success",
         processes: processesSave,
-        total_page: rs?.total_page
+        total_page: rs?.total_page,
       });
     } catch (error) {
       return res
