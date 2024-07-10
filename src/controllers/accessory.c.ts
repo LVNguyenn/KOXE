@@ -17,7 +17,7 @@ const accessoryController = {
       });
 
       if (accessory.length === 0) {
-        return res.status(404).json({
+        return res.status(200).json({
           status: "failed",
           msg: `No accessory found for salonId: ${salonId}`,
         });
@@ -52,7 +52,7 @@ const accessoryController = {
       });
       if (!accessory) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No accessory with id: ${id}` });
       }
 
@@ -117,7 +117,7 @@ const accessoryController = {
       });
       if (accessory.affected === 0) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No accessory with id: ${id}` });
       }
       const result = await accessoryRepository.findOne({
@@ -144,7 +144,7 @@ const accessoryController = {
       const accessory = await accessoryRepository.delete(id);
       if (accessory.affected === 0) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No accessory with id: ${id}` });
       }
       res.status(200).json({

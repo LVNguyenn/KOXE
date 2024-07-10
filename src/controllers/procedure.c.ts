@@ -63,7 +63,7 @@ const processController = {
 
       if (!process) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No process with id: ${id}` });
       }
 
@@ -145,7 +145,7 @@ const processController = {
 
       if (!process) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No process with id: ${id}` });
       }
 
@@ -179,7 +179,7 @@ const processController = {
 
       if (!process) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No process with id: ${id}` });
       }
 

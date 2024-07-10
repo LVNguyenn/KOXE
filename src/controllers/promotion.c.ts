@@ -108,7 +108,7 @@ const promotionController = {
 
       if (!promotion) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No promotion with id: ${id}` });
       }
 
@@ -240,7 +240,7 @@ const promotionController = {
           });
         }
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No promotion with id: ${id}` });
       }
 
@@ -284,7 +284,7 @@ const promotionController = {
 
       if (!promotion) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No promotion with id: ${id}` });
       }
 

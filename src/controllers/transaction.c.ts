@@ -25,7 +25,7 @@ const transactionController = {
       });
 
       if (!transaction) {
-        return res.status(404).json({
+        return res.status(200).json({
           status: "failed",
           msg: `No transaction with transactionId: ${id}`,
         });
@@ -311,7 +311,7 @@ const transactionController = {
 
       if (!transaction) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: "Transaction not found" });
       }
 
@@ -373,7 +373,7 @@ const transactionController = {
 
       if (!transaction) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: "Transaction not found" });
       }
 
@@ -516,7 +516,7 @@ const transactionController = {
       const transaction = await transactionRepository.delete(id);
       if (transaction.affected === 0) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No transaction with id: ${id}` });
       }
 

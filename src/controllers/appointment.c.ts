@@ -232,7 +232,7 @@ const appointmentController = {
       });
     } catch (error) {
       // console.log(error)
-      return res.status(404).json({
+      return res.status(200).json({
         status: "failed",
         msg: "Update error.",
       });
@@ -292,7 +292,7 @@ const appointmentController = {
         msg: "delete successfully!",
       });
     } catch (error) {
-      return res.status(404).json({
+      return res.status(200).json({
         status: "failed",
         msg: "delete error.",
       });

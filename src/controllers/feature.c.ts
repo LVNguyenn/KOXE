@@ -69,7 +69,7 @@ const featureController = {
       });
       if (!feature) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No feature with id: ${id}` });
       }
       // set value for cache
@@ -121,7 +121,7 @@ const featureController = {
       });
       if (feature.affected === 0) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No feature with id: ${id}` });
       }
       const result = await featureRepository.findOne({
@@ -150,7 +150,7 @@ const featureController = {
       const feature = await featureRepository.delete(id);
       if (feature.affected === 0) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No feature with id: ${id}` });
       }
 

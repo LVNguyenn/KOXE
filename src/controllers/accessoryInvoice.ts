@@ -104,7 +104,7 @@ const accessoryController = {
       const aInvoice = await getAccessoryInvoice(id);
 
       if (!aInvoice) {
-        return res.status(404).json({
+        return res.status(200).json({
           status: "failed",
           msg: `No accessory invoices with id: ${id}`,
         });
@@ -216,7 +216,7 @@ const accessoryController = {
       });
 
       if (!Invoice) {
-        return res.status(404).json({
+        return res.status(200).json({
           status: "failed",
           msg: `No accessory invoice with id: ${id}`,
         });
@@ -279,7 +279,7 @@ const accessoryController = {
       });
 
       if (!aInvoice) {
-        return res.status(404).json({
+        return res.status(200).json({
           status: "failed",
           msg: `No accessory invoices with id: ${id}`,
         });

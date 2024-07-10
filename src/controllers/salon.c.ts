@@ -218,7 +218,7 @@ const salonController = {
 
       if (!salon) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No salon with id: ${id}` });
       }
       // Cache.set(id+"salon", salon);
@@ -371,7 +371,7 @@ const salonController = {
         });
       }
       return res
-        .status(404)
+        .status(200)
         .json({ status: "failed", msg: `No salon with id: ${id}` });
     }
 
@@ -428,7 +428,7 @@ const salonController = {
 
       if (!salon) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No salon with id: ${id}` });
       }
 
@@ -527,7 +527,7 @@ const salonController = {
   getEmployees: async (req: Request, res: Response) => {
     const { salonId, userId, page, per_page, q } = req.body;
     const salonRepository = getRepository(Salon);
-    
+
     try {
       let salonDb: any = await salonRepository.findOne({
         select: ["salon_id", "name"],
@@ -569,7 +569,7 @@ const salonController = {
   handlePermission: async (req: Request, res: Response) => {
     const { permission, userId } = req.body;
     const userRepository = getRepository(User);
-    
+
     try {
       let userDb: User = await userRepository.findOneOrFail({
         where: { user_id: userId },
@@ -916,7 +916,7 @@ const salonController = {
   assignRoleToUser: async (req: Request, res: Response) => {
     const { employeeId, roleId } = req.body;
 
-    console.log(employeeId, roleId)
+    console.log(employeeId, roleId);
 
     if (!employeeId || !roleId) {
       return res.json({

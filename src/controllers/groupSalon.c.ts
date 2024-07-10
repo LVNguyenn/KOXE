@@ -57,7 +57,7 @@ const groupSalonController = {
       });
       if (!groupSalon) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No groupSalon with id: ${id}` });
       }
 
@@ -121,7 +121,7 @@ const groupSalonController = {
       });
       if (groupSalon.affected === 0) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No groupSalon with id: ${id}` });
       }
       const result = await groupSalonRepository.findOne({
@@ -151,7 +151,7 @@ const groupSalonController = {
 
       if (!groupSalon) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No groupSalon with id: ${id}` });
       }
 

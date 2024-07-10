@@ -265,7 +265,7 @@ const postController = {
 
       if (!post) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No post with id: ${id}` });
       }
 

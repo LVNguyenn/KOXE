@@ -113,7 +113,7 @@ const connectionController = {
 
       if (!connection) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No connection with id: ${id}` });
       }
 
@@ -226,7 +226,7 @@ const connectionController = {
       });
       if (connection.affected === 0) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No connection with id: ${id}` });
       }
       const result = await connectionRepository.findOne({

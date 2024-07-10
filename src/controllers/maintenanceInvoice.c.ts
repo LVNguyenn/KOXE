@@ -231,7 +231,7 @@ const maintainController = {
       const mInvoice = await getMaintenanceInvoice(id);
 
       if (!mInvoice) {
-        return res.status(404).json({
+        return res.status(200).json({
           status: "failed",
           msg: `No maintenance invoices with id: ${id}`,
         });
@@ -305,7 +305,7 @@ const maintainController = {
       }
 
       if (mInvoices.length === 0) {
-        return res.status(404).json({
+        return res.status(200).json({
           status: "failed",
           msg: "No maintenance invoices found for this license plate",
         });
@@ -486,7 +486,7 @@ const maintainController = {
       });
 
       if (!Invoice) {
-        return res.status(404).json({
+        return res.status(200).json({
           status: "failed",
           msg: `No maintenance invoice with id: ${id}`,
         });
@@ -574,7 +574,7 @@ const maintainController = {
       });
 
       if (!mInvoice) {
-        return res.status(404).json({
+        return res.status(200).json({
           status: "failed",
           msg: `No maintenance invoices with id: ${id}`,
         });

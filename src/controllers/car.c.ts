@@ -138,7 +138,7 @@ const carController = {
       });
       if (!car) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No car with id: ${id}` });
       }
       const { salon_id, name, address } = car.salon;
@@ -421,7 +421,7 @@ const carController = {
         });
       }
       return res
-        .status(404)
+        .status(200)
         .json({ status: "failed", msg: `No car with id: ${id}` });
     }
 
@@ -483,7 +483,7 @@ const carController = {
       });
       if (!car) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No car with id: ${id}` });
       }
 

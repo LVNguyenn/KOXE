@@ -93,7 +93,7 @@ const packageController = {
         .getOne();
       if (!packagee) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No package with id: ${id}` });
       }
 
@@ -199,7 +199,7 @@ const packageController = {
         cloudinary.uploader.destroy(filename);
       }
       return res
-        .status(404)
+        .status(200)
         .json({ status: "failed", msg: `No package with id: ${id}` });
     }
 
@@ -269,7 +269,7 @@ const packageController = {
       });
       if (!oldPackage) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No package with id: ${id}` });
       }
 

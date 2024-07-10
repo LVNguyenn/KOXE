@@ -19,7 +19,7 @@ const stageController = {
       });
 
       if (!stage) {
-        return res.status(404).json({
+        return res.status(200).json({
           status: "failed",
           msg: `No stage with process id: ${processId}`,
         });
@@ -47,7 +47,7 @@ const stageController = {
       });
 
       if (!stage) {
-        return res.status(404).json({
+        return res.status(200).json({
           status: "failed",
           msg: `No stage with id: ${id}`,
         });
@@ -166,7 +166,7 @@ const stageController = {
 
       if (stage.affected === 0) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No stage with id: ${id}` });
       }
 
@@ -212,7 +212,7 @@ const stageController = {
       const stage = await stageRepository.delete(id);
       if (stage.affected === 0) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: "failed", msg: `No stage with id: ${id}` });
       }
 

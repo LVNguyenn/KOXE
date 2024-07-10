@@ -64,7 +64,7 @@ const maintenanceController = {
         relations: ["salon"],
       });
       if (!maintenance) {
-        return res.status(404).json({
+        return res.status(200).json({
           status: "failed",
           msg: `No maintenance service with id: ${id}`,
         });
@@ -101,7 +101,7 @@ const maintenanceController = {
         where: { salon: { salon_id: salonId } },
       });
       if (maintenance.length === 0) {
-        return res.status(404).json({
+        return res.status(200).json({
           status: "failed",
           msg: `No maintenance service found for salonId: ${salonId}`,
         });
@@ -180,7 +180,7 @@ const maintenanceController = {
         cost,
       });
       if (maintenance.affected === 0) {
-        return res.status(404).json({
+        return res.status(200).json({
           status: "failed",
           msg: `No maintenance service with id: ${id}`,
         });
@@ -206,7 +206,7 @@ const maintenanceController = {
     try {
       const maintenance = await mRepository.delete(id);
       if (maintenance.affected === 0) {
-        return res.status(404).json({
+        return res.status(200).json({
           status: "failed",
           msg: `No maintenance service with id: ${id}`,
         });
