@@ -6,16 +6,12 @@ import uploadCloud from "../middleware/uploader";
 const router = Router();
 
 router.get("/", salonController.getAllSalons);
-router.get(
-  "/salonId",
-  middlewareController.verifyToken,
-  salonController.getSalonIdForUser
-);
-router.get(
-  "/salonId",
-  middlewareController.verifyToken,
-  salonController.getSalonIdForUser
-);
+
+// router.get(
+//   "/salonId",
+//   middlewareController.verifyToken,
+//   salonController.getSalonIdForUser
+// );
 router.get(
   "/no-block",
   middlewareController.verifyToken,
