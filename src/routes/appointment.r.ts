@@ -12,6 +12,8 @@ router.post("/create-appointment", middleware.verifyToken, appointmentController
 router.post("/get-appoint-user", middleware.verifyToken, appointmentController.get);
 router.patch("/update-one-user", middleware.verifyToken, appointmentController.updateOne);
 router.delete("/delete-appoint-user", middleware.verifyToken, appointmentController.delete);
+// update read from user
+router.patch("/read", middleware.verifyToken, appointmentController.updateRead);
 
 router.post("/get-busy-car", middleware.verifyToken, appointmentController.getTimeBusy);
 

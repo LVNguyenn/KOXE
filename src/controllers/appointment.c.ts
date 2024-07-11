@@ -8,6 +8,7 @@ import UserRepository from "../repository/user";
 import CarRepository from "../repository/car";
 import search from "../helper/search";
 import pagination from "../helper/pagination";
+import AppointmentRepository from "../repository/appointment";
 // import Cache from '../config/node-cache';
 
 const appointmentController = {
@@ -26,7 +27,7 @@ const appointmentController = {
         status: "failed",
         msg: "Unfortunately, the car was scheduled for that time frame.",
       });
-    } catch (error) {}
+    } catch (error) { }
 
     try {
       // get fullname of user
@@ -57,7 +58,7 @@ const appointmentController = {
       });
 
       // add logs
-      newLogs(salonId, `${userId} created appointment with your salon.`);
+      // newLogs(salonId, `${userId} created appointment with your salon.`);
 
       // del old value cache
       // Cache.del(salonId + "apm");
@@ -110,6 +111,7 @@ const appointmentController = {
           "salon",
           "car_id",
           "from",
+          "read"
         ],
         order: { create_at: "DESC" },
       });
@@ -420,6 +422,14 @@ const appointmentController = {
         msg: "Error with response.",
       });
     }
+  },
+
+  updateRead: async (req: Request, res: Response) => {
+    const userId = req.user;
+    const apmDb = await AppointmentRepository.updateRead({ userId });
+
+    return res.json({ ...apmDb });
+
   },
 };
 

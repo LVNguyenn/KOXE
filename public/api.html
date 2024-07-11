@@ -107,6 +107,8 @@
     có thêm lấy top các tính năng.
     <li>[GET] /transactions/statistics</li>
     Thống kê cho hoa tiêu và salon về giao dịch buôn bán xe (Bên salon cũng cần gọi API này để thống kê những hoa tiêu đã hoàn thành giao dịch với mình. Nếu bên hoa tiêu là số tiền nhận được thì bên salon là số tiền đã chi)
+    <li>[PATCH] /appointment/read</li>
+    Update read trong appointment.
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
     <h2>MỤC LỤC</h2>
@@ -364,6 +366,9 @@
         <b>status: 1 - đã được chấp nhận| </b>
         <b>status: 2 - bị từ chối gặp</b>
     </div>
+
+    <li>[PATCH] /appointment/read</li>
+    Khi user ấn vô lịch hẹn thì gọi đến api này để cập nhật thuộc tính read trong lịch hẹn thành true (user đã đọc toàn bộ lịch hẹn).
 
     <h3>Salon admin: cần đăng nhập thành công và là admin của group đó. Luôn phải truyền vào salonId.</h3>
     <li>[POST] /appointment/get-appoint-admin</li>

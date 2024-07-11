@@ -55,13 +55,17 @@ export class Appointment {
   @Column()
   car_id!: string;
 
+  @Column({default: false})
+  read!: boolean;
+
   init(
     salon_id: string,
     user_id: string,
     date: Date,
     description: string,
     status: number,
-    car_id: string
+    car_id: string,
+    read: boolean
   ) {
     this.salon_id = salon_id;
     this.user_id = user_id;
@@ -69,5 +73,6 @@ export class Appointment {
     this.description = description;
     this.status = status;
     this.car_id = car_id;
+    this.read = read;
   }
 }
