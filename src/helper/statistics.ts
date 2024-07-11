@@ -3,7 +3,6 @@ import { Accessory, Invoice, MInvoiceDetail, Maintenance, Purchase } from '../en
 import { isDateInMonth } from "../utils";
 
 const statistics = async ({ salonId, type, fromDate, year }: { salonId: string, type: string, fromDate: Date, year: any }) => {
-
     try {
         let sumExpense = 0;
         console.log("From date: ", fromDate)
@@ -13,8 +12,8 @@ const statistics = async ({ salonId, type, fromDate, year }: { salonId: string, 
             const invoiceRepository = getRepository(Invoice);
             let invoiceDb: any = await invoiceRepository
                 .createQueryBuilder('invoice')
-                .innerJoinAndSelect('invoice.seller', 'salon', 'salon.salon_id = :salonId', { salonId })
-                .where({ type: type, create_at: MoreThan(fromDate) && LessThan(toDate), payment_done: true })
+                .innerJoinAndSelect('invoice.seller', 'salon', 'salon.salon_id = :salonId', { salonId }) // payment_done = true
+                .where({ type: type, create_at: MoreThan(fromDate) && LessThan(toDate) })
                 .getMany()
 
             for (let iv of invoiceDb) {
@@ -35,6 +34,7 @@ const statistics = async ({ salonId, type, fromDate, year }: { salonId: string, 
             where: { purchaseDate: MoreThan(fromDate) },
             relations: ['user', 'package']
         })
+
         for (let pc of purchaseDb) {
             sumExpense += Number(pc?.total);
             // DELET infor user
@@ -49,7 +49,7 @@ const statistics = async ({ salonId, type, fromDate, year }: { salonId: string, 
 
         return { purchases: purchaseDb, total: sumExpense };
     } catch (error) {
-        console.log(error)
+        console.log("error: ", error)
         return null;
     }
 }
