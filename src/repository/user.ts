@@ -223,7 +223,7 @@ const UserRepository = {
         userDb?.salonId?.salon_id
       );
     } catch (error) {
-      return FormatData("failed", "find failed.", "");
+      return FormatData("failed", "find failed.");
     }
   },
 

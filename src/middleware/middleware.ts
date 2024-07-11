@@ -22,6 +22,7 @@ const middlewareController = {
           }
           req.user = decoded.userId; // add by cdq 050424 - simple for set permission later.
           (req as Request).headers.userId = decoded.userId;
+          delete req.body.salonId;
           next();
         }
       );
@@ -80,7 +81,7 @@ const middlewareController = {
     const token = req.headers.authorization || req.headers["authorization"];
     let userId: any = req.user||"";
     const salonRp = await UserRepository.getSalonIdByUserId({ userId });
-    const salonId = req.body.salonId || salonRp?.data;
+    const salonId = salonRp?.data;
 
     console.log(salonRp)
 
@@ -133,6 +134,7 @@ const middlewareController = {
     const userRepository = getRepository(User);
 
     try {
+      
       const userDb = await userRepository.findOneOrFail({
         where: { user_id: userId },
         relations: ["salonId"],
@@ -161,8 +163,8 @@ const middlewareController = {
       const userId: any = req.user;
       // find salonId
       const salonRp = await UserRepository.getSalonIdByUserId({ userId });
-      const salonId = req.body.salonId || salonRp?.data;
-
+      const salonId = salonRp?.data;
+      req.body.salonId = salonId;
 
       //console.log("salonId: ", salonId);
 
