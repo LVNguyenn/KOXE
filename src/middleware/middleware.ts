@@ -83,14 +83,14 @@ const middlewareController = {
     const salonRp = await UserRepository.getSalonIdByUserId({ userId });
     const salonId = salonRp?.data;
 
-    console.log(salonRp)
-
     if (!salonId) {
       return res.status(400).json({
         status: "failed",
         msg: "Invalid information.",
       });
     }
+
+    req.body.salonId = salonId;
 
     if (token) {
       const accessToken = token.split(" ")[1];

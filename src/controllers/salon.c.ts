@@ -856,6 +856,7 @@ const salonController = {
 
   createNewRole: async (req: Request, res: Response) => {
     const { salonId, name, permissions } = req.body;
+    console.log(salonId, name, permissions)
 
     if (!salonId || !name || !permissions) {
       return res.json({
