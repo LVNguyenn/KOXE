@@ -505,7 +505,7 @@ const salonController = {
       // notification to salon
       createNotification({
         to: salonId,
-        description: `${userDb.fullname} has accepted your invitation to your salon.`,
+        description: `${userDb.fullname} đã chấp nhận lời mời tham gia salon.`,
         types: "invite",
         avatar: userDb.avatar,
         isUser: true,
@@ -639,7 +639,7 @@ const salonController = {
         // user is existed already => send notification to this user
         createNotification({
           to: userDb.user_id,
-          description: `${fromUser.fullname} invited you to join their salon.`,
+          description: `Salon ${fromUser.fullname} đã mời bạn vô salon của họ.`,
           types: "invite",
           data: token,
           avatar: fromUser.avatar,
@@ -755,7 +755,7 @@ const salonController = {
       // notification to salon
       createNotification({
         to: salonId,
-        description: `${userDb.username} has accepted your invitation to your salon.`,
+        description: `${userDb.username} đã chấp nhận lời mời vô salon của bạn.`,
         types: "invite",
         avatar: userDb.avatar,
         isUser: true,
