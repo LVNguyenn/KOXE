@@ -8,7 +8,7 @@ router.post("/get-appoint-admin", middleware.verifyToken, middleware.havePermiss
 router.patch("/update-one-admin", middleware.verifyToken, middleware.havePermission("U_APM"),appointmentController.updateOne);
 router.delete("/delete-appoint-admin", middleware.verifyToken, middleware.havePermission("D_APM"),appointmentController.delete);
 
-router.post("/create-appointment", middleware.verifyToken2, appointmentController.createAppointment);
+router.post("/create-appointment", middleware.verifyToken, appointmentController.createAppointment);
 router.post("/get-appoint-user", middleware.verifyToken2, appointmentController.get);
 router.patch("/update-one-user", middleware.verifyToken2, appointmentController.updateOne);
 router.delete("/delete-appoint-user", middleware.verifyToken2, appointmentController.delete);

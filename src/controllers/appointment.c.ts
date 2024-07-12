@@ -9,13 +9,13 @@ import CarRepository from "../repository/car";
 import search from "../helper/search";
 import pagination from "../helper/pagination";
 import AppointmentRepository from "../repository/appointment";
+import SalonRepository from "../repository/salon";
 // import Cache from '../config/node-cache';
 
 const appointmentController = {
   createAppointment: async (req: Request, res: Response) => {
     const userId: any = req.headers["userId"];
-    const { salonId, date, description, carId }: any = req.body;
-    console.log(date)
+    const { date, description, carId }: any = req.body;
 
     try {
       //Check the car and no one has made an appointment at that time frame
@@ -31,6 +31,10 @@ const appointmentController = {
     } catch (error) { }
 
     try {
+      // get salonId of car:
+      const carRp = await CarRepository.findSalonIdByCarId({carId});
+      const salonId = carRp?.data?.salon?.salon_id;
+      if (!salonId) throw new Error("Error salonId")
       // get fullname of user
       const userRepository = getRepository(User);
       const userDb = await userRepository.findOneOrFail({
