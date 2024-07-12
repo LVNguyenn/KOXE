@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getRepository } from "typeorm";
-import { Post, User, Salon, Connection } from "../entities";
+import { Post, User, Salon, Connection, Transaction } from "../entities";
 import { getUserInfo } from "../helper/mInvoice";
 import createNotification from "../helper/createNotification";
 import search from "../helper/search";
@@ -269,13 +269,21 @@ const postController = {
           .json({ status: "failed", msg: `No post with id: ${id}` });
       }
 
+      const transactionRepository = getRepository(Transaction);
+      const count = await transactionRepository.count({
+        where: { user: { user_id: post.postedBy.user_id }, statusRating: 1 },
+        relations: ["user"],
+      });
+
+      const avgRating = post.postedBy.avgRating / count;
+
       const formatPost = {
         ...post,
         postedBy: {
           user_id: post.postedBy.user_id,
           fullname: post.postedBy.fullname,
           avatar: post.postedBy.avatar,
-          avgRating: post.postedBy.avgRating,
+          avgRating: avgRating.toFixed(2),
           completedTransactions: post.postedBy.completedTransactions,
         },
       };

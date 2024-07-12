@@ -36,4 +36,7 @@ export class Transaction {
 
   @Column({ default: "pending" })
   status!: string; // ('pending', 'success', 'fail')
+
+  @Column({ default: 1 })
+  statusRating!: number;
 }
