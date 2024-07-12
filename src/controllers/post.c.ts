@@ -270,10 +270,12 @@ const postController = {
       }
 
       const transactionRepository = getRepository(Transaction);
-      const count = await transactionRepository.count({
+      let count = await transactionRepository.count({
         where: { user: { user_id: post.postedBy.user_id }, statusRating: 1 },
         relations: ["user"],
       });
+
+      if (!count) count = 1;
 
       const avgRating = post.postedBy.avgRating / count;
 
