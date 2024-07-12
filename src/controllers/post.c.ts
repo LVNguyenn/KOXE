@@ -285,7 +285,7 @@ const postController = {
           user_id: post.postedBy.user_id,
           fullname: post.postedBy.fullname,
           avatar: post.postedBy.avatar,
-          avgRating: avgRating.toFixed(2),
+          avgRating: Number(avgRating.toFixed(2)),
           completedTransactions: post.postedBy.completedTransactions,
         },
       };
