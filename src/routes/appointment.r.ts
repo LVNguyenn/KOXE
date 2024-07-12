@@ -15,10 +15,10 @@ router.delete("/delete-appoint-user", middleware.verifyToken2, appointmentContro
 // update read from user
 router.patch("/read", middleware.verifyToken, appointmentController.updateRead);
 
-router.post("/get-busy-car", middleware.verifyToken, appointmentController.getTimeBusy);
+router.post("/get-busy-car", middleware.verifyToken2, appointmentController.getTimeBusy);
 
 // routing for process
 router.post("/create-appointment-process", middleware.verifyToken, middleware.havePermission("C_APM"), appointmentController.createAppointmentBySalon);
-router.patch("/response-appointment-process", middleware.verifyToken, appointmentController.acceptingApmByUser);
+router.patch("/response-appointment-process", middleware.verifyToken2, appointmentController.acceptingApmByUser);
 
 export default router;
