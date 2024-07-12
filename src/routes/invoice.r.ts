@@ -61,7 +61,10 @@ router.post(
   middlewareController.verifyToken,
   invoiceController.getInvoiceByPhone
 );
-router.post("/remove", invoiceController.removeInvoice);
+router.post("/remove",
+  middlewareController.verifyToken,
+  middlewareController.havePermission("D_IV"),
+  invoiceController.removeInvoice);
 
 // admin
 router.post(
