@@ -10,8 +10,8 @@ router.patch("/read-notification-admin", middleware.verifyToken, middleware.have
 router.delete("/delete-notification-admin",middleware.verifyToken, middleware.havePermission("D_NTF"), notificationController.delete);
 
 // user
-router.post("/get-notification-user", middleware.verifyToken, notificationController.get);
-router.patch("/read-notification-user", middleware.verifyToken, notificationController.update)
-router.delete("/delete-notification-user", middleware.verifyToken, notificationController.delete);
+router.post("/get-notification-user", middleware.verifyToken2, notificationController.get);
+router.patch("/read-notification-user", middleware.verifyToken2, notificationController.update)
+router.delete("/delete-notification-user", middleware.verifyToken2, notificationController.delete);
 
 export default router;
