@@ -31,6 +31,32 @@ const middlewareController = {
     }
   },
 
+  // no delete salonId
+  verifyToken2: (req: Request, res: Response, next: NextFunction) => {
+    const token = req.headers.authorization || req.headers["authorization"];
+    if (token) {
+      const accessToken = token.split(" ")[1];
+      // console.log("accessToken1: ", accessToken);
+      jwt.verify(
+        accessToken,
+        process.env.JWT_ACCESS_KEY as string,
+        (err: any, decoded: any) => {
+          if (err) {
+            return res
+              .status(401)
+              .json({ status: "failed", msg: "Token isn't valid!" });
+          }
+          req.user = decoded.userId; // add by cdq 050424 - simple for set permission later.
+          (req as Request).headers.userId = decoded.userId;
+          // delete req.body.salonId;
+          next();
+        }
+      );
+    } else {
+      return res.json({ status: "failed", msg: "You're not authenticated!" });
+    }
+  },
+
   verifyRefreshToken: (req: Request, res: Response, next: NextFunction) => {
     const refreshToken: string | undefined =
       req.cookies.refreshToken || req.headers["authorization"];

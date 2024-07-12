@@ -15,6 +15,7 @@ const appointmentController = {
   createAppointment: async (req: Request, res: Response) => {
     const userId: any = req.headers["userId"];
     const { salonId, date, description, carId }: any = req.body;
+    console.log(date)
 
     try {
       //Check the car and no one has made an appointment at that time frame
