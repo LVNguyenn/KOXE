@@ -31,7 +31,7 @@ const middlewareController = {
     }
   },
 
-  // no delete salonId
+  // not delete salonId
   verifyToken2: (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization || req.headers["authorization"];
     if (token) {

@@ -75,7 +75,8 @@ router.post(
 
 router.patch(
     "/update-period-user",
-    middlewareController.verifyToken2,
+    middlewareController.verifyToken,
+    middlewareController.havePermission("U_DC"),
     legalsController.updateNewPeriodForUser
 );
 
