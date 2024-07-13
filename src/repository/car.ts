@@ -74,6 +74,17 @@ const CarRepository = {
             return FormatData("failed", "Error find the legal documents.");
         }
     },
+
+    async updateCar (data: any) {
+        try {
+            const carRepository = getRepository(Car);
+            const carDb = await carRepository.save({ ...data })
+
+            return FormatData("success", "updated successfully!", carDb);
+        } catch (error) {
+            return FormatData("failed", "Error update car.");
+        }
+    }
 }
 
 export default CarRepository;

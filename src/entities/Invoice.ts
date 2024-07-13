@@ -65,9 +65,6 @@ export class Invoice {
   @Column({ nullable: true })
   employee_id!: string;
 
-  @Column({nullable: true})
-  car_id!: string;
-
   @Column("simple-array", { nullable: true })
   maintenanceServices!: string[];
 
@@ -93,7 +90,6 @@ export class Invoice {
     maintenanceServices: string[],
     accessories: string[],
     legals_user: Car_User_Legals,
-    car_id: string,
   ) {
     this.type = type;
     this.expense = expense;
@@ -108,6 +104,5 @@ export class Invoice {
     this.maintenanceServices = maintenanceServices;
     this.accessories = accessories;
     this.legals_user = legals_user;
-    this.car_id = car_id;
   }
 }

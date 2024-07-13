@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Car } from "../entities/Car";
 import { Any, MoreThan, getConnection, getRepository } from "typeorm";
-import { Invoice, Purchase, Salon, User } from '../entities';
+import { Car_User_Legals, Invoice, Purchase, Salon, User } from '../entities';
 import statistics, { averageEachMonth, getTopSeller } from '../helper/statistics';
 import Year from "../utils/year";
 import legalsController from "./legals.c";
@@ -17,7 +17,8 @@ import NotificationRepository from "../repository/notification";
 import { getUserInfo } from "../helper/mInvoice";
 import PackageRepository from "../repository/package";
 import FeatureRepository from "../repository/feature";
-
+import CarUserLegalRepository from "../repository/car_user_legal";
+import moment from 'moment-timezone';
 
 const invoiceController = {
 
@@ -397,13 +398,21 @@ const invoiceController = {
   tickDoneInvoice: async (req: Request, res: Response) => {
     try {
       const { salonId, invoiceId } = req.body;
-      console.log(salonId, invoiceId)
       const invoiceRepository = getRepository(Invoice);
       const invoiceDb = await invoiceRepository.findOneOrFail({
         where: { invoice_id: invoiceId },
         relations: ['seller']
       })
 
+      // find carId
+      const userLegalRp = await CarUserLegalRepository.getByInvoieId({invoiceId});
+      if (!userLegalRp.data.car_id) throw new Error("Error carId");
+      // update date_output of car
+      const dateOutput = moment().tz('Asia/Saigon').toDate();
+      const carRp = await CarRepository.findCarByCarIdSalonId({salonId, carId: userLegalRp.data.car_id});
+      const carRs = await CarRepository.updateCar({...carRp?.data, date_output: dateOutput});
+      if (!carRs?.data) throw new Error("Error update date out of car.")
+ 
       if (invoiceDb.seller.salon_id !== salonId) {
         return res.json({
           status: "failed",
@@ -420,6 +429,7 @@ const invoiceController = {
         msg: "Tick done for invoice successfully!"
       })
     } catch (error) {
+      console.log(error)
       return res.json({
         status: "failed",
         msg: "Error tick."
