@@ -24,40 +24,6 @@
     <h1>API SERVER</h1>
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
     <h2>Các API mới thêm vô</h2>
-    
-    <h3>Từ ngày 23/05/24 - Đến 30/5/24</h3>
-    <li>Hóa đơn mua phụ tùng</li>
-    <li>Nhắn tin có hình ảnh</li>
-    <li>[POST] /salons/employees</li>
-    <li>Phân trang, search</li>
-    <li>Thêm thông báo lúc salon next qua giai đoạn tiếp theo và khi hoàn tất quy trình thì cũng sẽ có thông báo cho hoa tiêu</li>
-    <li>Khi lấy bài post theo id sẽ kèm theo phần trăm đánh giá trung bình của hoa tiêu đó kèm theo số giao dịch đã hoàn thành, cung cấp thêm thông tin cho salon dễ ra quyết định kết nối</li>
-    <li>[POST] /invoice/get-invoice-buy-car-salon</li>
-    Đổi api /invoice/all lúc đầu (dễ nhầm lẫn)
-    
-    <h3>Từ ngày 30/05/24 - Đến 3/6/24</h3>
-    <li>[GET] /admin/users</li>
-    <li>[POST] /admin/create-user</li>
-    <li>[DELETE] /admin/user/:userId</li>
-    <li>[GET] /invoice/get-invoice-maintenance</li>
-    Đổi api /invoice lúc đầu (dễ nhầm lẫn)
-    <li>Hóa đơn mua phụ tùng</li>
-    <li>[GET] /admin/salons</li>
-    <li>[DELETE] /admin/salon/:salonId</li>
-    <li>[POST] /invoice/statistics-admin</li>
-    <li>Đăng tin khuyến mãi</li>
-    <li>Tạo group Salon</li>
-    <li>Khi gọi API [GET] /transactions sẽ có thêm trường là revenue(tổng số tiền)</li>
-
-    <h3>Từ ngày 3/6/24 - Đến 10/6/24</h3>
-    <li>[GET] /group/salon/:id</li>
-    <li>Tui có bổ sung thêm search cho khách hàng khi xem hóa đơn bảo dưỡng và hóa đơn phụ tùng đã mua. Salon thì search theo tên khách hàng, khách hàng thì search theo tên salon</li>
-
-    <h3>Từ ngày 10/6/24 - Đến 17/6/24</h3>
-    <li>Tui mới chỉnh lại thời gian nên tụi ông test lại mấy tính năng coi nào nó bị lệch với thời gian thực thì báo nha. Lúc trước là nó thường hay bị lệch 7 tiếng. Do múi giờ trên db deploy là UTC+0</li>
-    <li>Bên backend đã có handle khi mà salon tạo kết nối với hoa tiêu đó rồi mà tạo thêm lần nữa thì sẽ báo lỗi và có trả về connection_id đã kết nối. Tụi ông nhớ handle bên frontend luôn nhau</li>
-    <li>Phần getChattingUsers, getMessages giữa 2 người với nhau thì trường thời gian tui đã chỉnh lại theo format DD-MM-YYYY HH:mm:ss để dễ hiểu</li>
-    <li>Phần nhắn tin giờ có thêm search</li>
 
     <h3>Từ ngày 17/6/24 - Đến 24/6/24</h3>
     <li>Hôm trước thầy có góp ý phụ tùng cần có icon nên tui thêm trường mới là icon. Tui thấy hướng này dễ làm là mình sẽ tự đi tìm các icon phụ tùng xe trước. Chẳng hạn
@@ -109,6 +75,11 @@
     Thống kê cho hoa tiêu và salon về giao dịch buôn bán xe (Bên salon cũng cần gọi API này để thống kê những hoa tiêu đã hoàn thành giao dịch với mình. Nếu bên hoa tiêu là số tiền nhận được thì bên salon là số tiền đã chi)
     <li>[PATCH] /appointment/read</li>
     Update read trong appointment.
+    <h3>FINAL</h3>
+    <li>[POST] /warranty/add-maintenance</li>
+    Thêm gói bảo dưỡng vào gói bảo hành
+    <li>[POST] /warranty/remove-maintenance</li>
+    Xoá gói bảo dưỡng vào gói bảo hành.
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
     <h2>MỤC LỤC</h2>
@@ -711,6 +682,11 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <li>[POST] /warranty/cancel</li>
     Dùng để hủy bỏ liên kết của 1 xe với 1 gói bảo hành. Yêu cầu truyền vô:
     {"salonId", "warrantyId", "carId"}
+
+    <li>[POST] /warranty/add-maintenance</li>
+    Thêm gói bảo dưỡng vào gói bảo hành. Cần truyền vô {warrantyId, maintenanceId}
+    <li>[POST] /warranty/remove-maintenance</li>
+    Xoá gói bảo dưỡng vào gói bảo hành. Cần truyền vô {warrantyId, maintenanceId}
     
     <h2 id="invoice">Hóa đơn</h2>
     <li>[GET] /invoice/get-invoice</li>

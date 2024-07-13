@@ -57,6 +57,35 @@ const middlewareController = {
     }
   },
 
+  // có nhiều cái dành cho cả user và salon nên dùng cái này cho đỡ lỗi. Bỏ salonId vô body
+  verifyToken3: (req: Request, res: Response, next: NextFunction) => {
+    const token = req.headers.authorization || req.headers["authorization"];
+    if (token) {
+      const accessToken = token.split(" ")[1];
+      // console.log("accessToken1: ", accessToken);
+      jwt.verify(
+        accessToken,
+        process.env.JWT_ACCESS_KEY as string,
+        async (err: any, decoded: any) => {
+          if (err) {
+            return res
+              .status(401)
+              .json({ status: "failed", msg: "Token isn't valid!" });
+          }
+          req.user = decoded.userId; // add by cdq 050424 - simple for set permission later.
+          (req as Request).headers.userId = decoded.userId;
+          // find salonId
+          const salonRp = await UserRepository.getSalonIdByUserId({ userId: decoded.userId });
+          const salonId = salonRp?.data;
+          req.body.salonId = salonId;
+          next();
+        }
+      );
+    } else {
+      return res.json({ status: "failed", msg: "You're not authenticated!" });
+    }
+  },
+
   verifyRefreshToken: (req: Request, res: Response, next: NextFunction) => {
     const refreshToken: string | undefined =
       req.cookies.refreshToken || req.headers["authorization"];
@@ -105,7 +134,7 @@ const middlewareController = {
 
   isAdminOfSalon: async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization || req.headers["authorization"];
-    let userId: any = req.user||"";
+    let userId: any = req.user || "";
     const salonRp = await UserRepository.getSalonIdByUserId({ userId });
     const salonId = salonRp?.data;
 
@@ -160,7 +189,7 @@ const middlewareController = {
     const userRepository = getRepository(User);
 
     try {
-      
+
       const userDb = await userRepository.findOneOrFail({
         where: { user_id: userId },
         relations: ["salonId"],
