@@ -62,7 +62,8 @@ router.delete(
 
 router.post(
     "/check-details-user",
-    middlewareController.verifyToken2,
+    middlewareController.verifyToken,
+    middlewareController.havePermission("U_DT"),
     legalsController.addLegalDetailsForUser
 );
 
