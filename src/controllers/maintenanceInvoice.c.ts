@@ -373,8 +373,10 @@ const maintainController = {
       fullname,
       email,
       phone,
+      invoiceId,
     } = req.body;
     let salonId = "";
+    let state = { check: false };
 
     try {
       let mServiceIds = [];
@@ -395,7 +397,12 @@ const maintainController = {
       let expense = 0;
 
       if (services && services.length !== 0) {
-        const mExpense = calculateMExpense(services, mServices);
+        const mExpense = await calculateMExpense(
+          invoiceId,
+          services,
+          mServices,
+          state
+        );
         expense += mExpense;
       }
 
@@ -435,7 +442,12 @@ const maintainController = {
       );
 
       if (services && services.length !== 0)
-        await saveMInvoiceDetails(services, savedMaintenanceInvoice);
+        await saveMInvoiceDetails(
+          state.check,
+          invoiceId,
+          services,
+          savedMaintenanceInvoice
+        );
       if (accessories && accessories.length !== 0) {
         await saveAInvoiceDetails(accessories, savedMaintenanceInvoice);
       }

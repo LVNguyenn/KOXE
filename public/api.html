@@ -75,11 +75,14 @@
     Thống kê cho hoa tiêu và salon về giao dịch buôn bán xe (Bên salon cũng cần gọi API này để thống kê những hoa tiêu đã hoàn thành giao dịch với mình. Nếu bên hoa tiêu là số tiền nhận được thì bên salon là số tiền đã chi)
     <li>[PATCH] /appointment/read</li>
     Update read trong appointment.
+    
     <h3>FINAL</h3>
     <li>[POST] /warranty/add-maintenance</li>
     Thêm gói bảo dưỡng vào gói bảo hành
     <li>[POST] /warranty/remove-maintenance</li>
     Xoá gói bảo dưỡng vào gói bảo hành.
+    <li>[POST] /invoice</li>
+    Khi tạo giao dịch bảo dưỡng xe thì có thể truyền vào invoiceId để check xem nó có bảo hành không ?
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
     <h2>MỤC LỤC</h2>
@@ -728,22 +731,24 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     Tạo hóa đơn bảo dưỡng mới. Các trường cần truyền vào ví dụ như sau:
     <pre>
     {
-        "licensePlate": "ABC123",
-        "carName": "Toyota Corolla",
+        "licensePlate": "51F-12345",
+        "carName": "Toyota Crown Signia",
         "services": [
-            { "maintenance_id": "a3f3df0c-a41a-4c65-9161-e9c9d64ec312", "quantity": 2 },
-            { "maintenance_id": "c2e17c7d-b911-4563-a550-30e505774d00" }
+            { "maintenance_id": "0de2da74-211b-4279-9fed-6acc3e77ede5", "quantity": 2 },
+            { "maintenance_id": "0fe8bd10-6c0d-44f9-afd3-fcc2ee0aacc9" }
         ],
         "accessories": [
-            { "accessory_id": "7d2ba301-fb8c-4bec-aee1-fb36cead3288" }
+            { "accessory_id": "085ea946-8aa2-4a01-a20a-f986b9c45007" }
         ],
         "note": "Regular maintenance",
-        "fullname": "Nguyen12345",
-        "email": "nguyen123@gmail.com",
-        "phone": "0123456789"
+        "fullname": "Vi Nguyen",
+        "email": "levinguyen170602@gmail.com",
+        "phone": "0966841272",
+        "invoiceId": "c399031d-52b9-497c-b13f-588b80162cac"
     }
     </pre>
-    Nếu không truyền quantity vào thì mặc định nó sẽ là 1
+    <b>Nếu không truyền quantity vào thì mặc định nó sẽ là 1.</b>
+    <b>Có thể truyền vào invoiceId</b>
     <li>[PATCH] /invoice/:id</li>
     Dùng để cập nhật hóa đơn bảo dưỡng. Có thể cập nhật {licensePlate, carName, services, accessories, note, fullname, email, phone}. Muốn cập nhật trường nào thì truyền vào trường đó. Ví dụ:
     <pre>

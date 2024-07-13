@@ -9,6 +9,8 @@ import {
 } from "../entities";
 import { getRepository, In } from "typeorm";
 import { formatDate } from "../utils";
+import CarUserLegalRepository from "../repository/car_user_legal";
+import CarRepository from "../repository/car";
 
 export const getUserInfo = async (userId: string) => {
   try {
@@ -132,21 +134,81 @@ export const getAccessoryInvoiceDetailsList = async (invoiceIds: string[]) => {
   }
 };
 
-export const calculateMExpense = (
+export const calculateMExpense = async (
+  invoiceId: string,
   services: any,
-  mServices: Maintenance[]
-): number => {
-  let expense = 0;
-  for (const service of services) {
-    const quantity = service.quantity || 1;
-    const dbService = mServices.find(
-      (s) => s.maintenance_id === service.maintenance_id
-    );
-    if (dbService) {
-      expense += dbService.cost * quantity;
+  mServices: Maintenance[],
+  state: any
+): Promise<number> => {
+  if (invoiceId === "") {
+    let expense = 0;
+    for (const service of services) {
+      const quantity = service.quantity || 1;
+      const dbService = mServices.find(
+        (s) => s.maintenance_id === service.maintenance_id
+      );
+      if (dbService) {
+        expense += dbService.cost * quantity;
+      }
+    }
+    return expense;
+  } else {
+    const userLegalRp = await CarUserLegalRepository.getByInvoieId({
+      invoiceId,
+    });
+    if (!userLegalRp.data) {
+      let expense = 0;
+      for (const service of services) {
+        const quantity = service.quantity || 1;
+        const dbService = mServices.find(
+          (s) => s.maintenance_id === service.maintenance_id
+        );
+        if (dbService) {
+          expense += dbService.cost * quantity;
+        }
+      }
+      return expense;
+    } else {
+      const carId = userLegalRp.data.car_id;
+      const carRp = await CarRepository.getAllCar({ id: carId });
+      if (carRp?.data[0].warranties === null) {
+        let expense = 0;
+        for (const service of services) {
+          const quantity = service.quantity || 1;
+          const dbService = mServices.find(
+            (s) => s.maintenance_id === service.maintenance_id
+          );
+          if (dbService) {
+            expense += dbService.cost * quantity;
+          }
+        }
+        return expense;
+      } else {
+        state.check = true;
+        const maintenanceList = carRp?.data[0].warranties.maintenance;
+        let mServiceIds = [];
+        mServiceIds = maintenanceList.map(
+          (service: any) => service.maintenance_id
+        );
+        let expense = 0;
+        for (const service of services) {
+          const quantity = service.quantity || 1;
+          const dbService = mServices.find(
+            (s) => s.maintenance_id === service.maintenance_id
+          );
+          if (dbService && mServiceIds.includes(dbService.maintenance_id)) {
+            expense += 0;
+          } else if (
+            dbService &&
+            !mServiceIds.includes(dbService.maintenance_id)
+          ) {
+            expense += dbService.cost * quantity;
+          }
+        }
+        return expense;
+      }
     }
   }
-  return expense;
 };
 
 export const calculateAExpense = (
@@ -167,27 +229,60 @@ export const calculateAExpense = (
 };
 
 export const saveMInvoiceDetails = async (
+  check: boolean,
+  invoiceId: string,
   services: any,
   savedMaintenanceInvoice: Invoice
 ) => {
   const mInvoiceDetailRepository = getRepository(MInvoiceDetail);
-
-  for (const service of services) {
-    const quantity = service.quantity || 1;
-    const mInvoiceDetail = new MInvoiceDetail();
-
-    mInvoiceDetail.invoice_id = savedMaintenanceInvoice.invoice_id;
-    mInvoiceDetail.maintenance_id = service.maintenance_id;
-
-    // Lấy chi tiết dịch vụ từ bảng Maintenance
-    const mService = await getRepository(Maintenance).findOne({
-      where: { maintenance_id: service.maintenance_id },
+  if (check) {
+    const userLegalRp = await CarUserLegalRepository.getByInvoieId({
+      invoiceId,
     });
+    const carId = userLegalRp.data.car_id;
+    const carRp = await CarRepository.getAllCar({ id: carId });
+    const maintenanceList = carRp?.data[0].warranties.maintenance;
+    let mServiceIds = [];
+    mServiceIds = maintenanceList.map((service: any) => service.maintenance_id);
+    for (const service of services) {
+      const quantity = service.quantity || 1;
+      const mInvoiceDetail = new MInvoiceDetail();
 
-    mInvoiceDetail.quantity = quantity;
-    mInvoiceDetail.price = mService?.cost || 1; // Nếu không tìm thấy mService thì giá là 1
+      mInvoiceDetail.invoice_id = savedMaintenanceInvoice.invoice_id;
+      mInvoiceDetail.maintenance_id = service.maintenance_id;
 
-    await mInvoiceDetailRepository.save(mInvoiceDetail);
+      // Lấy chi tiết dịch vụ từ bảng Maintenance
+      const mService = await getRepository(Maintenance).findOne({
+        where: { maintenance_id: service.maintenance_id },
+      });
+
+      mInvoiceDetail.quantity = quantity;
+      if (mService && mServiceIds.includes(mService.maintenance_id)) {
+        mInvoiceDetail.price = 0;
+      } else {
+        mInvoiceDetail.price = mService?.cost || 1; // Nếu không tìm thấy mService thì giá là 1
+      }
+
+      await mInvoiceDetailRepository.save(mInvoiceDetail);
+    }
+  } else {
+    for (const service of services) {
+      const quantity = service.quantity || 1;
+      const mInvoiceDetail = new MInvoiceDetail();
+
+      mInvoiceDetail.invoice_id = savedMaintenanceInvoice.invoice_id;
+      mInvoiceDetail.maintenance_id = service.maintenance_id;
+
+      // Lấy chi tiết dịch vụ từ bảng Maintenance
+      const mService = await getRepository(Maintenance).findOne({
+        where: { maintenance_id: service.maintenance_id },
+      });
+
+      mInvoiceDetail.quantity = quantity;
+      mInvoiceDetail.price = mService?.cost || 1; // Nếu không tìm thấy mService thì giá là 1
+
+      await mInvoiceDetailRepository.save(mInvoiceDetail);
+    }
   }
 };
 
