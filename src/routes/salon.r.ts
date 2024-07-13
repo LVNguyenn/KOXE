@@ -96,7 +96,6 @@ router.delete(
   salonController.deleteRole
 );
 
-
 router.get("/:id", salonController.getSalonById);
 
 router.patch(

@@ -124,7 +124,7 @@ function calculateAverageRating(ratingList: Array<number>) {
     );
     avgRating = sum / validRatingList.length;
   } else {
-    avgRating = 0;
+    avgRating = -1;
   }
 
   return avgRating;

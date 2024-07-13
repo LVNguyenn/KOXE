@@ -235,7 +235,7 @@ const transactionController = {
           revenueList.map(async (revenue) => ({
             amount: revenue.amount,
             user: {
-              phone: revenue.user.user_id,
+              phone: revenue.user.phone,
               name: revenue.user.fullname,
             },
             numOfCompletedTran: await calcTotalNumOfCompletedTran(
@@ -471,10 +471,17 @@ const transactionController = {
             isUser: false,
           });
 
+          const validRatingList = transaction.ratingList.filter(
+            (rating) => rating !== -1
+          );
+          if (validRatingList.length <= 0) {
+            transaction.statusRating = 0;
+          }
+
           const avgRating = calculateAverageRating(transaction.ratingList);
           console.log(avgRating);
 
-          if (avgRating !== 0) {
+          if (avgRating !== -1) {
             const user = await userRepository.findOne({
               where: { user_id: transaction.user.user_id },
             });
@@ -483,7 +490,7 @@ const transactionController = {
               if (user.avgRating === 0) {
                 savedAvgRating = avgRating;
               } else {
-                savedAvgRating = (avgRating + user.avgRating) / 2;
+                savedAvgRating = avgRating + user.avgRating;
               }
               user.avgRating = savedAvgRating;
               user.completedTransactions += 1;
