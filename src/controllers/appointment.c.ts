@@ -10,14 +10,16 @@ import search from "../helper/search";
 import pagination from "../helper/pagination";
 import AppointmentRepository from "../repository/appointment";
 import SalonRepository from "../repository/salon";
+import moment from 'moment-timezone';
 // import Cache from '../config/node-cache';
 
 const appointmentController = {
   createAppointment: async (req: Request, res: Response) => {
     const userId: any = req.headers["userId"];
-    const { date, description, carId }: any = req.body;
+    let { date, description, carId }: any = req.body;
 
     try {
+      date = moment.tz(date, 'Asia/Saigon').toDate();
       //Check the car and no one has made an appointment at that time frame
       const appointRepository = getRepository(Appointment);
       await appointRepository.findOneOrFail({
@@ -32,7 +34,7 @@ const appointmentController = {
 
     try {
       // get salonId of car:
-      const carRp = await CarRepository.findSalonIdByCarId({carId});
+      const carRp = await CarRepository.findSalonIdByCarId({ carId });
       const salonId = carRp?.data?.salon?.salon_id;
       if (!salonId) throw new Error("Error salonId")
       // get fullname of user

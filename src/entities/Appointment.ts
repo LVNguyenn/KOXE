@@ -17,7 +17,7 @@ export class Appointment {
   @Column()
   salon_id!: string;
 
-  @Column()
+  @Column({ type: 'timestamp' })
   date!: Date;
 
   @Column({ nullable: true })
