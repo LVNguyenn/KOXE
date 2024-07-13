@@ -4,8 +4,10 @@ import {
   Column,
   Check,
   ManyToOne,
+  ManyToMany,
 } from "typeorm";
 import { Salon } from "./Salon";
+import { Warranty } from "./Warranty";
 
 @Entity()
 export class Maintenance {
@@ -24,6 +26,9 @@ export class Maintenance {
 
   @ManyToOne(() => Salon, (salon) => salon.services)
   salon!: Salon;
+
+  @ManyToMany(() => Warranty, warranty => warranty.maintenance, { onDelete: 'CASCADE' })  
+  warranty!: Warranty[];
 
   init(name: string, description: string, cost: number, salon: Salon) {
     this.name = name;

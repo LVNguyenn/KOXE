@@ -10,6 +10,7 @@ import {
 } from "typeorm";
 import { Salon } from "./Salon";
 import { Car } from "./Car";
+import { Maintenance } from "./Maintenance";
 
 @Entity()
 export class Warranty {
@@ -45,6 +46,10 @@ export class Warranty {
 
   @OneToMany(() => Car, (car) => car.warranties, { cascade: true })
   car!: Car[];
+
+  @ManyToMany(() => Maintenance, { cascade: true, onDelete: 'CASCADE' })
+  @JoinTable()
+  maintenance!: Maintenance[];
 
   init(
     create_at: Date,
