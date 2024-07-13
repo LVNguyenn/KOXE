@@ -35,7 +35,6 @@ const carController = {
     try {
       const cars = await carRepository.find({
         relations: ["salon"],
-        where: { available: 1 },
         select: [
           "car_id",
           "name",
@@ -54,6 +53,8 @@ const carController = {
           "inColor",
           "outColor",
           "image",
+          "date_in",
+          "date_out",
         ],
       });
 
@@ -120,14 +121,6 @@ const carController = {
   getCarById: async (req: Request, res: Response) => {
     const carRepository = getRepository(Car);
     const { id } = req.params;
-    // get value from car
-    // const valueCache = await Cache.get(id+"car");
-    // if (valueCache) {
-    //     return res.status(200).json({
-    //         status: "success",
-    //         car: valueCache
-    //     });
-    // }
 
     try {
       const car = await carRepository.findOne({
@@ -142,16 +135,6 @@ const carController = {
           .json({ status: "failed", msg: `No car with id: ${id}` });
       }
       const { salon_id, name, address } = car.salon;
-
-      // set new value for cache
-      // Cache.set(id+"car", {
-      //     ...car,
-      //     salon: {
-      //         salon_id,
-      //         name,
-      //         address
-      //     }
-      // });
 
       return res.status(200).json({
         status: "success",
