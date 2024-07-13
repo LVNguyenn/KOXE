@@ -107,13 +107,13 @@ export class Car {
     type: "timestamptz",
     default: () => "timezone('Asia/Saigon', now())",
   })
-  date_input!: Date;
+  date_in!: Date;
 
   @Column({
     type: "timestamptz",
     nullable: true
   })
-  date_output!: Date;
+  date_out!: Date;
 
   init(
     name: string,
@@ -134,8 +134,8 @@ export class Car {
     image: string[],
     salon: Salon,
     available: number,
-    date_input: Date,
-    date_output: Date,
+    date_in: Date,
+    date_out: Date,
   ) {
     this.name = name;
     this.description = description;
@@ -155,7 +155,7 @@ export class Car {
     this.image = image;
     this.salon = salon;
     this.available = available;
-    this.date_input = date_input;
-    this.date_output = date_output;
+    this.date_in = date_in;
+    this.date_out = date_out;
   }
 }

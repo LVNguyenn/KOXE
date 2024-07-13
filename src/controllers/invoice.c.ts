@@ -410,7 +410,7 @@ const invoiceController = {
       // update date_output of car
       const dateOutput = moment().tz('Asia/Saigon').toDate();
       const carRp = await CarRepository.findCarByCarIdSalonId({salonId, carId: userLegalRp.data.car_id});
-      const carRs = await CarRepository.updateCar({...carRp?.data, date_output: dateOutput});
+      const carRs = await CarRepository.updateCar({...carRp?.data, date_out: dateOutput});
       if (!carRs?.data) throw new Error("Error update date out of car.")
  
       if (invoiceDb.seller.salon_id !== salonId) {
