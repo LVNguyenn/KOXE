@@ -83,6 +83,7 @@
     Xoá gói bảo dưỡng vào gói bảo hành.
     <li>[POST] /invoice</li>
     Khi tạo giao dịch bảo dưỡng xe thì có thể truyền vào invoiceId để check xem nó có bảo hành không ? (Phần search thông tin hóa đơn xong cho fill vào thì dùng [POST] /invoice/lookup xong truyền invoiceId để lấy thông tin)
+    <li>[GET] /cars/salon/:salon_id?available=0</li>
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
     <h2>MỤC LỤC</h2>
@@ -247,8 +248,8 @@
     Lấy được hết tất cả các xe kèm theo tên và địa chỉ salon mà xe đó thuộc về
     <li>[GET] /cars/:id</li>
     Lấy được xe khi biết id
-    <li>[GET] /cars/salon/:salon_id</li>
-    Lấy được hết tất cả các xe khi biết id của 1 salon (có tìm kiếm, sắp xếp, phân trang) (Đã chỉnh chỉ lấy available = 1)
+    <li>[GET] /cars/salon/:salon_id?available=0</li>
+    Lấy được hết tất cả các xe khi biết id của 1 salon (có tìm kiếm, sắp xếp, phân trang). Nếu truyền available = 0 thì lấy theo xe đã bán, = 1 thì chưa bán, không truyền thì lấy hết.
     <li>[GET] /cars/brand/:brand/salon/:salon_id</li>
     Lấy được hết tất cả xe của cùng hãng xem truyền vào tên hãng trong 1 salon
     <li>[POST] /cars</li>
