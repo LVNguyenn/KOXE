@@ -123,12 +123,14 @@ const carController = {
     const { id } = req.params;
 
     try {
-      const car = await carRepository.findOne({
-        where: {
-          car_id: id,
-        },
-        relations: ["salon", "warranties"],
-      });
+      // const car = await carRepository.findOne({
+      //   where: {
+      //     car_id: id,
+      //   },
+      //   relations: ["salon", "warranties"],
+      // });
+      const carRp = await CarRepository.getAllCar({id});
+      const car = carRp?.data[0];
       if (!car) {
         return res
           .status(200)
