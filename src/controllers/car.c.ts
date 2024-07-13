@@ -150,12 +150,12 @@ const carController = {
   getCarsOfSalon: async (req: Request, res: Response) => {
     const carRepository = getRepository(Car);
     const { salon_id } = req.params;
-    const { page, per_page, q, sort }: any = req.query;
+    const { page, per_page, q, sort, available }: any = req.query;
     try {
       // let cars = await carRepository.find({
       //   where: { salon: { salon_id: salon_id }, available: 1 },
       // });
-      let carRp = await CarRepository.getAllCar({salonId: salon_id});
+      let carRp = await CarRepository.getAllCar({salonId: salon_id, available});
       let cars = carRp?.data;
 
       if (q) {

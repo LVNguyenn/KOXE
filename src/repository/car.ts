@@ -97,6 +97,9 @@ const CarRepository = {
       if (data?.id) {
         carDb = await carDb.where({ car_id: data?.id });
       }
+      if (data.available !== undefined && data.available !== "undefined") {
+        carDb = await carDb.where({ available: data?.available });
+      }
       rs = await carDb.getMany();
 
       //console.log(rs)
