@@ -420,8 +420,6 @@ const invoiceController = {
         })
       }
 
-      console.log(invoiceDb)
-
       await invoiceRepository.save({ ...invoiceDb, done: true });
 
       return res.json({

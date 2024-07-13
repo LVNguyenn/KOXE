@@ -100,6 +100,8 @@ const CarRepository = {
             }
             rs = await carDb.getMany()
 
+            console.log(rs)
+
             return FormatData("success", "find successfully!", rs);
         } catch (error) {
             console.log(error)

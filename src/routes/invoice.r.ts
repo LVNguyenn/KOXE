@@ -21,7 +21,10 @@ router.get(
   middlewareController.verifyToken,
   mInvoiceController.findMaintenanceInvoicesByLicensePlate
 );
-router.patch("/tick-done", invoiceController.tickDoneInvoice);
+router.patch("/tick-done", middlewareController.verifyToken, 
+  middlewareController.havePermission("U_IV"), 
+  invoiceController.tickDoneInvoice
+);
 router.post(
   "/",
   middlewareController.verifyToken,
