@@ -84,6 +84,8 @@
     <li>[POST] /invoice</li>
     Khi tạo giao dịch bảo dưỡng xe thì có thể truyền vào invoiceId để check xem nó có bảo hành không ? (Phần search thông tin hóa đơn xong cho fill vào thì dùng [POST] /invoice/lookup xong truyền invoiceId để lấy thông tin)
     <li>[GET] /cars/salon/:salon_id?available=0</li>
+    <li>[GET] /cars/user</li>
+    Dùng để lấy ra toàn bộ xe mà khách hàng đã mua (phía khách hàng gọi).
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
 
     <h2>MỤC LỤC</h2>
@@ -265,6 +267,9 @@
     < 0 thì sẽ báo lỗi)
     <li>[DELETE] /cars/:id</li>
     Xóa xe khi biết id
+
+    <li>[GET] /cars/user</li>
+    Dùng để lấy ra toàn bộ xe mà khách hàng đã mua (phía khách hàng gọi).
 
     <h2 id="salon">SALON</h2>
     <li>[GET] /salons</li>

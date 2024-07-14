@@ -10,6 +10,8 @@ import dayjs from "dayjs";
 import search from "../helper/search";
 import Sort from "../helper/sort";
 import pagination from "../helper/pagination";
+import UserRepository from "../repository/user";
+import CarUserLegalRepository from "../repository/car_user_legal";
 
 interface MulterFile {
   path: string;
@@ -572,6 +574,26 @@ const carController = {
     const legalRp = await CarRepository.findLegalByCar({ carId, salonId });
 
     return res.json({ ...legalRp });
+  },
+
+  getAllCarForUser: async (req: Request, res: Response) => {
+    const userId: any = req.user;
+    
+    try {
+      const userRp = await UserRepository.getUserById(userId);
+      const phone = userRp.data.phone;
+      if (!phone) throw new Error("Error phone.")
+      const carRp = await CarUserLegalRepository.getByPhone({phone});
+
+      return res.json({...carRp})
+    } catch (error) {
+      console.log(error)
+      return res.json({
+        status: "failed",
+        msg: "Need to update your phone."
+      })
+    }
+    
   },
 };
 

@@ -1,6 +1,6 @@
 import { getRepository } from "typeorm";
 import { FormatData } from '../utils/index';
-import { Appointment, Car_User_Legals } from "../entities";
+import { Appointment, Car, Car_User_Legals } from "../entities";
 
 const CarUserLegalRepository = {
 
@@ -18,6 +18,28 @@ const CarUserLegalRepository = {
             return FormatData("failed", "update failed.");
         }
 
+    },
+
+    async getByPhone(data: any) {
+        try {
+            const warrantyRepository = getRepository(Car_User_Legals);
+            let warrantyDb = await warrantyRepository
+            .createQueryBuilder('car_user_legals')
+            .leftJoinAndMapOne(
+                'car_user_legals.car',
+                Car,
+                'car',
+                'car.car_id = car_user_legals.car_id'
+            )
+            .leftJoinAndSelect('car_user_legals.invoice', 'invoice')
+            .where('car_user_legals.phone = :phone', { ...data })
+            .getMany();
+
+            return FormatData("success", "find successfully!", warrantyDb);
+        } catch (error) {
+            console.log(error)
+            return FormatData("failed", "Can not find the salon.");
+        }
     },
 }
 
