@@ -55,7 +55,7 @@ const warrantyController = {
                 .innerJoinAndSelect('warranty.salon', 'salon', 'salon.salon_id = :salonId', { salonId })
                 .leftJoinAndSelect('warranty.maintenance', 'maintenance')
                 .where({ reuse: true })
-                
+
             if (warrantyId)
                 warrantyDb = warrantyDb
                     .where({ warranty_id: warrantyId })
@@ -227,18 +227,30 @@ const warrantyController = {
     },
 
     addMaintence: async (req: Request, res: Response) => {
-        const { salonId, maintenanceId, warrantyId} = req.body;
+        const { salonId, maintenanceArray, warrantyId } = req.body;
+        let rsSave = "";
         try {
-            if (!salonId || !maintenanceId || !warrantyId) throw new Error("Missing input data.")
+            if (!salonId || !maintenanceArray[0] || !warrantyId) throw new Error("Missing input data.")
             // find warranty by salonid and warranty_id
             const warrantyRepository = getRepository(Warranty);
-            let warrantyRp: any = await WarrantyRepository.findWarrantyByIdSalonId({salonId, warrantyId});
-            if (!warrantyRp.data) throw new Error("Error data warranty.");
-            // find maintenance by id
-            const maintenanceRp = await MaintenanceRepository.findMaintenanceByIdSalonId({salonId, maintenanceId});
-            if (!maintenanceRp.data) throw new Error("Error maintenance data.");
-            const maintenance = !warrantyRp.data?.maintenance ? [maintenanceRp.data] : [...warrantyRp.data?.maintenance, maintenanceRp.data];
-            const rsSave = await warrantyRepository.save({ ...warrantyRp.data, maintenance });
+            for (let maintenanceId of maintenanceArray) {
+                try {
+                    let warrantyRp: any = await WarrantyRepository.findWarrantyByIdSalonId({ salonId, warrantyId });
+                    if (!warrantyRp.data) throw new Error("Error data warranty.");
+                    // find maintenance by id
+                    const maintenanceRp = await MaintenanceRepository.findMaintenanceByIdSalonId({ salonId, maintenanceId });
+                    if (!maintenanceRp.data) throw new Error("Error maintenance data.");
+                    const maintenance = !warrantyRp.data?.maintenance ? [maintenanceRp.data] : [...warrantyRp.data?.maintenance, maintenanceRp.data];
+                    rsSave = await warrantyRepository.save({ ...warrantyRp.data, maintenance });
+                } catch (error) { }
+            }
+            // let warrantyRp: any = await WarrantyRepository.findWarrantyByIdSalonId({ salonId, warrantyId });
+            // if (!warrantyRp.data) throw new Error("Error data warranty.");
+            // // find maintenance by id
+            // const maintenanceRp = await MaintenanceRepository.findMaintenanceByIdSalonId({ salonId, maintenanceId });
+            // if (!maintenanceRp.data) throw new Error("Error maintenance data.");
+            // const maintenance = !warrantyRp.data?.maintenance ? [maintenanceRp.data] : [...warrantyRp.data?.maintenance, maintenanceRp.data];
+            // const rsSave = await warrantyRepository.save({ ...warrantyRp.data, maintenance });
 
             return res.json({
                 status: "success",
@@ -255,15 +267,15 @@ const warrantyController = {
     },
 
     removeMaintence: async (req: Request, res: Response) => {
-        const { salonId, maintenanceId, warrantyId} = req.body;
+        const { salonId, maintenanceId, warrantyId } = req.body;
         try {
             if (!salonId || !maintenanceId || !warrantyId) throw new Error("Missing input data.")
             // find warranty by salonid and warranty_id
             const warrantyRepository = getRepository(Warranty);
-            let warrantyRp: any = await WarrantyRepository.findWarrantyByIdSalonId({salonId, warrantyId});
+            let warrantyRp: any = await WarrantyRepository.findWarrantyByIdSalonId({ salonId, warrantyId });
             if (!warrantyRp.data) throw new Error("Error data warranty.");
             // find maintenance by id
-            const maintenanceRp = await MaintenanceRepository.findMaintenanceByIdSalonId({salonId, maintenanceId});
+            const maintenanceRp = await MaintenanceRepository.findMaintenanceByIdSalonId({ salonId, maintenanceId });
             if (!maintenanceRp.data) throw new Error("Error maintenance data.");
             let maintenance: any = warrantyRp.data.maintenance.filter((item: any) => item.maintenance_id !== maintenanceId);
             const rsSave = await warrantyRepository.save({ ...warrantyRp.data, maintenance });
