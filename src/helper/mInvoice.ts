@@ -308,29 +308,70 @@ export const saveAInvoiceDetails = async (
 };
 
 export const processServices = async (id: string, services: any) => {
-  let total = 0;
+  const userLegalRp = await CarUserLegalRepository.getByInvoieId({
+    id,
+  });
+  const carId = userLegalRp.data.car_id;
+  const carRp = await CarRepository.getAllCar({ id: carId });
+  if (carRp?.data[0].warranties === null) {
+    let total = 0;
 
-  for (const service of services) {
-    const { maintenance_id, quantity } = service;
-    const mInvoiceDetailRepository = getRepository(MInvoiceDetail);
-    const mInvoiceDetail = new MInvoiceDetail();
-    mInvoiceDetail.invoice_id = id;
-    mInvoiceDetail.maintenance_id = maintenance_id;
-    const mService = await getRepository(Maintenance).findOne({
-      where: { maintenance_id: service.maintenance_id },
-    });
-    mInvoiceDetail.quantity = quantity || 1;
-    mInvoiceDetail.price = mService?.cost || 1;
-    await mInvoiceDetailRepository.save(mInvoiceDetail);
+    for (const service of services) {
+      const { maintenance_id, quantity } = service;
+      const mInvoiceDetailRepository = getRepository(MInvoiceDetail);
+      const mInvoiceDetail = new MInvoiceDetail();
+      mInvoiceDetail.invoice_id = id;
+      mInvoiceDetail.maintenance_id = maintenance_id;
+      const mService = await getRepository(Maintenance).findOne({
+        where: { maintenance_id: service.maintenance_id },
+      });
+      mInvoiceDetail.quantity = quantity || 1;
+      mInvoiceDetail.price = mService?.cost || 1;
+      await mInvoiceDetailRepository.save(mInvoiceDetail);
 
-    const dbService = await getRepository(Maintenance).findOne({
-      where: { maintenance_id: maintenance_id },
-    });
-    if (dbService) {
-      total += dbService.cost * (quantity || 1);
+      const dbService = await getRepository(Maintenance).findOne({
+        where: { maintenance_id: maintenance_id },
+      });
+      if (dbService) {
+        total += dbService.cost * (quantity || 1);
+      }
     }
+    return total;
+  } else {
+    const maintenanceList = carRp?.data[0].warranties.maintenance;
+    let mServiceIds = [];
+    mServiceIds = maintenanceList.map((service: any) => service.maintenance_id);
+    let total = 0;
+
+    for (const service of services) {
+      const { maintenance_id, quantity } = service;
+      const mInvoiceDetailRepository = getRepository(MInvoiceDetail);
+      const mInvoiceDetail = new MInvoiceDetail();
+      mInvoiceDetail.invoice_id = id;
+      mInvoiceDetail.maintenance_id = maintenance_id;
+      const mService = await getRepository(Maintenance).findOne({
+        where: { maintenance_id: service.maintenance_id },
+      });
+      mInvoiceDetail.quantity = quantity || 1;
+      if (mService && mServiceIds.includes(mService.maintenance_id)) {
+        mInvoiceDetail.price = 0;
+      } else {
+        mInvoiceDetail.price = mService?.cost || 1;
+      }
+      await mInvoiceDetailRepository.save(mInvoiceDetail);
+
+      const dbService = await getRepository(Maintenance).findOne({
+        where: { maintenance_id: maintenance_id },
+      });
+
+      if (dbService && mServiceIds.includes(dbService.maintenance_id)) {
+        total += 0;
+      } else if (dbService && !mServiceIds.includes(dbService.maintenance_id)) {
+        total += dbService.cost * quantity;
+      }
+    }
+    return total;
   }
-  return total;
 };
 
 export const processAccessory = async (id: string, accessories: any) => {

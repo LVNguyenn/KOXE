@@ -6,6 +6,7 @@ import { getFileName } from "../utils/index";
 import { newLogs } from "../helper/createLogs";
 // import Cache from '../config/node-cache';
 import CarRepository from "../repository/car";
+import dayjs from "dayjs";
 import search from "../helper/search";
 import Sort from "../helper/sort";
 import pagination from "../helper/pagination";
@@ -52,6 +53,11 @@ const carController = {
 
       let formattedCars = cars.map((car) => ({
         ...car,
+        date_in: dayjs(car.date_in).format("DD/MM/YYYY"),
+        date_out:
+          car.date_out === null
+            ? car.date_out
+            : dayjs(car.date_out).format("DD/MM/YYYY"),
         salon: {
           salon_id: car.salon.salon_id,
           name: car.salon.name,
@@ -121,7 +127,7 @@ const carController = {
       //   },
       //   relations: ["salon", "warranties"],
       // });
-      const carRp = await CarRepository.getAllCar({id});
+      const carRp = await CarRepository.getAllCar({ id });
       const car = carRp?.data[0];
       if (!car) {
         return res
@@ -134,6 +140,11 @@ const carController = {
         status: "success",
         car: {
           ...car,
+          date_in: dayjs(car.date_in).format("DD/MM/YYYY"),
+          date_out:
+            car.date_out === null
+              ? car.date_out
+              : dayjs(car.date_out).format("DD/MM/YYYY"),
           salon: {
             salon_id,
             name,
@@ -155,8 +166,20 @@ const carController = {
       // let cars = await carRepository.find({
       //   where: { salon: { salon_id: salon_id }, available: 1 },
       // });
-      let carRp = await CarRepository.getAllCar({salonId: salon_id, available});
+      let carRp = await CarRepository.getAllCar({
+        salonId: salon_id,
+        available,
+      });
       let cars = carRp?.data;
+
+      cars = cars.map((car: any) => ({
+        ...car,
+        date_in: dayjs(car.date_in).format("DD/MM/YYYY"),
+        date_out:
+          car.date_out === null
+            ? car.date_out
+            : dayjs(car.date_out).format("DD/MM/YYYY"),
+      }));
 
       if (q) {
         cars = await search({
@@ -218,6 +241,15 @@ const carController = {
       //         address: car.salon.address
       //     }
       // }));
+
+      cars = cars.map((car: any) => ({
+        ...car,
+        date_in: dayjs(car.date_in).format("DD/MM/YYYY"),
+        date_out:
+          car.date_out === null
+            ? car.date_out
+            : dayjs(car.date_out).format("DD/MM/YYYY"),
+      }));
 
       // search and pagination
       if (q) {
