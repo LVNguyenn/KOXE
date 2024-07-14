@@ -264,7 +264,7 @@ const transactionController = {
         formatRevenue = await Promise.all(
           revenueList.map(async (revenue) => ({
             amount: Number(revenue.amount),
-            salon: {
+            user: {
               salon_id: revenue.salon.salon_id,
               phone: revenue.salon.phoneNumber,
               name: revenue.salon.name,
