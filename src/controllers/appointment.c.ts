@@ -34,7 +34,7 @@ const appointmentController = {
 
     try {
       // get salonId of car:
-      const carRp = await CarRepository.findSalonIdByCarId({ carId });
+      const carRp = await CarRepository.findSalonIdByCarId2({ carId });
       const salonId = carRp?.data?.salon?.salon_id;
       if (!salonId) throw new Error("Error salonId")
       // get fullname of user

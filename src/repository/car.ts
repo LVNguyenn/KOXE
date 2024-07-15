@@ -35,6 +35,20 @@ const CarRepository = {
     }
   },
 
+  async findSalonIdByCarId2(data: any) {
+    try {
+      const carRepository = getRepository(Car);
+      const carDb: Car = await carRepository.findOneOrFail({
+        where: { car_id: data.carId },
+        relations: ["salon"],
+      });
+
+      return FormatData("success", "find successfully!", carDb);
+    } catch (error) {
+      return FormatData("failed", "Error find the car.");
+    }
+  },
+
   async findLegalByCar(data: any) {
     try {
       const carRepository = getRepository(Car);
