@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
+import { Warranty } from "./Warranty";
 
 @Entity()
 export class Feature {

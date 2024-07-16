@@ -17,7 +17,7 @@ export class Invoice {
   @Column({ default: "buy car" })
   type!: string;
 
-  @Column({})
+  @Column({nullable: true, type: "float"})
   expense!: number;
 
   @Column({ nullable: true })
