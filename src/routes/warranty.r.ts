@@ -12,6 +12,6 @@ router.delete("/delete", middlewareController.verifyToken, middlewareController.
 router.post("/cancel", middlewareController.verifyToken, middlewareController.havePermission("U_WRT"), warrantyController.cancelWarranty);
 
 router.post("/add-maintenance", middlewareController.verifyToken, middlewareController.havePermission("U_WRT"), warrantyController.addMaintence);
-router.post("/remove-maintenance", middlewareController.verifyToken, middlewareController.havePermission("R_WRT"), warrantyController.removeMaintence);
+// router.post("/remove-maintenance", middlewareController.verifyToken, middlewareController.havePermission("R_WRT"), warrantyController.removeMaintence);
 
 export default router;

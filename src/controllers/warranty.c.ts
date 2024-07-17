@@ -229,28 +229,23 @@ const warrantyController = {
     addMaintence: async (req: Request, res: Response) => {
         const { salonId, maintenanceArray, warrantyId } = req.body;
         let rsSave = "";
-        try {
-            if (!salonId || !maintenanceArray[0] || !warrantyId) throw new Error("Missing input data.")
+        try {;
+            let warrantyRp: any = await WarrantyRepository.findWarrantyByIdSalonId({ salonId, warrantyId });
+            if (!warrantyRp.data) throw new Error("Error data warranty.");
             // find warranty by salonid and warranty_id
             const warrantyRepository = getRepository(Warranty);
+            let maintenance: any = [];
+
             for (let maintenanceId of maintenanceArray) {
                 try {
-                    let warrantyRp: any = await WarrantyRepository.findWarrantyByIdSalonId({ salonId, warrantyId });
-                    if (!warrantyRp.data) throw new Error("Error data warranty.");
                     // find maintenance by id
                     const maintenanceRp = await MaintenanceRepository.findMaintenanceByIdSalonId({ salonId, maintenanceId });
                     if (!maintenanceRp.data) throw new Error("Error maintenance data.");
-                    const maintenance = !warrantyRp.data?.maintenance ? [maintenanceRp.data] : [...warrantyRp.data?.maintenance, maintenanceRp.data];
-                    rsSave = await warrantyRepository.save({ ...warrantyRp.data, maintenance });
+                    maintenance =[...maintenance, maintenanceRp.data]
                 } catch (error) { }
             }
-            // let warrantyRp: any = await WarrantyRepository.findWarrantyByIdSalonId({ salonId, warrantyId });
-            // if (!warrantyRp.data) throw new Error("Error data warranty.");
-            // // find maintenance by id
-            // const maintenanceRp = await MaintenanceRepository.findMaintenanceByIdSalonId({ salonId, maintenanceId });
-            // if (!maintenanceRp.data) throw new Error("Error maintenance data.");
-            // const maintenance = !warrantyRp.data?.maintenance ? [maintenanceRp.data] : [...warrantyRp.data?.maintenance, maintenanceRp.data];
-            // const rsSave = await warrantyRepository.save({ ...warrantyRp.data, maintenance });
+
+            rsSave = await warrantyRepository.save({ ...warrantyRp.data, maintenance });
 
             return res.json({
                 status: "success",
