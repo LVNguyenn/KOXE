@@ -8,7 +8,7 @@ const server = http.createServer(app);
 const io: any = new Server(server, {
   cors: {
     origin: ["http://localhost:3000", "https://fe-salon-oto.vercel.app"],
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   },
 });
 
