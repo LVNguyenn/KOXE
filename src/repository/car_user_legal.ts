@@ -31,7 +31,8 @@ const CarUserLegalRepository = {
                 'car',
                 'car.car_id = car_user_legals.car_id'
             )
-            .leftJoinAndSelect('car_user_legals.invoice', 'invoice')
+            .innerJoinAndSelect('car_user_legals.invoice', 'invoice', 'invoice.done = :done', { done: true })
+            // .innerJoinAndSelect('car_user_legals.invoice', 'invoice')
             .where('car_user_legals.phone = :phone', { ...data })
             .getMany();
 

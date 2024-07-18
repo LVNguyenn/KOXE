@@ -106,7 +106,7 @@ const CarRepository = {
       let carDb: any = await carRepository
         .createQueryBuilder("car")
         .leftJoinAndSelect("car.warranties", "warranty")
-        .leftJoinAndSelect("car.salon", "salon", data?.salonId? 'salon.salon_id =:salonId' : '', {...data})
+        .innerJoinAndSelect("car.salon", "salon", data?.salonId? 'salon.salon_id =:salonId' : '', {...data})
         .leftJoinAndSelect("warranty.maintenance", "maintenance");
       if (data?.id) {
         carDb = await carDb.where({ car_id: data?.id });
