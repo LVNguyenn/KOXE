@@ -345,9 +345,10 @@ const invoiceController = {
 
   getInvoiceByPhone: async (req: Request, res: Response) => {
     const { q, page, per_page } = req.body;
+    const id: any = req.query.id;
     const userId: any = req.user;
     let phone;
-
+    
     try {
       const userRepository = getRepository(User);
       const userDb = await userRepository.findOneOrFail({
@@ -372,7 +373,7 @@ const invoiceController = {
       const invoiceRepository = getRepository(Invoice);
 
       let invoiceDb = await invoiceRepository.find({
-        where: { phone: phone, type: "buy car" },
+        where: { phone: phone, type: "buy car", invoice_id: id },
         relations: ['seller', 'legals_user']
       })
 
@@ -388,6 +389,7 @@ const invoiceController = {
         total_page: rs?.total_page
       })
     } catch (error) {
+      console.log(error)
       return res.json({
         status: "failed",
         msg: "Error information."

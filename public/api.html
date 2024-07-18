@@ -714,7 +714,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     <!-- <li>[POST] /invoice/create-invoice</li>
     Dùng để lấy ra tất cả các hóa đơn(mua xe, mua phụ tùng, bảo dưỡng). Có phân trang và search theo loại. Trong đây có total_expense là tổng số tiền -->
     <div>[POST] /invoice/get-invoice-buy-car</div>
-    Tìm lịch sử giao dịch mua xe cho khách hàng. Yêu cầu khách hàng cần đăng nhập. Không truyền vô gì.
+    Tìm lịch sử giao dịch mua xe cho khách hàng. Yêu cầu khách hàng cần đăng nhập. Không truyền vô gì. Có thể ?id=InvoiceId nếu muốn tìm theo id.
     <li>[POST] /invoice/create-invoice</li>
     Dùng để tạo ra hóa đơn phụ trách việc mua xe của khách hàng. Yêu cầu chủ salon or nhân viên có quyền C_IV .Yêu cầu truyền vô:
     {licensePlate: option,carId, salonId, note, fullname: tên khách hàng, email: email khách hàng, phone: sdt của khách hàng, expense: tổng chi phí., processId: id của qui trình cần thiết lập cho khách hàng., employeeId: id nhân viên của salon.}
