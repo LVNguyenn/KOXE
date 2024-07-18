@@ -21,7 +21,7 @@ router.post(
 router.post(
     "/create-details",
     middlewareController.verifyToken,
-    middlewareController.havePermission("C_DL"),
+    middlewareController.havePermission("C_DC"),
     legalsController.createLegalDetails
 );
 
@@ -63,7 +63,7 @@ router.delete(
 router.post(
     "/check-details-user",
     middlewareController.verifyToken,
-    middlewareController.havePermission("U_DT"),
+    middlewareController.havePermission("U_DC"),
     legalsController.addLegalDetailsForUser
 );
 
