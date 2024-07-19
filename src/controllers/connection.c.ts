@@ -34,6 +34,7 @@ const connectionController = {
         connections = await connectionRepository.find({
           where: { salon: { salon_id: salonId } },
           relations: ["user", "post"],
+          order: {"createdAt": "DESC"}
         });
         formatConnection = connections.map((connection) => ({
           ...connection,
@@ -51,6 +52,7 @@ const connectionController = {
         connections = await connectionRepository.find({
           where: { user: { user_id: userId } },
           relations: ["salon", "post"],
+          order: {"createdAt": "DESC"}
         });
         formatConnection = connections.map((connection) => ({
           ...connection,

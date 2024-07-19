@@ -14,6 +14,7 @@ const accessoryController = {
     try {
       let accessory = await accessoryRepository.find({
         where: { salon: { salon_id: salonId } },
+        order: {"createdAt": "DESC"}
       });
 
       if (accessory.length === 0) {

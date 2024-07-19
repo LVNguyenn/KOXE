@@ -68,6 +68,7 @@ export const getMaintenanceInvoiceListBySalonId = async (salonId: string) => {
     const mInvoices = await mInvoicesRepository.find({
       where: { type: "maintenance", seller: { salon_id: salonId } },
       relations: ["seller"],
+      order: {"create_at": "DESC"}
     });
 
     return mInvoices;
@@ -82,6 +83,7 @@ export const getMaintenanceInvoiceListByPhone = async (phone: string) => {
     const mInvoices = await mInvoicesRepository.find({
       where: { type: "maintenance", phone: phone },
       relations: ["seller"],
+      order: {"create_at": "DESC"}
     });
 
     return mInvoices;
@@ -535,6 +537,7 @@ export const getAccessoryInvoiceListBySalonId = async (salonId: string) => {
     const aInvoices = await aInvoicesRepository.find({
       where: { type: "buy accessory", seller: { salon_id: salonId } },
       relations: ["seller"],
+      order: {"create_at": "DESC"}
     });
 
     return aInvoices;
@@ -549,6 +552,7 @@ export const getAccessoryInvoiceListByPhone = async (phone: string) => {
     const aInvoices = await aInvoicesRepository.find({
       where: { type: "buy accessory", phone: phone },
       relations: ["seller"],
+      order: {"create_at": "DESC"}
     });
 
     return aInvoices;

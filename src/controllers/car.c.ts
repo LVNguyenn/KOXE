@@ -51,6 +51,7 @@ const carController = {
           "date_in",
           "date_out",
         ],
+        order: {"date_in": "DESC"}
       });
 
       let formattedCars = cars.map((car) => ({
@@ -227,6 +228,7 @@ const carController = {
           brand: brand,
           salon: { salon_id: salon_id },
         },
+        order: {"date_in": "DESC"}
         //relations: ['salon'],
         //select: [
         //    'car_id', 'name', 'description', 'origin', 'price', 'brand',

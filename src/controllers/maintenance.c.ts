@@ -13,8 +13,9 @@ const maintenanceController = {
     try {
       const maintenances = await mRepository.find({
         relations: ["salon"],
+        order: {"createdAt": "DESC"}
       });
-
+ 
       let maintenanceFormat = {
         maintenances: maintenances.map((maintenance) => ({
           maintenance_id: maintenance.maintenance_id,
@@ -99,6 +100,7 @@ const maintenanceController = {
     try {
       let maintenance = await mRepository.find({
         where: { salon: { salon_id: salonId } },
+        order: {"createdAt": "DESC"}
       });
       if (maintenance.length === 0) {
         return res.status(200).json({

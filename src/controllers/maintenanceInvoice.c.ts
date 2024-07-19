@@ -295,12 +295,14 @@ const maintainController = {
             seller: { salon_id: salonId },
           },
           relations: ["seller"],
+          order: {"create_at": "DESC"}
         });
       } else {
         const phone = user.phone;
         mInvoices = await getRepository(Invoice).find({
           where: { licensePlate, type: "maintenance", phone: phone },
           relations: ["seller"],
+          order: {"create_at": "DESC"}
         });
       }
 

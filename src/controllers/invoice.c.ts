@@ -164,6 +164,7 @@ const invoiceController = {
         .leftJoinAndSelect('invoice.legals_user', 'car_user_legals')
         // .leftJoinAndSelect('user', 'user', 'invoice.employee_id = user.user_id')
         .where({ type: "buy car" })
+        .addOrderBy("invoice.create_at", "DESC")
 
       if (done !== undefined && done !== "undefined") {
         queryBuilder = await queryBuilder.where({ done: done })
@@ -374,7 +375,8 @@ const invoiceController = {
 
       let invoiceDb = await invoiceRepository.find({
         where: { phone: phone, type: "buy car", invoice_id: id },
-        relations: ['seller', 'legals_user']
+        relations: ['seller', 'legals_user'],
+        order: {"create_at": "DESC"}
       })
 
       if (q) {

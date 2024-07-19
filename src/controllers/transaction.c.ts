@@ -77,6 +77,7 @@ const transactionController = {
         transactionList = await transactionRepository.find({
           where: { salon: { salon_id: salonId } },
           relations: ["user", "connection", "process", "stage"],
+          order: {"createdAt": "DESC"}
         });
 
         formatTransactions = transactionList.map((transaction) => ({

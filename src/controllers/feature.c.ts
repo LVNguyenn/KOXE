@@ -21,7 +21,9 @@ const featureController = {
     // }
 
     try {
-      let features = await featureRepository.find({});
+      let features = await featureRepository.find({
+        order: {"createdAt": "DESC"}
+      });
 
       // search and pagination
       if (q) {

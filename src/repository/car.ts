@@ -107,7 +107,9 @@ const CarRepository = {
         .createQueryBuilder("car")
         .leftJoinAndSelect("car.warranties", "warranty")
         .innerJoinAndSelect("car.salon", "salon", data?.salonId? 'salon.salon_id =:salonId' : '', {...data})
-        .leftJoinAndSelect("warranty.maintenance", "maintenance");
+        .leftJoinAndSelect("warranty.maintenance", "maintenance")
+        .addOrderBy("car.date_in", "DESC")
+
       if (data?.id) {
         carDb = await carDb.where({ car_id: data?.id });
       }

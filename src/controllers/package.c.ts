@@ -27,6 +27,8 @@ const packageController = {
       const packages = await packageRepository
         .createQueryBuilder("package")
         .leftJoinAndSelect("package.features", "feature")
+        .orderBy("package.createdAt", "DESC" )
+        .addOrderBy("feature.createdAt", "DESC" )
         .getMany();
 
       const savedPackage = {
@@ -36,10 +38,12 @@ const packageController = {
           description: pkg.description,
           price: pkg.price,
           image: pkg.image,
+          createdAt: pkg.createdAt,
           features: pkg.features.map((feature) => ({
             feature_id: feature.feature_id,
             name: feature.name,
             description: feature.description,
+            createdAt: feature.createdAt
           })),
         })),
         nbHits: packages.length,
@@ -67,6 +71,7 @@ const packageController = {
         total_page: rs?.total_page,
       });
     } catch (error) {
+      console.log("Error: ", error)
       return res
         .status(500)
         .json({ status: "failed", msg: "Internal server error" });

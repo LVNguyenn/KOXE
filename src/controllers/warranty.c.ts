@@ -55,6 +55,7 @@ const warrantyController = {
                 .innerJoinAndSelect('warranty.salon', 'salon', 'salon.salon_id = :salonId', { salonId })
                 .leftJoinAndSelect('warranty.maintenance', 'maintenance')
                 .where({ reuse: true })
+                .orderBy("warranty.create_at", "DESC")
 
             if (warrantyId)
                 warrantyDb = warrantyDb

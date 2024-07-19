@@ -29,6 +29,12 @@ export class Accessory {
   @Column({ nullable: true })
   icon!: string;
 
+  @Column({
+    type: "timestamptz",
+    default: () => "timezone('Asia/Saigon', now())",
+  })
+  createdAt!: Date;
+
   init(name: string, manufacturer: string, price: number, salon: Salon) {
     this.name = name;
     this.manufacturer = manufacturer;
