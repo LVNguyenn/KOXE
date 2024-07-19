@@ -71,7 +71,7 @@ const LegalsRepository = {
       let processDb;
       const queryBuilder: any = await processRepository
         .createQueryBuilder("Process")
-        .leftJoinAndSelect(
+        .innerJoinAndSelect(
           "Process.salon",
           "salon",
           "salon.salon_id = :salonId",
@@ -83,11 +83,13 @@ const LegalsRepository = {
 
       if (data?.processId) {
         processDb = await queryBuilder.where({ id: data?.processId }).getOne();
+        if (!processDb) throw new Error("Data is null");
 
         return FormatData("success", "find successfully!", processDb);
       } else {
         processDb = await queryBuilder.getMany();
         const dataRs = processDb.filter((pr: any) => pr?.salon != null);
+        if (!dataRs[0]) throw new Error("Data is null");
 
         return FormatData("success", "find successfully!", dataRs);
       }
