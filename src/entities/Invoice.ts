@@ -24,8 +24,8 @@ export class Invoice {
   note!: string;
 
   @Column({
-    type: "timestamp",
-    default: () => "timezone('Asia/Saigon', now())",
+    type: "timestamptz",
+    default: () => "CURRENT_TIMESTAMP",
   })
   create_at!: Date;
 
