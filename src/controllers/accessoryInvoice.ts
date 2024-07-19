@@ -166,7 +166,6 @@ const accessoryController = {
       salonId = user.salonId.salon_id;
 
       const newBuyAccessory = {
-        create_at: moment().format("YYYY-MM-DDTHH:mm:ss"),
         seller: { salon_id: salonId },
         accessories: accessoryIds,
         expense,
