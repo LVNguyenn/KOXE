@@ -19,9 +19,7 @@ const appointmentController = {
     let { date, description, carId }: any = req.body;
 
     try {
-      //date = moment.tz(date, "Asia/Saigon").toDate();
-      //date = moment(date).add(7, "hours").tz("Asia/Saigon").toDate();
-      date = moment.tz(date, "Asia/Saigon").add(7, "hours").toDate();
+      date = moment.tz(date, "Asia/Saigon").toDate();
       //Check the car and no one has made an appointment at that time frame
       const appointRepository = getRepository(Appointment);
       await appointRepository.findOneOrFail({
