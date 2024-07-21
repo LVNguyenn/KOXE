@@ -10,7 +10,7 @@ import search from "../helper/search";
 import pagination from "../helper/pagination";
 import AppointmentRepository from "../repository/appointment";
 import SalonRepository from "../repository/salon";
-import moment from 'moment-timezone';
+import moment from "moment-timezone";
 // import Cache from '../config/node-cache';
 
 const appointmentController = {
@@ -19,7 +19,9 @@ const appointmentController = {
     let { date, description, carId }: any = req.body;
 
     try {
-      date = moment.tz(date, 'Asia/Saigon').toDate();
+      //date = moment.tz(date, "Asia/Saigon").toDate();
+      //date = moment(date).add(7, "hours").tz("Asia/Saigon").toDate();
+      date = moment.tz(date, "Asia/Saigon").add(7, "hours").toDate();
       //Check the car and no one has made an appointment at that time frame
       const appointRepository = getRepository(Appointment);
       await appointRepository.findOneOrFail({
@@ -30,13 +32,13 @@ const appointmentController = {
         status: "failed",
         msg: "Unfortunately, the car was scheduled for that time frame.",
       });
-    } catch (error) { }
+    } catch (error) {}
 
     try {
       // get salonId of car:
       const carRp = await CarRepository.findSalonIdByCarId2({ carId });
       const salonId = carRp?.data?.salon?.salon_id;
-      if (!salonId) throw new Error("Error salonId")
+      if (!salonId) throw new Error("Error salonId");
       // get fullname of user
       const userRepository = getRepository(User);
       const userDb = await userRepository.findOneOrFail({
@@ -118,7 +120,7 @@ const appointmentController = {
           "salon",
           "car_id",
           "from",
-          "read"
+          "read",
         ],
         order: { create_at: "DESC" },
       });
@@ -436,7 +438,6 @@ const appointmentController = {
     const apmDb = await AppointmentRepository.updateRead({ userId });
 
     return res.json({ ...apmDb });
-
   },
 };
 
