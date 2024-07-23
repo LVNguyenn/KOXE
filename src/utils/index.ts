@@ -130,9 +130,9 @@ function calculateAverageRating(ratingList: Array<number>) {
   return avgRating;
 }
 
-function subtractHoursFromStringTime(timeString: string, hours: number) {
+function addHoursFromStringTime(timeString: string, hours: number) {
   let givenTime = new Date(timeString);
-  let timeBefore = new Date(givenTime.getTime() - hours * 60 * 60 * 1000);
+  let timeBefore = new Date(givenTime.getTime() + hours * 60 * 60 * 1000);
 
   let year = timeBefore.getFullYear();
   let month = String(timeBefore.getMonth() + 1).padStart(2, "0");
@@ -196,6 +196,44 @@ export const buildWhereCondition = (
   return whereCondition;
 };
 
+export const buildWhereCondForTransaction = (
+  year?: number,
+  quarter?: number,
+  month?: number
+) => {
+  const whereCondition: any = {};
+  if (year) {
+    if (quarter) {
+      const startMonth = (quarter - 1) * 3 + 1;
+      const endMonth = startMonth + 2;
+      const startDate = new Date(year, startMonth - 1, 1);
+      const endDate = new Date(year, endMonth - 1, 31);
+      whereCondition.createdAt = Between(startDate, endDate);
+    } else if (month) {
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 0);
+      whereCondition.createdAt = Between(startDate, endDate);
+    } else {
+      whereCondition.createdAt = Between(
+        new Date(`${year}-01-01`),
+        new Date(`${year}-12-31`)
+      );
+    }
+  } else if (quarter) {
+    const startMonth = (quarter - 1) * 3 + 1;
+    const endMonth = startMonth + 2;
+    const startDate = new Date(new Date().getFullYear(), startMonth - 1, 1);
+    const endDate = new Date(new Date().getFullYear(), endMonth - 1, 31);
+    whereCondition.createdAt = Between(startDate, endDate);
+  } else if (month) {
+    const startDate = new Date(new Date().getFullYear(), month - 1, 1);
+    const endDate = new Date(new Date().getFullYear(), month, 0);
+    whereCondition.createdAt = Between(startDate, endDate);
+  }
+
+  return whereCondition;
+};
+
 export const calcTotal = (invoices: any, phone: string, type: string) => {
   invoices = invoices.filter((invoice: any) => invoice.type === type);
   const totalExpense: any = invoices.reduce(
@@ -233,5 +271,5 @@ export {
   getNextElement,
   isArraySubset,
   calculateAverageRating,
-  subtractHoursFromStringTime,
+  addHoursFromStringTime,
 };

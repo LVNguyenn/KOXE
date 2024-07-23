@@ -7,6 +7,7 @@ import {
   isArraySubset,
   calculateAverageRating,
   calcTotalNumOfCompletedTran,
+  buildWhereCondForTransaction,
 } from "../utils/index";
 import { formatDate } from "../utils";
 import createNotification from "../helper/createNotification";
@@ -54,7 +55,8 @@ const transactionController = {
     const revenueRepository = getRepository(Revenue);
     const userRepository = getRepository(User);
     const userId: any = req.headers["userId"] || "";
-    const { page, per_page, q }: any = req.query;
+    const { page, per_page, q, year, quarter, month }: any = req.query;
+
     let checkSalon = false;
     //let totalRevenue = 0;
     //let completedTran = 0;
@@ -72,12 +74,17 @@ const transactionController = {
     try {
       let transactionList;
       let formatTransactions: any;
+
+      const whereCondition = buildWhereCondForTransaction(year, quarter, month);
+
       if (salonId !== "") {
+        whereCondition.salon = { salon_id: salonId };
         checkSalon = true;
         transactionList = await transactionRepository.find({
-          where: { salon: { salon_id: salonId } },
+          //where: { salon: { salon_id: salonId } },
+          where: whereCondition,
           relations: ["user", "connection", "process", "stage"],
-          order: {"createdAt": "DESC"}
+          order: { createdAt: "DESC" },
         });
 
         formatTransactions = transactionList.map((transaction) => ({
@@ -92,9 +99,12 @@ const transactionController = {
           },
         }));
       } else {
+        whereCondition.user = { user_id: userId };
         transactionList = await transactionRepository.find({
-          where: { user: { user_id: userId } },
+          //where: { user: { user_id: userId } },
+          where: whereCondition,
           relations: ["salon", "connection", "process", "stage"],
+          order: { createdAt: "DESC" },
         });
 
         formatTransactions = transactionList.map((transaction) => ({

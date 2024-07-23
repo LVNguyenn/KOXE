@@ -86,6 +86,10 @@
     Dùng để lấy ra toàn bộ xe mà khách hàng đã mua (phía khách hàng gọi).
     <li>[POST] /warranty/add-maintenance</li>
     Có chỉnh sửa nhiều, nên xem lại để tránh lỗi.
+
+    <h3>23/7</h3>
+    <li>[GET] /transactions</li>
+    Có thể lấy được theo năm, quý, tháng (Chủ salon và hoa tiêu đều gọi này để xem lịch sử giao dịch với nhau)
    
 
     <li>--------------------------------------------------------------------------------------------------------------------------------------</li>
@@ -1037,6 +1041,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     </div>
     <li>[GET] /transactions</li>
     Sẽ lấy ra được tất cả các giao dịch của salon mình với các hoa tiêu. Nếu là user thì lấy ra được tất cả các giao dịch của mình với các salon (Lấy ra đươc tình trạng, tên user, quy trình áp dụng, ngày tạo kết nối)
+    Nếu là salon thì lấy ra được các hoa tiêu mà mình giao dịch. Có thể lấy theo năm, quý, tháng
     <b>Ở đây đã được thêm search theo tên của salon và tên hoa tiêu</b>
     <li>[GET] /transactions/statistics</li>
     Dùng để thống kê cho hoa tiêu và salon về giao dịch buôn bán xe. Lấy ra được các salon mà hoa tiêu đã giao dịch, có tổng tiền mà từng salon đã chi và số giao dịch hoàn thành với salon đó. Total có 2 cái là totalAmount (tổng số tiền nhận được từ tất cả salon) và totalNumOfCompletedTran (tổng số giao dịch hoàn thành từ tất cả salon)

@@ -3,7 +3,7 @@ import { getRepository } from "typeorm";
 import { Appointment, Car, Salon, User } from "../entities";
 import createNotification from "../helper/createNotification";
 import { newLogs } from "../helper/createLogs";
-import { isValidUUID, subtractHoursFromStringTime } from "../utils";
+import { isValidUUID, addHoursFromStringTime } from "../utils";
 import UserRepository from "../repository/user";
 import CarRepository from "../repository/car";
 import search from "../helper/search";
@@ -47,9 +47,9 @@ const appointmentController = {
       appoint.salon_id = salonId;
       appoint.user_id = userId;
       appoint.date = date;
-      appoint.notificationTime = subtractHoursFromStringTime(
+      appoint.notificationTime = addHoursFromStringTime(
         appoint.date.toString(),
-        0.5
+        6.5
       );
       appoint.description = description;
       appoint.car_id = carId;
