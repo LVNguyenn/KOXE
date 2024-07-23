@@ -17,7 +17,7 @@ export class Invoice {
   @Column({ default: "buy car" })
   type!: string;
 
-  @Column({nullable: true, type: "float"})
+  @Column({ nullable: true, type: "float" })
   expense!: number;
 
   @Column({ nullable: true })
@@ -89,7 +89,7 @@ export class Invoice {
     policy: string,
     maintenanceServices: string[],
     accessories: string[],
-    legals_user: Car_User_Legals,
+    legals_user: Car_User_Legals
   ) {
     this.type = type;
     this.expense = expense;

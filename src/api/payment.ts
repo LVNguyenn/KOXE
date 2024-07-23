@@ -51,7 +51,8 @@ export const payment = (app: any) => {
         try {
             const data  = await service.vnpayReturn(req.query);
 
-            return res.json(data);
+            // return res.json(data);
+            return res.redirect(data?.url);
         } catch (err: any) {
             next(err);
         }

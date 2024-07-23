@@ -24,6 +24,12 @@ export class Maintenance {
   @Check(`"cost" >= 0`)
   cost!: number;
 
+  @Column({
+    type: "timestamptz",
+    default: () => "timezone('Asia/Saigon', now())",
+  })
+  createdAt!: Date;
+
   @ManyToOne(() => Salon, (salon) => salon.services)
   salon!: Salon;
 

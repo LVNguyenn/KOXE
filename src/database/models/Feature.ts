@@ -6,14 +6,20 @@ export class Feature {
     @PrimaryGeneratedColumn('uuid')
     feature_id!: string;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     name!: string;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     description!: string;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     keyMap!: string;
+
+    @Column({
+        type: "timestamptz",
+        default: () => "timezone('Asia/Saigon', now())",
+    })
+    createdAt!: Date;
 
     init(name: string, description: string, keyMap: string) {
         this.name = name;

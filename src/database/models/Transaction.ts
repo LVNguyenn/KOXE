@@ -39,4 +39,10 @@ export class Transaction {
 
   @Column({ default: 1 })
   statusRating!: number;
+
+  @Column({
+    type: "timestamptz",
+    default: () => "timezone('Asia/Saigon', now())",
+  })
+  createdAt!: Date;
 }

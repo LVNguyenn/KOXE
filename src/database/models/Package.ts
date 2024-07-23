@@ -7,18 +7,24 @@ export class Package {
     @PrimaryGeneratedColumn('uuid')
     package_id!: string;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     name!: string;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     description!: string;
 
-    @Column({nullable: true, type: 'float'})
+    @Column({ nullable: true, type: 'float' })
     @Check(`"price" >= 0`)
     price!: number;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     image!: string;
+
+    @Column({
+        type: "timestamptz",
+        default: () => "timezone('Asia/Saigon', now())",
+    })
+    createdAt!: Date;
 
     @ManyToMany(() => Feature, { cascade: true })
     @JoinTable()
