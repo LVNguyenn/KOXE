@@ -258,19 +258,19 @@ const invoiceController = {
       }
 
       // for quater
-      let rsQuaterDataMT = invoiceController.groupByQuarter(MTinvoiceDb.invoiceDb, "create_at", fromDate.slice(0,4));
-      let rsQuaterDataBC = invoiceController.groupByQuarter(MTinvoiceDb.invoiceDb, "create_at", fromDate.slice(0,4));
-      let rsQuaterDataBA = invoiceController.groupByQuarter(MTinvoiceDb.invoiceDb, "create_at", fromDate.slice(0,4));
+      // let rsQuaterDataMT = invoiceController.groupByQuarter(MTinvoiceDb.invoiceDb, "create_at", fromDate.slice(0,4));
+      // let rsQuaterDataBC = invoiceController.groupByQuarter(MTinvoiceDb.invoiceDb, "create_at", fromDate.slice(0,4));
+      // let rsQuaterDataBA = invoiceController.groupByQuarter(MTinvoiceDb.invoiceDb, "create_at", fromDate.slice(0,4));
 
-      for (let dataMonth in rsQuaterDataMT) {
-        rsQuaterDataMT[dataMonth] = await pagination({ data: rsQuaterDataMT[dataMonth], page, per_page });
-      }
-      for (let dataMonth in rsQuaterDataBC) {
-        rsQuaterDataBC[dataMonth] = await pagination({ data: rsQuaterDataBC[dataMonth], page, per_page });
-      }
-      for (let dataMonth in rsQuaterDataBA) {
-        rsQuaterDataBA[dataMonth] = await pagination({ data: rsQuaterDataBA[dataMonth], page, per_page });
-      }
+      // for (let dataMonth in rsQuaterDataMT) {
+      //   rsQuaterDataMT[dataMonth] = await pagination({ data: rsQuaterDataMT[dataMonth], page, per_page });
+      // }
+      // for (let dataMonth in rsQuaterDataBC) {
+      //   rsQuaterDataBC[dataMonth] = await pagination({ data: rsQuaterDataBC[dataMonth], page, per_page });
+      // }
+      // for (let dataMonth in rsQuaterDataBA) {
+      //   rsQuaterDataBA[dataMonth] = await pagination({ data: rsQuaterDataBA[dataMonth], page, per_page });
+      // }
 
       return res.json({
         status: "success",
@@ -285,9 +285,9 @@ const invoiceController = {
         rsMonthsDataMT,
         rsMonthsDataBC,
         rsMonthsDataBA,
-        rsQuaterDataMT,
-        rsQuaterDataBC,
-        rsQuaterDataBA,
+        // rsQuaterDataMT,
+        // rsQuaterDataBC,
+        // rsQuaterDataBA,
       })
 
     } catch (error) {
@@ -381,13 +381,17 @@ const invoiceController = {
     if (!year) year = 2024;
     if (!quater && !months) months = 1;
     let toMonth = quater ? 3 * quater : months;
+    let fromMonth = quater ? (3 * quater - 2) : months;
 
-    let fromDate: any = `${year}-${months}-01`;
+    let fromDate: any = `${year}-${fromMonth}-01`;
     let toDate: any = `${year}-${toMonth}-28`;
+    console.log(fromDate, toDate)
 
     try {
       const BCTopDb = await getTopSeller({ salonId, type: "buy car", fromDate, toDate });
       let totalBuyCar = 0;
+      const carDb = await CarRepository.getAllCar({salonId, fromDate, toDate});
+
 
       for (const bc of BCTopDb) {
         totalBuyCar += bc.quantitySold;
@@ -400,7 +404,8 @@ const invoiceController = {
         totalBuyCar,
         buyCarTop: BCTopDb,
         MTTopDb,
-        accessoriesTop: ATopDb
+        accessoriesTop: ATopDb,
+        carDb: carDb.data
       })
     } catch (error) {
       return res.json({

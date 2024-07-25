@@ -1,4 +1,4 @@
-import { getRepository } from "typeorm";
+import { getRepository, LessThan, MoreThan } from "typeorm";
 import { FormatData } from "../utils/index";
 import { Car } from "../entities";
 
@@ -121,6 +121,11 @@ const CarRepository = {
       if (data.available !== undefined && data.available !== "undefined") {
         carDb = await carDb.where({ available: data?.available });
       }
+      if (data.fromDate !== undefined && data.fromDate !== "undefined" && data.toDate !== undefined && data.toDate !== "undefined" ) {
+        // carDb = await carDb.where({ date_out: MoreThan(data.fromDate) && LessThan(data.toDate) });
+        carDb = await carDb.where('car.date_out >= :fromDate', { fromDate: data.fromDate })
+        .andWhere('car.date_out <= :toDate', { toDate: data.toDate });
+      }
       rs = await carDb.getMany();
 
       //console.log(rs)
@@ -131,6 +136,8 @@ const CarRepository = {
       return FormatData("failed", "Can not find the salon.");
     }
   },
+
+
 };
 
 export default CarRepository;
