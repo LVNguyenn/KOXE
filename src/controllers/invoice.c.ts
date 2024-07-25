@@ -238,10 +238,12 @@ const invoiceController = {
       // get data for each months
       // get data for maintenance
       let rsMonthsDataMT = invoiceController.groupByMonth(MTinvoiceDb.invoiceDb, "create_at");
+      // data for quater
       // pagination
       for (let dataMonth in rsMonthsDataMT) {
         rsMonthsDataMT[dataMonth] = await pagination({ data: rsMonthsDataMT[dataMonth], page, per_page });
       }
+
       // get data for maintenance
       let rsMonthsDataBC = invoiceController.groupByMonth(MTinvoiceDb.invoiceDb, "create_at");
       // pagination
@@ -253,6 +255,21 @@ const invoiceController = {
       // pagination
       for (let dataMonth in rsMonthsDataMT) {
         rsMonthsDataBA[dataMonth] = await pagination({ data: rsMonthsDataBA[dataMonth], page, per_page });
+      }
+
+      // for quater
+      let rsQuaterDataMT = invoiceController.groupByQuarter(MTinvoiceDb.invoiceDb, "create_at");
+      let rsQuaterDataBC = invoiceController.groupByQuarter(MTinvoiceDb.invoiceDb, "create_at");
+      let rsQuaterDataBA = invoiceController.groupByQuarter(MTinvoiceDb.invoiceDb, "create_at");
+
+      for (let dataMonth in rsQuaterDataMT) {
+        rsQuaterDataMT[dataMonth] = await pagination({ data: rsQuaterDataMT[dataMonth], page, per_page });
+      }
+      for (let dataMonth in rsQuaterDataBC) {
+        rsQuaterDataBC[dataMonth] = await pagination({ data: rsQuaterDataBC[dataMonth], page, per_page });
+      }
+      for (let dataMonth in rsQuaterDataBA) {
+        rsQuaterDataBA[dataMonth] = await pagination({ data: rsQuaterDataBA[dataMonth], page, per_page });
       }
 
       return res.json({
@@ -267,7 +284,10 @@ const invoiceController = {
         totalCarSold: BCinvoiceDb.invoiceDb.length,
         rsMonthsDataMT,
         rsMonthsDataBC,
-        rsMonthsDataBA
+        rsMonthsDataBA,
+        rsQuaterDataMT,
+        rsQuaterDataBC,
+        rsQuaterDataBA,
       })
 
     } catch (error) {
@@ -324,10 +344,17 @@ const invoiceController = {
       topFeature.sort((a: any, b: any) => b.count - a.count);
       // get data for months
       let rsMonthsData = invoiceController.groupByMonth(purchaseDb.purchases, "purchaseDate");
+      // data for quater
+      let rsQuaterData: any;
+      rsQuaterData = invoiceController.groupByQuarter(purchaseDb.purchases, "purchaseDate")
       // pagination
       for (let dataMonth in rsMonthsData) {
         rsMonthsData[dataMonth] = await pagination({ data: rsMonthsData[dataMonth], page, per_page });
       }
+      for (let dataQuater in rsQuaterData) {
+        rsQuaterData[dataQuater] = await pagination({ data: rsQuaterData[dataQuater], page, per_page });
+      }
+
       return res.json({
         status: "success",
         purchases: purchaseDb,
@@ -336,7 +363,8 @@ const invoiceController = {
         topPackages: getTopPackage?.data,
         topFeature,
         rsQuater,
-        rsMonthsData
+        rsMonthsData,
+        rsQuaterData
       })
     } catch (error) {
       console.log(error);
@@ -520,6 +548,34 @@ const invoiceController = {
         acc[key] = [];
       }
 
+      acc[key].push(item);
+      return acc;
+    }, {});
+  },
+
+  groupByQuarter : (data: any, by: any) => {
+    return data.reduce((acc: any, item: any) => {
+      const date = new Date(item[by]);
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+      let quarter;
+  
+      if (month <= 3) {
+        quarter = 'q1';
+      } else if (month <= 6) {
+        quarter = 'q2';
+      } else if (month <= 9) {
+        quarter = 'q3';
+      } else {
+        quarter = 'q4';
+      }
+  
+      const key = `${year}-${quarter}`;
+  
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+  
       acc[key].push(item);
       return acc;
     }, {});

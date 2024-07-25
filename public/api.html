@@ -822,6 +822,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     }, ... tháng 1 đến tháng 12}. Giá trị total là tổng theo từng tháng. còn value không cần quan tâm cũng được.; 
     "avg": 840918.1666666666  Đây là giá trị trung bình cho mỗi tháng (tổng / 12).
     <div>Mới nhất: có thêm rsMonthsDataMT: dữ liệu bảo dưỡng, rsMonthsDataBC: mua xe, rsMonthsDataBA: mua phụ tùng. Bên trong đã có phân trang, đây là lấy dữ liệu cho từng tháng</div>
+    <div>Theo quí: rsQuaterDataMT: dữ liệu bảo dưỡng theo quí, rsQuaterDataBC: mua xe, rsQuaterDataBA: mua phụ tùng. Lưu ý để lấy ra thì chỉ cần gọi rsQuaterDataBA["2024-q1"] là lấy được dữ liệu cho quí 1 và tương tự, cái nào ko có thì là ko có.</div>
     nếu chưa có tk test:
     đăng nhập: 
     "username": "duyanh123",
@@ -856,7 +857,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
     },...].  Đây là top các gói đã bán chạy nhất.
     <div>Mới: dữ liệu có trả về thêm mảng topFeature: đây là mảng chứa top các tính năng, mỗi cái có count giảm dần</div>
     <div>Mới nhất: có thêm rsMonthsData: dữ liệu cho từng tháng. </div>
-
+    <div>Theo quí: rsQuaterData: dữ liệu theo quí. Cần lấy ra theo quí nào thì chỉ cần gọi rsQuaterData["2024-q1"] có thì có còn không có thì là không có dữ liệu.</div>
 
     <h2 id="legal">Giấy tờ pháp lý</h2>
     Khi tạo hóa đơn thành công thì người dùng tự đồng được thêm vào tiến trình theo số điện thoại.
