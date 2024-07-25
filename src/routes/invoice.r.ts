@@ -58,7 +58,11 @@ router.post(
   middlewareController.havePermission("R_IV"),
   invoiceController.revenueStatistics
 );
-router.post("/get-top", invoiceController.getTopThingBestSeller);
+router.post("/get-top",
+  middlewareController.verifyToken,
+  middlewareController.havePermission("R_IV"),
+  invoiceController.getTopThingBestSeller,
+);
 router.post(
   "/get-invoice-buy-car",
   middlewareController.verifyToken,
