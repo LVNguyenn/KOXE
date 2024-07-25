@@ -217,6 +217,7 @@ const invoiceController = {
 
   revenueStatistics: async (req: Request, res: Response) => {
     let { salonId, fromDate } = req.body;
+    let { page, per_page }: any = req.query;
     let rsQuater = [0, 0, 0, 0];
     let year = new Year().months;
     if (!fromDate) fromDate = "2024-01-01";
@@ -234,6 +235,26 @@ const invoiceController = {
         else rsQuater[0] += year[key].total;
       }
 
+      // get data for each months
+      // get data for maintenance
+      let rsMonthsDataMT = invoiceController.groupByMonth(MTinvoiceDb.invoiceDb, "create_at");
+      // pagination
+      for (let dataMonth in rsMonthsDataMT) {
+        rsMonthsDataMT[dataMonth] = await pagination({ data: rsMonthsDataMT[dataMonth], page, per_page });
+      }
+      // get data for maintenance
+      let rsMonthsDataBC = invoiceController.groupByMonth(MTinvoiceDb.invoiceDb, "create_at");
+      // pagination
+      for (let dataMonth in rsMonthsDataMT) {
+        rsMonthsDataBC[dataMonth] = await pagination({ data: rsMonthsDataBC[dataMonth], page, per_page });
+      }
+      // get data for maintenance
+      let rsMonthsDataBA = invoiceController.groupByMonth(MTinvoiceDb.invoiceDb, "create_at");
+      // pagination
+      for (let dataMonth in rsMonthsDataMT) {
+        rsMonthsDataBA[dataMonth] = await pagination({ data: rsMonthsDataBA[dataMonth], page, per_page });
+      }
+
       return res.json({
         status: "success",
         maintenances: MTinvoiceDb,
@@ -243,11 +264,11 @@ const invoiceController = {
         year,
         rsQuater,
         avg,
-        totalCarSold: BCinvoiceDb.invoiceDb.length
+        totalCarSold: BCinvoiceDb.invoiceDb.length,
+        rsMonthsDataMT,
+        rsMonthsDataBC,
+        rsMonthsDataBA
       })
-
-
-
 
     } catch (error) {
       console.log(error)
@@ -259,14 +280,24 @@ const invoiceController = {
   },
 
   revenueStatisticsAdmin: async (req: Request, res: Response) => {
-    const { fromDate } = req.body;
+    let { fromDate } = req.body;
+    let { page, per_page }: any = req.query;
+    let rsQuater = [0, 0, 0, 0];
     let year = new Year().months;
+    if (!fromDate) fromDate = "2024-01-01";
     try {
       let purchaseDb: any = await statistics({ salonId: "", type: "package", fromDate, year });
       const rs = await pagination({ data: purchaseDb.purchases, per_page: 10 });
       purchaseDb.purchases = rs.data || "";
       const getTopPackage = await PurchaseRepository.getAllPurchase({});
       const avg = averageEachMonth(year);
+
+      for (const key in year) {
+        if (year[key].value <= 3) rsQuater[0] += year[key].total;
+        else if (year[key].value <= 6) rsQuater[1] += year[key].total;
+        else if (year[key].value <= 9) rsQuater[2] += year[key].total;
+        else rsQuater[0] += year[key].total;
+      }
 
       // get package and features
       const packageRp = await PackageRepository.getAll({});
@@ -291,14 +322,21 @@ const invoiceController = {
 
       // arrage rs
       topFeature.sort((a: any, b: any) => b.count - a.count);
-
+      // get data for months
+      let rsMonthsData = invoiceController.groupByMonth(purchaseDb.purchases, "purchaseDate");
+      // pagination
+      for (let dataMonth in rsMonthsData) {
+        rsMonthsData[dataMonth] = await pagination({ data: rsMonthsData[dataMonth], page, per_page });
+      }
       return res.json({
         status: "success",
         purchases: purchaseDb,
         months: year,
         avg,
         topPackages: getTopPackage?.data,
-        topFeature
+        topFeature,
+        rsQuater,
+        rsMonthsData
       })
     } catch (error) {
       console.log(error);
@@ -311,7 +349,7 @@ const invoiceController = {
 
   getTopThingBestSeller: async (req: Request, res: Response) => {
     let { salonId, year, quater, months } = req.body;
-
+    console.log(salonId)
     if (!year) year = 2024;
     if (!quater && !months) months = 1;
     let toMonth = quater ? 3 * quater : months;
@@ -349,7 +387,7 @@ const invoiceController = {
     const id: any = req.query.id;
     const userId: any = req.user;
     let phone;
-    
+
     try {
       const userRepository = getRepository(User);
       const userDb = await userRepository.findOneOrFail({
@@ -376,7 +414,7 @@ const invoiceController = {
       let invoiceDb = await invoiceRepository.find({
         where: { phone: phone, type: "buy car", invoice_id: id },
         relations: ['seller', 'legals_user'],
-        order: {"create_at": "DESC"}
+        order: { "create_at": "DESC" }
       })
 
       if (q) {
@@ -409,14 +447,14 @@ const invoiceController = {
       })
 
       // find carId
-      const userLegalRp = await CarUserLegalRepository.getByInvoieId({invoiceId});
+      const userLegalRp = await CarUserLegalRepository.getByInvoieId({ invoiceId });
       if (!userLegalRp.data.car_id) throw new Error("Error carId");
       // update date_output of car
       const dateOutput = moment().tz('Asia/Saigon').toDate();
-      const carRp = await CarRepository.findCarByCarIdSalonId({salonId, carId: userLegalRp.data.car_id});
-      const carRs = await CarRepository.updateCar({...carRp?.data, date_out: dateOutput});
+      const carRp = await CarRepository.findCarByCarIdSalonId({ salonId, carId: userLegalRp.data.car_id });
+      const carRs = await CarRepository.updateCar({ ...carRp?.data, date_out: dateOutput });
       if (!carRs?.data) throw new Error("Error update date out of car.")
- 
+
       if (invoiceDb.seller.salon_id !== salonId) {
         return res.json({
           status: "failed",
@@ -469,6 +507,22 @@ const invoiceController = {
         msg: "Error remove invoice."
       })
     }
+  },
+
+  groupByMonth: (data: any, by: string) => {
+    return data.reduce((acc: any, item: any) => {
+      const date = new Date(item[by]);
+      const month = date.getMonth() + 1; // Tháng từ 0-11, cần +1 để đúng tháng
+      const year = date.getFullYear();
+      const key = `${year}-${month.toString().padStart(2, '0')}`;
+
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+
+      acc[key].push(item);
+      return acc;
+    }, {});
   },
 
 }
