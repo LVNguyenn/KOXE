@@ -75,7 +75,9 @@ export const getTopSeller = async ({ salonId, type, fromDate, toDate }: { salonI
             let invoiceDb: any = await invoiceRepository
                 .createQueryBuilder('invoice')
                 .innerJoinAndSelect('invoice.seller', 'salon', 'salon.salon_id = :salonId', { salonId })
-                .where({ type, create_at: MoreThan(fromDate) && LessThan(toDate) })
+                // .where({ type, create_at: MoreThan(fromDate) && LessThan(toDate) })
+                .where('invoice.create_at >= :fromDate AND invoice.create_at <= :toDate', { fromDate, toDate })
+                .andWhere('invoice.type = :type', { type })
                 .select('invoice.carName, COUNT(*) AS count')
                 .groupBy('invoice.carName')
                 .addGroupBy('invoice.invoice_id')
