@@ -377,7 +377,7 @@ const invoiceController = {
 
   getTopThingBestSeller: async (req: Request, res: Response) => {
     let { salonId, year, quater, months } = req.body;
-    console.log(salonId)
+    let {page, per_page}: any = req.query;
     if (!year) year = 2024;
     if (!quater && !months) months = 1;
     let toMonth = quater ? 3 * quater : months;
@@ -390,7 +390,7 @@ const invoiceController = {
     try {
       const BCTopDb = await getTopSeller({ salonId, type: "buy car", fromDate, toDate });
       let totalBuyCar = 0;
-      const carDb = await CarRepository.getAllCar({salonId, fromDate, toDate});
+      let carDb = await CarRepository.getAllCar({salonId, fromDate, toDate});
 
 
       for (const bc of BCTopDb) {
@@ -398,6 +398,8 @@ const invoiceController = {
       }
       const MTTopDb = await getTopSeller({ salonId, type: "maintenance", fromDate, toDate });
       const ATopDb = await getTopSeller({ salonId, type: "accessory", fromDate, toDate });
+      // pagination for car Db
+      let rsCar = await pagination({ data: carDb.data, page, per_page });
 
       return res.json({
         status: "success",
@@ -405,7 +407,7 @@ const invoiceController = {
         buyCarTop: BCTopDb,
         MTTopDb,
         accessoriesTop: ATopDb,
-        carDb: carDb.data
+        carDb: rsCar
       })
     } catch (error) {
       return res.json({

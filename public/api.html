@@ -842,7 +842,7 @@ nhất thiết phải truyền vô hết các thuộc tính trong newWarranty.} 
         Và cũng có top các phụ kiện được sử dụng nhiều nhất. Danh sách trả về trong ouput ngang cấp với buyCarTop là:
         "accessoriesTop": [{"name": {thông tin gói}, "quantitySold": số lượng.}]
     </div>
-    <div>Mới: có thêm dữ liệu toàn các xe cho tháng or quí đó (CarDb)</div>
+    <div>Mới: có thêm dữ liệu toàn các xe cho tháng or quí đó (CarDb). Có phân trang ?page=1&&per_page=2</div>
     <li>[POST] /invoice/statistics-admin</li>
     Thống kê doanh thu mua bán gói chức năng của hệ thống mình. yêu cầu là admin của hệ thống. Yêu cầu truyền vô: {"fromDate": "2024-04-21"}.
     Dữ liệu trả về: {status,  "purchaseDb": {purchases: [{}, {}, danh sách các giao dịch mua gói chức năng.], total: tổng tiền của tất cả giao dịch.}.}
