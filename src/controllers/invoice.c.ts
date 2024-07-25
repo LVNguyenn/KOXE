@@ -237,7 +237,7 @@ const invoiceController = {
 
       // get data for each months
       // get data for maintenance
-      let rsMonthsDataMT = invoiceController.groupByMonth(MTinvoiceDb.invoiceDb, "create_at");
+      let rsMonthsDataMT = invoiceController.groupByMonth(MTinvoiceDb.invoiceDb, "create_at", fromDate.slice(0,4));
       // data for quater
       // pagination
       for (let dataMonth in rsMonthsDataMT) {
@@ -245,22 +245,22 @@ const invoiceController = {
       }
 
       // get data for maintenance
-      let rsMonthsDataBC = invoiceController.groupByMonth(MTinvoiceDb.invoiceDb, "create_at");
+      let rsMonthsDataBC = invoiceController.groupByMonth(MTinvoiceDb.invoiceDb, "create_at", fromDate.slice(0,4));
       // pagination
       for (let dataMonth in rsMonthsDataMT) {
         rsMonthsDataBC[dataMonth] = await pagination({ data: rsMonthsDataBC[dataMonth], page, per_page });
       }
       // get data for maintenance
-      let rsMonthsDataBA = invoiceController.groupByMonth(MTinvoiceDb.invoiceDb, "create_at");
+      let rsMonthsDataBA = invoiceController.groupByMonth(MTinvoiceDb.invoiceDb, "create_at", fromDate.slice(0,4));
       // pagination
       for (let dataMonth in rsMonthsDataMT) {
         rsMonthsDataBA[dataMonth] = await pagination({ data: rsMonthsDataBA[dataMonth], page, per_page });
       }
 
       // for quater
-      let rsQuaterDataMT = invoiceController.groupByQuarter(MTinvoiceDb.invoiceDb, "create_at");
-      let rsQuaterDataBC = invoiceController.groupByQuarter(MTinvoiceDb.invoiceDb, "create_at");
-      let rsQuaterDataBA = invoiceController.groupByQuarter(MTinvoiceDb.invoiceDb, "create_at");
+      let rsQuaterDataMT = invoiceController.groupByQuarter(MTinvoiceDb.invoiceDb, "create_at", fromDate.slice(0,4));
+      let rsQuaterDataBC = invoiceController.groupByQuarter(MTinvoiceDb.invoiceDb, "create_at", fromDate.slice(0,4));
+      let rsQuaterDataBA = invoiceController.groupByQuarter(MTinvoiceDb.invoiceDb, "create_at", fromDate.slice(0,4));
 
       for (let dataMonth in rsQuaterDataMT) {
         rsQuaterDataMT[dataMonth] = await pagination({ data: rsQuaterDataMT[dataMonth], page, per_page });
@@ -343,10 +343,10 @@ const invoiceController = {
       // arrage rs
       topFeature.sort((a: any, b: any) => b.count - a.count);
       // get data for months
-      let rsMonthsData = invoiceController.groupByMonth(purchaseDb.purchases, "purchaseDate");
+      let rsMonthsData = invoiceController.groupByMonth(purchaseDb.purchases, "purchaseDate", fromDate.slice(0,4));
       // data for quater
       let rsQuaterData: any;
-      rsQuaterData = invoiceController.groupByQuarter(purchaseDb.purchases, "purchaseDate")
+      rsQuaterData = invoiceController.groupByQuarter(purchaseDb.purchases, "purchaseDate", fromDate.slice(0,4))
       // pagination
       for (let dataMonth in rsMonthsData) {
         rsMonthsData[dataMonth] = await pagination({ data: rsMonthsData[dataMonth], page, per_page });
@@ -537,27 +537,33 @@ const invoiceController = {
     }
   },
 
-  groupByMonth: (data: any, by: string) => {
+  groupByMonth : (data: any, by: string, year: string) => {
     return data.reduce((acc: any, item: any) => {
       const date = new Date(item[by]);
+      const itemYear: any = date.getFullYear();
+      
+      if (itemYear != year) return acc; // Bỏ qua nếu không phải năm mong muốn
+  
       const month = date.getMonth() + 1; // Tháng từ 0-11, cần +1 để đúng tháng
-      const year = date.getFullYear();
-      const key = `${year}-${month.toString().padStart(2, '0')}`;
-
+      const key = `${itemYear}-${month.toString().padStart(2, '0')}`;
+  
       if (!acc[key]) {
         acc[key] = [];
       }
-
+  
       acc[key].push(item);
       return acc;
     }, {});
   },
 
-  groupByQuarter : (data: any, by: any) => {
+  groupByQuarter : (data: any, by: string, year: string) => {
     return data.reduce((acc: any, item: any) => {
       const date = new Date(item[by]);
+      const itemYear: any = date.getFullYear();
+      
+      if (itemYear != year) return acc; // Bỏ qua nếu không phải năm mong muốn
+  
       const month = date.getMonth() + 1;
-      const year = date.getFullYear();
       let quarter;
   
       if (month <= 3) {
@@ -570,7 +576,7 @@ const invoiceController = {
         quarter = 'q4';
       }
   
-      const key = `${year}-${quarter}`;
+      const key = `${itemYear}-${quarter}`;
   
       if (!acc[key]) {
         acc[key] = [];
