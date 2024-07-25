@@ -137,6 +137,43 @@ const CarRepository = {
     }
   },
 
+  async getAllCar2(data: any) {
+    try {
+      const carRepository = getRepository(Car);
+      let rs = "";
+      let carDb: any = await carRepository
+        .createQueryBuilder("car")
+        .leftJoinAndSelect("car.warranties", "warranty")
+        .innerJoinAndSelect(
+          "car.salon",
+          "salon",
+          data?.salonId ? "salon.salon_id =:salonId" : "",
+          { ...data }
+        )
+        .leftJoinAndSelect("warranty.maintenance", "maintenance")
+        .addOrderBy("car.date_out", "DESC");
+
+      if (data?.id) {
+        carDb = await carDb.where({ car_id: data?.id });
+      }
+      if (data.available !== undefined && data.available !== "undefined") {
+        carDb = await carDb.where({ available: data?.available });
+      }
+      if (data.fromDate !== undefined && data.fromDate !== "undefined" && data.toDate !== undefined && data.toDate !== "undefined" ) {
+        // carDb = await carDb.where({ date_out: MoreThan(data.fromDate) && LessThan(data.toDate) });
+        carDb = await carDb.where('car.date_out >= :fromDate', { fromDate: data.fromDate })
+        .andWhere('car.date_out <= :toDate', { toDate: data.toDate });
+      }
+      rs = await carDb.getMany();
+
+      //console.log(rs)
+
+      return FormatData("success", "find successfully!", rs);
+    } catch (error) {
+      console.log(error);
+      return FormatData("failed", "Can not find the salon.");
+    }
+  },
 
 };
 

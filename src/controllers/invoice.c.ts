@@ -390,7 +390,7 @@ const invoiceController = {
     try {
       const BCTopDb = await getTopSeller({ salonId, type: "buy car", fromDate, toDate });
       let totalBuyCar = 0;
-      let carDb = await CarRepository.getAllCar({salonId, fromDate, toDate});
+      let carDb = await CarRepository.getAllCar2({salonId, fromDate, toDate});
 
 
       for (const bc of BCTopDb) {
